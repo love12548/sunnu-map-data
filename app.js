@@ -69,15 +69,20 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     return true;
   }
   function status(text, retry) { $('smv3-load-message').textContent = text; $('smv3-retry').hidden = !retry; }
-  function applyContent(c) {
-    if (!c || typeof c !== 'object') c = {};
+  let lastContent = null, tickerDefault = null;
+  if (/[?&]debug/.test(location.search)) window.__ac = c => applyContent(c);
+  function applyContent(c0) {
+    lastContent = c0; let c = c0 && typeof c0 === 'object' ? c0 : {}, isG = false; try { isG = !!game; } catch (e) {}
+    /* 遊戲模式：c.game 有填的欄位優先；字級完全獨立（沒填 = 遊戲預設） */
+    if (isG && c.game && typeof c.game === 'object') { const g = c.game, m = Object.assign({}, c); Object.keys(g).forEach(k => { if (k === 'sizes' || k === 'hide') return; const v = g[k]; if (typeof v === 'string' ? v.trim() !== '' : v !== undefined && v !== null) m[k] = v; }); if (Array.isArray(g.hide) && g.hide.length) m.hide = g.hide; m.sizes = g.sizes && typeof g.sizes === 'object' ? g.sizes : {}; c = m; }
+    else if (isG) c = Object.assign({}, c, { sizes: {} });
     { /* 後台自訂字級：sizes = { h1: [手機, 平板, 電腦], ... }，空白或 0 = 用預設 */
       const SZ = { eyebrow: '.smv3-eyebrow', h1: '.smv3-hero h1', line: '.smv3-hero-line', desc: '.smv3-hero-desc', h2: '.smv3-story h2', p: '.smv3-story-copy p' }, MQ = ['(max-width:620px)', '(min-width:621px) and (max-width:950px)', '(min-width:951px)'];
       let css = ''; const sz = c.sizes && typeof c.sizes === 'object' ? c.sizes : {};
-      Object.keys(SZ).forEach(k => { const arr = Array.isArray(sz[k]) ? sz[k] : []; MQ.forEach((mq, i) => { const v = Math.round(+arr[i]); if (v >= 10 && v <= 200) css += '@media ' + mq + '{#sunnu-map-app-v3:not(.smv3-game) ' + SZ[k] + '{font-size:' + v + 'px!important}}'; }); });
+      Object.keys(SZ).forEach(k => { const arr = Array.isArray(sz[k]) ? sz[k] : []; MQ.forEach((mq, i) => { const v = Math.round(+arr[i]); if (v >= 10 && v <= 200) css += '@media ' + mq + '{#sunnu-map-app-v3' + (isG ? '.smv3-game ' : ':not(.smv3-game) ') + SZ[k] + '{font-size:' + v + 'px!important}}'; }); });
       let st = document.getElementById('smv3-size-style'); if (!st) { st = document.createElement('style'); st.id = 'smv3-size-style'; document.head.appendChild(st); } st.textContent = css;
     }
-    root.querySelectorAll('[data-k]').forEach(el => { el.style.display = ''; const v = c[el.dataset.k]; if (typeof v === 'string' && v) el.textContent = v; });
+    root.querySelectorAll('[data-k]').forEach(el => { el.style.display = ''; if (el.dataset.d0 === undefined) el.dataset.d0 = el.textContent; const v = c[el.dataset.k]; el.textContent = typeof v === 'string' && v ? v : el.dataset.d0; });
     ctaLinks = (Array.isArray(c.ctaLinks) ? c.ctaLinks : []).map(safeUrl).filter(Boolean);
     const cta = root.querySelector('.smv3-cta');
     cta.textContent = typeof c.cta === 'string' && c.cta.trim() ? c.cta : '開始亂晃 ↓';
@@ -86,6 +91,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     buttonLabels.hide = Array.isArray(c.hide) ? c.hide : [];
     const shop = safeUrl(c.shopUrl);
     root.querySelector('.smv3-shop-link').href = shop || 'https://www.sunnu.co/categories/%E5%86%B7%E9%96%80%E7%B3%BB%E5%88%97';
+    if (tickerDefault === null) tickerDefault = $('smv3-ticker-in').innerHTML; else if (!(typeof c.ticker === 'string' && c.ticker.trim())) $('smv3-ticker-in').innerHTML = tickerDefault;
     if (typeof c.ticker === 'string' && c.ticker.trim()) {
       const words = c.ticker.split('\n').map(x => x.trim()).filter(Boolean);
       const box = $('smv3-ticker-in'); box.textContent = '';
@@ -3571,6 +3577,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   function setGame(on, quiet) {
     game = on; store('sunnuGame', on ? '1' : '0'); root.querySelector('.smv3-side').removeAttribute('style'); if (!on && mapFull) mapFullToggle(false);
     root.classList.toggle('smv3-game', on);
+    if (lastContent) applyContent(lastContent);
     $('smv3-game').setAttribute('aria-pressed', on); $('smv3-game').textContent = on ? '遊戲模式：開' : '遊戲模式';
     $('smv3-gamebar').hidden = !on;
     clearInterval(typeTimer); travelToken++; stopCam(); encClear(); arenaClose();
