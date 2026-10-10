@@ -45,7 +45,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       seen.add(p.id); return true;
     }).map(p => {
       const videos = (Array.isArray(p.videos) ? p.videos : []).filter(v => v && /^[A-Za-z0-9_-]{11}$/.test(v.youtubeId))
-        .map(v => ({ youtubeId: v.youtubeId, title: String(v.title || ''), timecode: String(v.timecode || '') }));
+        .map(v => ({ youtubeId: v.youtubeId, title: String(v.title || ''), timecode: String(v.timecode || ''), date: String(v.date || '').slice(0, 10) }));
       return Object.assign({}, p, { videos, region: String(p.region || ''), category: String(p.category || ''),
         description: String(p.description || ''), mapsQuery: p.mapsUrl || '', status: String(p.condition || 'normal'),
         tags: Array.isArray(p.tags) ? p.tags.map(String) : [] });
@@ -486,6 +486,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     defId = null; defKind = '';
     if (!filtered.length) return null;
     if (state.area || state.region || state.category || state.q || state.video) return filtered[0].id;
+    let nd = '', nh = null; filtered.forEach(p => vids(p).forEach(v => { if (/^\d{4}-/.test(v.date) && v.date > nd) { nd = v.date; nh = p; } })); if (nh) { defId = nh.id; defKind = 'latest'; return nh.id; }
     for (const c of covers) { const hit = filtered.find(p => vids(p).some(v => v.youtubeId === c.id)); if (hit) { defId = hit.id; defKind = 'latest'; return hit.id; } }
     const d = new Date(), seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(), hit = filtered[(seed * 2654435761 >>> 0) % filtered.length];
     defId = hit.id; defKind = 'daily'; return hit.id;
@@ -3265,7 +3266,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       };
       const drawPuck = (o, isC) => { if (o.fall > .9) return; const k = o.fall ? 1 - o.fall / .9 : 1, drop = isC && C.drop > 0 ? C.drop : 0, sz = (isC ? 30 : P.big > 0 ? 34 : 22) * k, sq = o.sq > 0 ? o.sq : 0, y = o.y - drop * 120;
         if (!o.fall) { g.globalAlpha = .35; circ(o.x, o.y + o.r * .5, o.r * (1 - drop * .6), '#0b2a33'); g.globalAlpha = 1; }
-        if (!o.fall) { circ(o.x, y, o.r + 1, '#3b2a1e'); circ(o.x, y, o.r, isC ? (o.heavy > 0 ? '#8a8aa0' : '#e8a040') : o.sup > 0 ? ['#ff6a8a', '#f0c24a', '#59d68a', '#5aa0e0'][Math.floor(S.t * 12) % 4] : '#ff9ac0'); circ(o.x - o.r * .3, y - o.r * .35, o.r * .3, 'rgba(255,255,255,.5)'); }
+        if (!o.fall) { circ(o.x, y, o.r + 1, '#3b2a1e'); circ(o.x, y, o.r, isC ? (o.heavy > 0 ? '#8a8aa0' : '#5fd3c4') : o.sup > 0 ? ['#ff6a8a', '#f0c24a', '#59d68a', '#5aa0e0'][Math.floor(S.t * 12) % 4] : '#ff9ac0'); circ(o.x - o.r * .3, y - o.r * .35, o.r * .3, 'rgba(255,255,255,.5)'); }
         if (o.inv > 0 && Math.floor(S.t * 16) % 2) return;
         const w = sz * (1 + sq * .6), h = sz * (1 - sq * .5); K.draw(o.key, o.x - w / 2, y - h * .62 - (o.fall ? o.fall * 10 : 0), w, h);
         if (isC && C.heavy > 0) { g.globalAlpha = .5; ring(o.x, y, o.r + 3 + Math.sin(S.t * 12), '#fff', 1); g.globalAlpha = 1; }
@@ -3336,7 +3337,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       const heal = (n, why) => { if (S.life >= 5) return; S.life = Math.min(5, S.life + n); setLife(); GS.coin(5); K.pop(why + ' ❤️+' + n, HX - 34, TY - 34, '#ff8a9a', 15); K.burst(HX, PB - 16, ['#ff8a9a', '#fff'], 10, 60, { up: 1 }); };
       const breakC = () => { S.combo = 0; cCombo.style.display = 'none'; };
       const hurtMe = (why, side) => { if (S.tutN > 0 || S.tutHold > S.t) { K.pop('沒關係，再試一次', HX, TY - 26, '#ffdd6c', 14); GS.tone(300, 260, .12, { vol: .04 }); return; } breakC(); S.streak = 0; S.life--; setLife(); K.shake(10); S.flash = -.25; S.stop = .07; GS.smash(); S.knock = .5; S.knockS = side || (Math.random() < .5 ? 1 : -1); K.pop(why || '被打中了！', HX, TY - 26, '#ff6a6a'); K.burst(HX, TY, ['#fff', '#ff3b3b', '#ffdd6c'], 16, 120); if (S.life <= 0) { K.banner('被打倒了…', '', '#5aa0e0', 1.3); GS.bossLose(); finish(false); } };
-      const fine = matchMedia('(pointer:fine)').matches; const setBtns = r => { bD.style.display = r === 2 ? 'flex' : 'none'; bD.innerHTML = fine ? '⬇ 蹲<small style="font-size:11px">S／↓</small>' : '⬇ 蹲'; bW.style.width = bU.style.width = r === 2 ? 'calc(33.3% - 10px)' : 'calc(50% - 12px)'; bW.innerHTML = r === 2 ? '⬅ 閃' + (fine ? '<small style="font-size:11px">A／←</small>' : '') : '汪' + (fine ? '<small style="font-size:11px">A／F</small>' : ''); bU.innerHTML = r === 2 ? '閃 ➡' + (fine ? '<small style="font-size:11px">D／→</small>' : '') : '嗚' + (fine ? '<small style="font-size:11px">D／J</small>' : ''); bW.style.background = r === 2 ? '#f0c24a' : '#ff6a5a'; bU.style.background = r === 2 ? '#f0c24a' : '#5aa0ff'; };
+      const fine = matchMedia('(pointer:fine)').matches; const setBtns = r => { bD.style.display = r === 2 ? 'flex' : 'none'; bD.innerHTML = '⬇ 蹲'; bW.style.width = bU.style.width = r === 2 ? 'calc(33.3% - 10px)' : 'calc(50% - 12px)'; bW.innerHTML = r === 2 ? '⬅ 閃' : '汪'; bU.innerHTML = r === 2 ? '閃 ➡' : '嗚'; bW.style.background = r === 2 ? '#f0c24a' : '#ff6a5a'; bU.style.background = r === 2 ? '#f0c24a' : '#5aa0ff'; };
       const finMiss = why => { S.st = 'play'; S.hp = 12; B.dmg(1 - S.hp / HPMAX); S.gap = 1.2; hurtMe(why, 1); bark(.6, .18, 1, 'a'); K.banner('夾褲還沒倒！', '再打到沒血一次', '#e8564a', 1.1); };
       const goDown = () => { S.st = 'down'; S.downs++; S.cnt = 0; S.cntT = 0; S.gu = 0; S.waves = []; S.drums = []; S.strikes = []; S.counter = 0; S.tired = 0; setStars(); GS.ko(); K.shake(12); K.banner('DOWN！', '狂點！別讓牠爬起來！', '#f0c24a', 1.2); };
       const dmgCEO = n => { if (S.st !== 'play') return; S.hp = Math.max(0, S.hp - n); B.dmg(1 - S.hp / HPMAX); S.hurt = .35; K.shake(5); GS.bossHit(); K.burst(HX, HY + 10, ['#fff', '#ffdd6c', '#ff8a7a'], 12, 100); K.pop('-' + Math.round(n), HX + R(-22, 22), HY - 8, '#ffdd6c', 15);
@@ -3365,7 +3366,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
         if (S.round === 0) { const w = S.waves.filter(v => !v.done && Math.abs(t - v.arr) < .24).sort((a, b) => Math.abs(t - a.arr) - Math.abs(t - b.arr))[0];
           if (!w) { breakC(); K.pop('空汪…', HX, TY - 24, '#ccc', 13); return; }
           if (w.k === 'f') { w.done = true; breakC(); S.hp = Math.min(HPMAX, S.hp + 4); B.dmg(1 - S.hp / HPMAX); K.pop('上當了！', HX, TY - 26, '#c0c0d0'); bark(.7, .14, 1, 'a'); S.mouth = .3; return; }
-          if (w.k === 'b') { w[kind] = t; if (w.w && w.u && Math.abs(w.w - w.u) < .18) reflect(w, Math.abs(t - w.arr) < .1); return; }
+          if (w.k === 'b') { const oth = kind === 'w' ? 'u' : 'w'; if (!w[oth] && w[kind] && t - w[kind] < .18) w[oth] = t; w[kind] = t; if (w.w && w.u && Math.abs(w.w - w.u) < .18) reflect(w, Math.abs(t - w.arr) < .1); return; }
           if (w.k !== kind) { w.done = true; hurtMe('按錯了！'); return; }
           reflect(w, Math.abs(t - w.arr) < .1); return; }
         if (S.round === 1) { const n = S.drums.filter(v => !v.res && Math.abs(t - v.at) < .14).sort((a, b) => Math.abs(t - a.at) - Math.abs(t - b.at))[0]; if (!n) return; if (n.k !== kind) { n.res = 'x'; S.miss++; breakC(); K.pop('打錯', 26, LH * .44, '#ff8a8a', 13); if (S.miss % 4 === 0) hurtMe('打錯太多了！'); return; } n.res = 'o'; const per = Math.abs(t - n.at) < .06; good(30, LH * .42, per ? '良！' : '可', per ? '#ffdd6c' : '#fff'); K.burst(DX, DY, [COL[n.k][0], '#fff'], per ? 10 : 6, 70); dmgCEO(per ? 2 : 1.5); S.hit = .12; return; }
@@ -3388,7 +3389,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
         c.play.addEventListener('pointerdown', onDown); c.play.addEventListener('pointerup', onUp); c.play.addEventListener('pointercancel', () => { sid = null; }); }
       c.on(bStar, 'pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (S.stars <= 0 || S.st !== 'play' || S.round !== 2) return; const n = S.stars; S.stars = 0; setStars(); S.starT = .9; S.strikes.forEach(s => { if (!s.done) { s.res = 'cancel'; s.done = 1; } }); S.gap = 1.2; GS.power(); K.banner('⭐ 星星拳！', '', '#ffdd6c', .9);
         setTimeout(() => { if (S.over) return; S.stop = .15; S.flash = .25; K.shake(16); GS.ko(); S.squish = .5; good(HX, HY - 24, n >= 3 ? '超級星星拳！！' : '星星拳！', '#ffdd6c'); dmgCEO(5 * n + (n >= 3 ? 4 : 0)); K.burst(HX, HY + 6, ['#ffdd6c', '#fff', '#ff8ac0', '#8ad0ff'], 40, 170); }, 450); });
-      const kd = e => { if (e.repeat) return; const k = e.key.toLowerCase(); if (['a', 'f', 'arrowleft', 'z'].includes(k)) press('w'); else if (['d', 'j', 'l', 'arrowright', 'x'].includes(k)) press('u'); else if ((k === 's' || k === 'arrowdown') && S.round === 2) { e.preventDefault(); duckNow(); } }; document.addEventListener('keydown', kd);
+      const kd = e => { if (e.repeat) return; const k = e.key.toLowerCase(); if (k === ' ' && S.round === 0 && S.st === 'play') { e.preventDefault(); press('w'); press('u'); } else if (['a', 'f', 'arrowleft', 'z'].includes(k)) press('w'); else if (['d', 'j', 'l', 'arrowright', 'x'].includes(k)) press('u'); else if ((k === 's' || k === 'arrowdown') && S.round === 2) { e.preventDefault(); duckNow(); } }; document.addEventListener('keydown', kd);
       /* ---- 出招排程 ---- */
       const PAT = [[[0, 'w']], [[0, 'u']], [[0, 'w'], [2, 'w']], [[0, 'u'], [2, 'b']], [[0, 'w'], [1, 'u']], [[0, 'b']], [[0, 'u'], [2, 'f']], [[0, 'w'], [.5, 'w']]];
       const schedule = bar => { const b0 = T0 + bar * 4 * bt;
@@ -3491,7 +3492,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
           if (S.downs === 1 && S.cnt >= 6) S.gu = 1;
           if (S.gu >= 1 && S.st === 'down') { S.st = 'play'; S.rage2 = 1; S.hp = 25; heal(2, '中場休息'); B.dmg(1 - S.hp / HPMAX); S.round = 2; S.gap = 1; setBtns(2); K.banner('夾褲爬起來了！', '牠暴怒了！再打倒一次！', '#e8564a', 1.4); GS.siren(); bark(.65, .18, 1, 'a'); } }
         if (S.st === 'ko' && !S.over) { S.koT += dt; if (S.koT > .5 && !S.koB) { S.koB = 1; K.banner('K.O.！！', '孫女獲勝！', '#f0c24a', 2.2); K.confetti(120); GS.win(); } if (S.koT > 2.8) finish(true); }
-        K.hint(S.st === 'down' ? '狂點！不讓牠爬起來！' : S.st === 'play' && S.round === 2 && S.tutN > 0 && !S.counter && !S.tired ? ([S.strikes.find(s => s.tut)].map(s => !s ? '看牠哪隻拳套往後拉 → 往另一邊閃' : s.k === 'U' ? '夾褲蹲下＝上勾拳 → 按「⬇ 蹲」（S／↓／下滑）' : s.k === 'L' ? '牠的「左拳」往後拉了 → 往右閃（D／→／右滑）' : '牠的「右拳」往後拉了 → 往左閃（A／←／左滑）')[0]) : S.st === 'play' && (S.counter > 0 || S.tired > 0) ? '點一下就打一拳！狂點！' : S.st === 'play' && S.t - S.rt0 < 9 ? ['聲波到頭上圈圈時：紅＝按「汪」　藍＝按「嗚」　紫＝兩個一起', '音符滑到左邊圓圈時：紅＝「汪」　藍＝「嗚」', '拳頭快打到才閃＝PERFECT；閃過後狂點連打'][S.round] : '', 55);
+        K.hint(S.st === 'down' ? '狂點！不讓牠爬起來！' : S.st === 'play' && S.round === 2 && S.tutN > 0 && !S.counter && !S.tired ? ([S.strikes.find(s => s.tut)].map(s => !s ? '看牠哪隻拳套往後拉 → 往另一邊閃' : s.k === 'U' ? '夾褲蹲下＝上勾拳 → 按「⬇ 蹲」（S／↓／下滑）' : s.k === 'L' ? '牠的「左拳」往後拉了 → 往右閃（D／→／右滑）' : '牠的「右拳」往後拉了 → 往左閃（A／←／左滑）')[0]) : S.st === 'play' && (S.counter > 0 || S.tired > 0) ? '點一下就打一拳！狂點！' : S.st === 'play' && S.t - S.rt0 < 5 ? ['聲波到頭上圈圈時：紅＝按「汪」　藍＝按「嗚」　紫＝兩個一起', '音符滑到左邊圓圈時：紅＝「汪」　藍＝「嗚」', '拳頭快打到才閃＝PERFECT；閃過後狂點連打'][S.round] : '', S.round < 2 ? 12 : 55);
         c.bar(S.st === 'down' ? 1 - S.gu : S.hp / HPMAX, S.st === 'down' ? '數到 10 就 K.O.' : 'ROUND ' + (S.round + 1) + '・' + RN[S.round], S.st === 'down' ? S.cnt + '/10' : Math.round(S.hp) + '%');
         K.cam(dt); S.camX = (S.camX || 0) + ((S.dodgeX ? -S.dodgeX * 8 : 0) - (S.camX || 0)) * .2; g.translate(Math.round(S.camX), 0);
         drawStage(); if (S.st === 'ko') drawKO(); else drawCEO(); if (S.round === 0) drawWaves(); drawDrums(); drawStrikes(); drawPlayer(); drawDown(); if (S.st === 'final') { const k = Math.min(1.2, S.finT / 1.3), r = Math.max(4, 40 * (1 - k) + 8), cx = HX, cy = HY + 4; g.strokeStyle = '#ffdd6c'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, 10, 0, 7); g.stroke(); g.strokeStyle = k > .8 && k <= 1.02 ? '#59d68a' : '#fff'; g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); }
