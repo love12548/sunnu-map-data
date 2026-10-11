@@ -40,6 +40,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rend
 .stamps span{white-space:nowrap;border:2px solid var(--ink);padding:4px 2px;font-size:12px;background:#fffdf3}
 .stamps span.got{background:var(--gold);font-weight:900}
 .choice{display:block;width:100%;margin:6px 0;text-align:left}
+@media(max-height:560px){.card>div{width:90%;padding:8px 10px;max-height:96%}.card b{font-size:16px;margin-bottom:3px}.card p{font-size:12px;margin:2px 0 4px;line-height:1.35}.choice{margin:4px 0;padding:5px 8px;font-size:12px}}
 button{border:3px solid var(--ink);background:var(--gold);color:var(--ink);padding:10px 16px;box-shadow:0 4px 0 var(--ink);cursor:pointer;font:15px Cubic11,"Noto Sans TC",system-ui,sans-serif;border-radius:0}
 button:active{transform:translateY(3px);box-shadow:none}
 .fps{position:absolute;right:8px;top:4px;font:11px monospace;color:#fff6dc;background:rgba(0,0,0,.45);padding:2px 4px}
@@ -73,9 +74,17 @@ button:active{transform:translateY(3px);box-shadow:none}
   <p class="help">電腦：方向鍵移動，X 鍵超載（熱血槽滿時），拿到光束炮會持續射擊，消耗熱血槽，空白鍵或 F 開始。</p>
 </div>
 <script>
-const EMB = /[?&]embed=1/.test(location.search);
-if (EMB) { const st = document.createElement('style'); st.textContent = 'h1,.help{display:none!important}body{background:#000}.wrap{padding:0;min-height:100dvh}.game{width:min(100%,calc(100dvh*2/3));border:0;box-shadow:none}'; document.head.appendChild(st); document.getElementById('cbody').innerHTML = '<p>手指拖曳移動，飛機自動射擊。<br>撿到武器道具會換成飛彈、雷電、光束炮或散彈。<br>擦過子彈加熱血槽，熱血滿了雙擊畫面超載。<br><b>打倒第一關的魔王就過關！</b></p>'; }
-function embedEnd(win) { try { parent.postMessage({ sunnuShooter: 1, win: !!win, score: S.score | 0, hits: S.lvHits | 0, grade: (S.grades && S.grades[S.grades.length - 1]) || '' }, '*'); } catch (e) {} }
+const EMB = /[?&]embed=1/.test(location.search), DF = ((location.search.match(/[?&]diff=(easy|normal|hard)/) || [])[1]) || 'normal';
+/* 三種難度（只在嵌入地圖時生效）。每個數值依關卡 [第1關,第2關,第3關]；start＝開局配置 */
+const Z = {
+  easy:   { hpEn: [.45, .6, .8], fire: [2.3, 1.8, 1.4], bul: [.55, .7, .85], spawn: [1.4, 1.25, 1.1], pick: [8, 11, 14], bossHp: [.4, .6, .8], regenK: [10, 15, 20], cap: [2, 1.7, 1.4], hitW: [3, 4, 5], hitH: [4, 5, 6], start: { lives: 7, dmg: 2, shot: 2, rate: 2, pierce: 1, inv: 1.5, shield: 1, heat: 70, regen: true, aegis: 10 } },
+  normal: { hpEn: [.5, .7, .9], fire: [2, 1.5, 1.15], bul: [.65, .8, .95], spawn: [1.3, 1.1, 1], pick: [10, 14, 18], bossHp: [.5, .7, .9], regenK: [15, 20, 30], cap: [1.8, 1.4, 1.1], hitW: [3, 5, 7], hitH: [4, 6, 8], start: { lives: 5, dmg: 1, shot: 1, rate: 1, pierce: 0, inv: 1, shield: 1, heat: 50, regen: true, aegis: 14 } },
+  hard:   { hpEn: [.55, .9, 1.1], fire: [1.6, 1.2, 1], bul: [.7, .95, 1.1], spawn: [1.15, 1, .9], pick: [11, 14, 18], bossHp: [.5, .9, 1.1], regenK: [25, 30, 35], cap: [1.3, 1.05, .95], hitW: [3.5, 6, 8], hitH: [4.5, 7, 9], start: { lives: 4, dmg: 1, shot: 1, rate: 1, pierce: 0, inv: 1, shield: 1, heat: 35, regen: true, aegis: 18 } }
+};
+const ez = k => EMB ? Z[DF][k][Math.min(2, (S && S.level) | 0)] : 1;
+let EMB_DONE = false;
+if (EMB) { const st = document.createElement('style'); st.textContent = 'h1,.help{display:none!important}body{background:#000}.wrap{padding:0;min-height:100dvh}.game{width:min(100%,calc(100dvh*2/3));border:0;box-shadow:none}'; document.head.appendChild(st); document.getElementById('cbody').innerHTML = '<p>手指拖曳移動，飛機自動射擊。<br>撿到武器道具會換成飛彈、雷電、光束炮或散彈。<br>擦過子彈加熱血槽，熱血滿了雙擊畫面超載。<br><b>闖過三關、打倒風獅爺就過關！</b></p>'; }
+function embedEnd(win) { EMB_DONE = true; try { music(''); document.getElementById('cbtn').style.display = 'none'; } catch (e) {} try { parent.postMessage({ sunnuShooter: 1, diff: DF, win: !!win, score: S.score | 0, hits: S.lvHits | 0, grade: (S.grades && S.grades[S.grades.length - 1]) || '' }, '*'); } catch (e) {} }
 const PAL = {"D": "#111111", "x": "#2b2018", "k": "#3b2a1e", "d": "#6e6e6e", "E": "#9a9a9a", "e": "#c9c9c9", "X": "#dde3ea", "W": "#efe6d8", "w": "#ffffff", "f": "#8e2c3a", "R": "#c0453c", "F": "#b5533c", "r": "#ec6a5c", "L": "#ff9a7a", "i": "#ff5fa2", "P": "#e8879f", "p": "#f9b5c4", "M": "#ffe0ea", "O": "#d07a32", "o": "#f4a24c", "J": "#c8962a", "Y": "#e6a93a", "y": "#ffd95a", "j": "#fff3a0", "C": "#fff6dc", "h": "#5b3b25", "B": "#82552f", "K": "#a8693f", "b": "#b07a48", "H": "#c9a27e", "N": "#d9ab78", "n": "#f1d3a8", "S": "#efb48e", "s": "#ffd9b8", "Z": "#1f4d2e", "Q": "#2a7550", "q": "#3f9a6b", "G": "#55a144", "g": "#86cf62", "z": "#9aa83e", "l": "#c3e79a", "m": "#b8ecd8", "T": "#2a8a80", "t": "#4fc3b5", "a": "#2c3e6b", "A": "#2f5fd0", "U": "#4a8cc8", "u": "#78bfe8", "c": "#bfe6f5", "V": "#7c62b3", "v": "#a98bd9", "I": "#d9c8f2"};
 const SPR = {"ic_umb": "......................................RRRR..........RwRRRRwR.......RRwRRRRwRR.....RRRwRRRRwRRR....RRRwRRRRwRRR....RRRwRRRRwRRR..........k...............k...............k...............k...............k..............kk.......................................", "ic_tea": "........................r...............r...............r...............r...........wwwwrwww........wwwwwwww.........nnnnnn..........bbbbbb..........bbbbbb..........bbbbbb..........nnnnnn..........nkkkkn..........nkkkkn.....................................", "bird": ".....................................rrrR...........rrrrrR.........wwwwxxxx......EdwxwwwxxxB.......wwpwwxxxxx.......wwwwxwxwx.......wwwxxwxwxx......wwwwxxwxxx.......wwwxwxxxxx......wwwwxxxxxx.......wwwxx..xx.......yy.y......................................", "bee": "....................x......x.........x....x..........yyyyyY........yyyyyyyyyY....wwyyxyyyyxyYww..wcyypyyyypyYcw..wcyyyyxxyyyYcw...wxxxxxxxxxxw.....yyyyyyyyyY......xxxxxxxxxx.......yyyyyyYY.........YYYYYY............xx.......................................", "veh_balloon": ".....................rryyrr........ywrryyrryY.....rywrryyrryYR....ryyrryyrryYR....ryyrryyrryYR....ryyrryyrryYR.....yyrryyrrYY........RRYYRR.........bhhhhhhb........bhxssxhb.......bbbbbbbbbb.......bBbBbBbB........BbBbBbBb.........BBBBBB.....................", "veh_ufo": "......................................cccc...........chhhhc.........chhhhhhc........chxssxhc........cpsssspc......eeeeeeeeeeee...ewweeeeeeeeeEE..eereeyeegeeuEE..EEEEEEEEEEEEEE...EddddddddddE.....y..y..y..y...................................................", "puffer": "......................................j.j............jjyjjj.........jyyyyyyj.......jyyxyyxyyj......jyyyyyyyyj......jyyyppyyyj......jjyyyyyyj.jj.....jjyyyyjjjjj......jjjjjj..j..................................................................................", "rocket": ".......................rR.............rrrR...........rrrrRR..........wwwwwW..........wcuuwW..........wuuUwW..........wwwwwW.........rwxwwxWR.......rrwpwwpWRR......rrwwwwwWRR......rR.EEEE.RR.........oyyo.............yo..............o........................", "sparkle": "..................y....yy........yyy...yy.........y....yy.............yyyy............ywyY...........yywwyY......yyyyywwwwyyyyY..yyyyywwwwyYYYY......yywwYY...........yyYY............yYYY...y.........yY...yyy........yY....y.........YY.......................", "ic_starO": ".......................EE..............................EE.........................EEEEEEEEEEEE......................................EEEEEEEE.......................................EEEEEEEEEE...................................................................", "ic_bolt": "........................yyyy............yjyy...........yyjy............yyjy..........yyyyyy..........yyyyyy............yyyyy...........yyyyy..........yyyy............yyyy...........yyy.............yyy............y...........................................", "ic_shield": "...................................UUUUUUUUUU......UUUUccUUUU......UUUUccUUUU......UccccccccU......UccccccccU......UUUUccUUUU......UUUUccUUUU.......UUUccUUU........UUUccUUU..........UUUU............UUUU......................................................", "ic_boom": "........................yy..............yy.........yy...yy...yy....yyy.ooo..yyy.....yoooooooyy.......ooRRRooy.......ooRRRRRoo....yyyooRRRRRooyyy.yyyooRRRRRooyyy.....ooRRRoo.........oooooooy.......yyyooo.yyy.....yyy..yy..yyy....yy...yy...yy.........yy......", "ic_love": ".......................................yyy...........yyyyyyy........yyyyyyyyy......yyyyyyyyyyy.....yykyyyykyyy....yykyyyyyykyyy...yyyyyyyyyyyyy...yiiyyyyyyiiyy....yyyyyyyyyyy.....yyRRRRRRyyy......yyyyyyyyy........yyyyyyy...........yyy......................", "ic_flash": "....................................dddddddd........dyyyyyyd.....jj.dyyyyyyd.jj.....dddddddd.........EEEEEE..........EEEEEE..........EEEEEE...........kkkk............kkkk............kkkk............kkkk............kkkk......................................", "ic_wind": "..........................................................uuu.....cccccccc..u.....cccccccc..u...............u.......................cccccccccc......cccccccccc...........................uuu......ccccccc.........ccccccc.......................................", "ic_fire": "........................o...............Ro.............ooo.............Roo............ooooo..........oooooo..........oooooo.........RRoooooo........RRoyyyoo........RRyyyyyo.........Ryyyyo...........oyyo.............oo.......................................", "ic_swirl": ".......................................UwU...........UU...UU........U..ccc..U......U.cc...cc.U.....U.c.UUU.c.U....U.c.UU.UU.c.U...U.c.U...U.c.U...U.c.UU.UU.c.U....U.c.UUU.c.U.....U.cc...cc.U......U..ccc..U........UU...UU...........UUU......................", "farm": "......................l..G.........gg.lGlG.o......gllglGGgoO.....gllggGgrroo.....gglgggrrRoO.....ggggGrwrrRo......gGGGrrrRR......nnNNNNNNNNNNNN..bnbnbnbnbnbnbB..bbbbbbbbbbbbBB..bBbBbBbBbBbBBB...bbbbbbbbbbBB....bBbBbBbBbBBB.....BBBBBBBBBB...................", "steamtrain": "..................wwW............wwwwwW...........xxxxW...rrrrR....dd..yY..rccR...EEEEEEEEErccR..ydddddddddrccR..ddddddddddrrrR...dddddddddrrrR..rrrrrrrrrrrrrR...rR...rR...rR...reeRdreeRdreeR..reeR.reeR.reeR...RR...RR...RR...eeeeeeeeeeeeeE.................", "enc_ghost": ".....................wwwwww.........wwwwwwww.......wwwwwwwwww......wwxwwwwxww......wwxwwwwxww......wwwwppwwww......wwwwxxwwww......wwwwwwwwww......wXwwwwwwXw......wXwwwwwwXw......XwwwXXwwwX......Xww.XX.wwX.......X........X..................................", "boat": ".......................rr..............rrr.............Brrr............B...........wwwwB...........wcwcwW..........wwwwwW........rrrrrrrrrrrrrr..uuuuuuuuuuuuUU...uwuuuuuuuuUU.....UUUUUUUUUU.....c..cc...c..c...cccc.ccccc.cc..................................", "enc_typhoon": "....................EEEE.EEE.......EeeeeEeeeE.....EeeexeeexeeE....EeeeeeeeeeeE....EeeeexxeeeeE.....EeeeeeeeeE.......EEEEEEEE......u..u..u..u.......u..u..u..u.....u..u..u..u.......u..u..u..u...................................................................", "enc_closed": "..................BBBBBBBBBBBB....BKKKKKKKKKKB....BKbbbbbbbbKB....BKbwwwwwwbKB....BKbwxwwxwbKB....BKbwwwwwwbKB....BKbwxxxxwbKB....BKbbbbbbbbKB....BKKKKKKKKKKB....BKKKKyKKKKKB....BKKKKKKKKKKB....BBBBBBBBBBBB..................................................", "boss_corgi_ko": ".....kk....kk.......kook..kook.....kooOokkoOook...kooooooooooook.koooooooooooookkooooooooooooooOkoooCCCCCCCCoooOkooCCCCCCCCCCooOkooCCCCooCCCCooOkooCCCCOOCCCCooO.kooCCCCCCCCooOk.kooooCCCCooooOk..kooookCCkooOOk...kOokkookkoOk.....kOkkOok.kOk......k..kk...k..", "turtle": "......................eeee...........exeexE..........epeepE......ee..dddddd..eE..eeedeeeeeeEdEE...deedddddEEEd....dedeeeeEdEEd....dedeeeEEdEEd....dEdEEEEEdEEd....dEEdddddEEEd...eedEEEEEEEEdEE..eE..dddddd..EE........eE.......................................", "soda": "......................rrrr............RRRR............wccu............cwcu...........ccwccu.........ccccccuu........cwcccccu........wwwwwwwW........wrrrrrrW........wwwwwwwW........cwcccccu........ccwccccu........cccccccu.........uuuuuu.....................", "herbtea": "..........................rw.............wr........eeeeeerweee....eccccccwrcccE....lqqqqqrwqqE.....lqcqqwrqqqE.....lqqqqrwqcqE.....lqqqqqqqqqE......lqqxqqxqE.......lqpqxqpqE.......lqqqqqqQE.......lqqqqqQQE........QQQQQQQ....................................", "mochi": "......................................wwww..........wwwnwwww.......wwnwwwwnwW.....wwwwwwwwwwwW....wnwwwwwwwnwW...wwwwxwwwwxwwWW..wwwpwwxxwwpwWW..wnwwwwwwwwwnWW..wwwwwwwwwwwWWW...WwwwwwwwwWWW.....WWWWWWWWWW.....gggggggggggG......GGGGGGGG...................."};
 const SHIP = "..kk........kk...koOkk....kkOok..kooookkkkooook.koopooowwooopookkoppoowwwwooppokkooukkkkkkkkuookkookuucwwcuukookkookuuuwwuuukookkoowkkkDDkkkwookkowwwwxppxwwwwok.kowwwwppwwwwok..koowwwwwwwwook.kRrrrrrrrrrrrrRk.kRrrwWwwWwrrRk...kkwwwkkkkwwwk.....kkk....kkk..";
@@ -89,7 +98,7 @@ const LEVELS = [
   { name: '第二關・海岸風', mini: ['puffer', 'ufo', 'scarecrow'], mid: ['pirate', 'vendor', 'train'], big: 'typhoon' },
   { name: '第三關・地獄火山', mini: ['ufo', 'puffer'], mid: ['vendor', 'train', 'pirate'], big: 'lion' },
 ];
-const LEVEL_LEN = 75;
+const LEVEL_LEN = EMB ? 50 : 75;
 // 魔王規格：pats＝會用的招式
 const BOSSES = {
   scarecrow: { name: '稻草人', k: 'b_scarecrow', size: 48, hp: 35, pats: ['fan', 'rain'], kind: 'mini' },
@@ -358,17 +367,17 @@ function mkItem(type) {
 function addEnemy(type, x, y, extra) {
   const d = ENEMY[type];
   const rare = S.t >= 12 && Math.random() < (S.mod === 'gold' ? .16 : .04) && !(extra && extra.noRare);
-  S.en.push(Object.assign({ type, x, y, rare, lf: S.level >= 1 && !d.fire ? 1 + Math.random() * 2 : 0, hp: Math.ceil(d.hp * [1.2, 2.2, 3.2][S.level] * pmul() * (EMB ? .45 : 1)) * (rare ? 3 : 1), t: Math.random() * 6, x0: x, fire: d.fire ? d.fire * (.6 + Math.random() * .6) / diff() * (EMB ? 2.2 : 1) : 0, sq: 0, flash: 0, ringi: undefined, sway: undefined, dead: false }, extra || {}));
+  S.en.push(Object.assign({ type, x, y, rare, lf: S.level >= 1 && !d.fire ? 1 + Math.random() * 2 : 0, hp: Math.ceil(d.hp * [1.2, 2.2, 3.2][S.level] * pmul() * ez('hpEn')) * (rare ? 3 : 1), t: Math.random() * 6, x0: x, fire: d.fire ? d.fire * (.6 + Math.random() * .6) / diff() * ez('fire') : 0, sq: 0, flash: 0, ringi: undefined, sway: undefined, dead: false }, extra || {}));
 }
 function aim(x, y, sp) { const dx = S.px - x, dy = S.py - y, l = Math.hypot(dx, dy) || 1; return { vx: dx / l * sp, vy: dy / l * sp }; }
-function ebullet(x, y, vx, vy, kind) { if (S.eb.length >= 70) S.eb.shift(); const bs = (S.mod === 'barrage' ? 1.25 : 1) * (EMB ? .6 : 1); vx *= bs; vy *= bs; S.eb.push({ x, y, vx, vy, kind: kind || 0, age: 0, bounced: false }); }
+function ebullet(x, y, vx, vy, kind) { if (S.eb.length >= 70) S.eb.shift(); const bs = (S.mod === 'barrage' ? 1.25 : 1) * ez('bul'); vx *= bs; vy *= bs; S.eb.push({ x, y, vx, vy, kind: kind || 0, age: 0, bounced: false }); }
 
 // ---------- 生成 ----------
 function spawn(dt) {
   const t = S.level * 20 + Math.min(19.9, S.lvT / 5), m = diff();
   S.spawnT -= dt;
   if (S.spawnT <= 0) {
-    S.spawnT = (t < 20 ? .8 : t < 40 ? .62 : .5) / m / (S.mod === 'horde' ? 1.5 : 1) * (EMB ? 1.4 : 1);
+    S.spawnT = (t < 20 ? .8 : t < 40 ? .62 : .5) / m / (S.mod === 'horde' ? 1.5 : 1) * ez('spawn');
     const x = 14 + Math.random() * (W - 28);
     const pool = t < 20 ? ['umb', 'umb', 'bird'] : t < 40 ? ['umb', 'bird', 'bee', 'tea', 'shell', 'soda'] : ['bird', 'bee', 'tea', 'rocket', 'shell', 'soda', 'herb', 'mochi'];
     const r = Math.random(), kind = pool[Math.floor(Math.random() * pool.length)];
@@ -387,10 +396,10 @@ function spawn(dt) {
   }
   if (t >= 20) { S.shooterT -= dt; if (S.shooterT <= 0) { S.shooterT = 2.6 / m; addEnemy(Math.random() < .5 ? 'ufo' : 'tea', 24 + Math.random() * (W - 48), -18); } }
   if (t >= 40) { S.swarmT -= dt; if (S.swarmT <= 0) { S.swarmT = 4.2 / m; addEnemy(Math.random() < .5 ? 'balloon' : 'puffer', 24 + Math.random() * (W - 48), -20); } }
-  S.pickT -= dt; if (S.pickT <= 0) { S.pickT = EMB ? 8 : 22; S.items.push(mkItem(['shield', 'heal', 'bomb'][Math.floor(Math.random() * 3)])); }
+  S.pickT -= dt; if (S.pickT <= 0) { S.pickT = EMB ? ez('pick') : 22; S.items.push(mkItem(['shield', 'heal', 'bomb'][Math.floor(Math.random() * 3)])); }
 }
 function spawnBossX(id) {
-  const B = BOSSES[id], hp = Math.round(B.hp * { mini: [1.5, 2.4, 3.1], mid: [2.0, 2.9, 3.6], big: [2.4, 3.1, 3.8] }[B.kind][S.level] * pmul() * (EMB ? .4 : 1));
+  const B = BOSSES[id], hp = Math.round(B.hp * { mini: [1.5, 2.4, 3.1], mid: [2.0, 2.9, 3.6], big: [2.4, 3.1, 3.8] }[B.kind][S.level] * pmul() * ez('bossHp'));
   S.noHit = true;
   S.mini = { capT: B.kind === 'mini' ? 12 : B.kind === 'mid' ? 18 : 25, id, B, name: B.name, kind: B.kind, x: W / 2, y: -B.size, hp, max: hp, t: 0, cool: 1.4, flash: 0, r: B.size * .42, phase: 0, act: null, actT: 0, charge: null };
   if (B.kind === 'big') { S.en.length = 0; S.eb.length = 0; S.flash = .4; sfx.boss(); }
@@ -400,7 +409,7 @@ function spawnBossX(id) {
 function spawnBoss() {
   S.noHit = true;
   const pm = pmul();
-  S.boss = { pm, intro: 3.8, capT: 15, life: 0, x: W / 2, y: -90, hp: Math.round(LION_HP[0] * pm), max: Math.round(LION_HP[0] * pm), t: 0, cool: 1.6, mode: -1, modeT: 0, phase: 0, flash: 0, dive: null };
+  S.boss = { pm, intro: 3.8, capT: 15, life: 0, x: W / 2, y: -90, hp: Math.round(LION_HP[0] * pm * ez('bossHp')), max: Math.round(LION_HP[0] * pm * ez('bossHp')), t: 0, cool: 1.6, mode: -1, modeT: 0, phase: 0, flash: 0, dive: null };
   S.en.length = 0; S.eb.length = 0; S.lt.on = 0; S.lt.warn = 0;
   S.shake = 14; S.flash = .6; sfx.boss(); sfx.thunder();
 }
@@ -410,7 +419,7 @@ function miniUpdate(dt) {
   const m = S.mini, B = m.B; m.t += dt; if (m.flash > 0) m.flash -= dt;
   const homeY = B.kind === 'big' ? 64 : 56;
   const ph = m.hp / m.max <= .33 ? 2 : m.hp / m.max <= .66 ? 1 : 0;
-  if (B.kind === 'big' && ph > m.phase) { m.phase = ph; S.flash = .4; S.shake = 12; S.stop = .1; sfx.boss(); banner(B.name + (ph === 1 ? ' 動怒了！' : ' 狂暴！'), 1.8); burst(m.x, m.y, '#ff8a7a', 16, true); }
+  if (B.kind === 'big' && ph > m.phase) { m.phase = ph; S.flash = .4; S.shake = 8; S.stop = .05; sfx.boss(); banner(B.name + (ph === 1 ? ' 動怒了！' : ' 狂暴！'), 1.8); burst(m.x, m.y, '#ff8a7a', 16, true); }
   const spd = 1 + (B.kind === 'big' ? ph * .3 : ph * .15);
   if (m.charge) {                                  // 衝撞：先預警，再朝玩家衝下去
     const c = m.charge;
@@ -472,7 +481,7 @@ function bossAttack(dt) {
   if (ph > b.phase) {
     b.phase = ph; b.cut = 2.4; b.cutMax = 2.4; S.eb.length = 0; S.gust = null; F.breath = null; F.gaze = null; F.bands = []; F.tors = []; F.blades = [];
     for (let i = 0; i < 4; i++) S.rings.push({ x: b.x, y: b.y, t: -i * .1 });
-    S.flash = .5; S.shake = 16; S.stop = .15; sfx.boss();
+    S.flash = .5; S.shake = 10; S.stop = .06; sfx.boss();
     banner('', .1);
     burst(b.x, b.y, '#ff8a7a', 18, true);
   }
@@ -614,10 +623,10 @@ function killEnemy(e, depth) {
   }
   explodePix(e.x, e.y, false);
   pop(e.x, e.y - 8, '+' + pts + (mult > 1 ? ' ×' + mult : ''), mult > 1 ? '#ffdd6c' : '#fff6dc');
-  S.shake = Math.max(S.shake, 3); S.stop = Math.max(S.stop, .03);
+  S.shake = Math.max(S.shake, 1.5);
   if (S.killBoom && (depth || 0) < 1) { const rr = 14 + S.killBoom * 8; for (const o of S.en) if (!o.dead && o !== e && Math.hypot(o.x - e.x, o.y - e.y) < rr) { o.hp -= 1; if (o.hp <= 0) killEnemy(o, 1); } S.rings.push({ x: e.x, y: e.y, t: .1 }); }
-  if (S.regen && ++S.regenK >= (EMB ? 10 : 30)) { S.regenK = 0; if (S.lives < S.maxLives) { S.lives++; pop(S.px, S.py - 26, '+1 命', '#ff8a7a'); } }
-  if (e.rare) { S.items.push(mkItem()); S.items.push(mkItem()); S.shake = Math.max(S.shake, 6); banner('稀有強怪被打倒！', 1.4); }
+  if (S.regen && ++S.regenK >= (EMB ? ez('regenK') : 30)) { S.regenK = 0; if (S.lives < S.maxLives) { S.lives++; pop(S.px, S.py - 26, '+1 命', '#ff8a7a'); } }
+  if (e.rare) { S.items.push(mkItem()); S.items.push(mkItem()); S.shake = Math.max(S.shake, 3); banner('稀有強怪被打倒！', 1.4); }
   else if (Math.random() < (S.mod === 'treasure' ? .08 : .04)) S.items.push(mkItem());
   if (!S.stamps[e.type]) { S.stamps[e.type] = true; pop(e.x, e.y + 14, '集章：' + d.st, '#8fe39a'); }
   if (combo_milestone()) {}
@@ -625,7 +634,7 @@ function killEnemy(e, depth) {
   if (d.split) { addEnemy('mochiS', e.x - 8, e.y, { noRare: true, sway: true }); addEnemy('mochiS', e.x + 8, e.y, { noRare: true, sway: true }); }
   if (d.bomber && (depth || 0) < 2) for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; ebullet(e.x, e.y, Math.cos(a) * 55, Math.sin(a) * 55); }
   if (d.chain && (depth || 0) < 2) {
-    S.shake = Math.max(S.shake, 6); pop(e.x, e.y - 24, 'CHAIN!', '#ff8a7a');
+    S.shake = Math.max(S.shake, 2.5); pop(e.x, e.y - 24, 'CHAIN!', '#ff8a7a');
     for (const o of S.en) if (!o.dead && Math.hypot(o.x - e.x, o.y - e.y) < 46) { o.hp -= 1; if (o.hp <= 0) killEnemy(o, (depth || 0) + 1); }
     S.eb = S.eb.filter(b => Math.hypot(b.x - e.x, b.y - e.y) > 46);
     burst(e.x, e.y, '#ff8a7a', 12, true);
@@ -633,18 +642,18 @@ function killEnemy(e, depth) {
 }
 function combo_milestone() {
   const c = S.combo;
-  if (c === 5 || c === 10 || c === 20 || c === 30) { banner('連擊 ' + c + '！', 1.4); S.shake = Math.max(S.shake, 6); burst(S.px, S.py - 30, '#ffdd6c', 10, true); return true; }
+  if (c === 5 || c === 10 || c === 20 || c === 30) { banner('連擊 ' + c + '！', 1.4); S.shake = Math.max(S.shake, 2.5); burst(S.px, S.py - 30, '#ffdd6c', 10, true); return true; }
   return false;
 }
 function hurtBoss(b, n) {
   if (!b || n <= 0) return 0;
   if (b.intro > 0 || b.cut > 0 || b.shieldT > 0) { if (S.t - (b.immMsg || 0) > .7) { b.immMsg = S.t; pop(b.x, b.y - 34, b.shieldT > 0 ? '護盾中！先躲' : '無敵！', '#9fe8ff'); } return 0; }
-  const cap = b.max / (b.capT || 30) * (EMB ? 2 : 1);
+  const cap = b.max / (b.capT || 30) * ez('cap');
   if (!b.win || S.t - b.win.t >= 1) b.win = { t: S.t, d: 0 };
   const d = Math.min(n, Math.max(0, cap - b.win.d)); b.win.d += d; b.hp -= d; return d;
 }
 function hitFx(x, y, px) { burst(x, y, '#fff6dc', 4, false, (px || 0) * 60, 0); }
-function critFx(x, y) { S.crit++; sfx.crit(); S.shake = Math.max(S.shake, 6); S.stop = Math.max(S.stop, .06); burst(x, y, '#ffdd6c', 12, true); pop(x, y - 12, 'CRIT!', '#ffdd6c'); S.heat = Math.min(100, S.heat + 8); }
+function critFx(x, y) { S.crit++; sfx.crit(); S.shake = Math.max(S.shake, 2.5); burst(x, y, '#ffdd6c', 12, true); pop(x, y - 12, 'CRIT!', '#ffdd6c'); S.heat = Math.min(100, S.heat + 8); }
 
 // ---------- 道具 ----------
 function getItem(it) {
@@ -772,7 +781,7 @@ function fireWeapon(dt) {
 function takeHit() {
   if (S.superT > 0 || S.inv > 0) return;
   if (S.shield > 0) { S.shield = 0; S.inv = .8; S.shake = 6; burst(S.px, S.py, '#8fe39a', 10, true); pop(S.px, S.py - 20, '護盾擋住！', '#8fe39a'); sfx.hit(); return; }
-  S.lives -= 1; S.inv = 1.5 + S.invBonus; S.noHit = false; S.lvHits++; S.shake = 14; S.flash = .3; S.combo = 0; S.hits = 0; if (!EMB) { S.weapon = null; S.wepT = 0; }
+  S.lives -= 1; S.inv = 1.5 + S.invBonus; S.noHit = false; S.lvHits++; S.shake = 14; S.flash = .3; S.combo = 0; S.hits = 0; if (!EMB || DF === 'hard') { S.weapon = null; S.wepT = 0; }
   burst(S.px, S.py, '#c0453c', 12, true); sfx.hurt(); pop(S.px, S.py - 22, '嗚汪！', '#ff8a7a');
   S.eb = S.eb.filter(b => Math.hypot(b.x - S.px, b.y - S.py) > 42);
   if (S.lives <= 0) lose();
@@ -829,7 +838,7 @@ function step(dt) {
   if (!S.boss && !S.mini && !S.evDone && S.lvT >= 30) { S.evDone = true; startEvent(); }
   if (S.ev) updEvent(sdt);
   if (S.level === 1) { const c = S.lvT % 12; S.wind = c > 8 ? (Math.floor(S.lvT / 12) % 2 ? 1 : -1) : 0; if (S.wind) { S.px += S.wind * 38 * sdt; S.tx += S.wind * 38 * sdt; for (const p of S.pb) p.x += S.wind * 50 * sdt; } } else S.wind = 0;
-  if (!S.boss && !S.mini && !S.midDone && S.lvT >= 42) { S.midDone = true; spawnBossX(pickOne(LV.mid)); }
+  if (!S.boss && !S.mini && !S.midDone && !EMB && S.lvT >= 42) { S.midDone = true; spawnBossX(pickOne(LV.mid)); }
   if (!S.boss && !S.mini) { if (S.lvT < LEVEL_LEN) spawn(sdt); else if (S.en.length === 0 && !S.bigCalled) { S.bigCalled = true; if (LV.big === 'lion') spawnBoss(); else spawnBossX(LV.big); } }
   else if (!S.boss) { /* 中型魔王期間仍有小怪 */ spawn(sdt * .5); }
   if (!S.boss) { S.pickT -= 0; }
@@ -970,7 +979,7 @@ function step(dt) {
   S.pb = S.pb.filter(p => !p.dead && p.y > -90);
   S.en = S.en.filter(e => e.hp > 0 && !e.dead && e.y < H + 26 && e.y > -40 && e.x > -40 && e.x < W + 40);
   // 玩家被撞
-  const touch = (x, y, w, h) => Math.abs(S.px - x) < ((EMB ? 3 : 9) + w) / 2 && Math.abs(S.py - y) < ((EMB ? 4 : 11) + h) / 2;
+  const touch = (x, y, w, h) => Math.abs(S.px - x) < ((EMB ? ez('hitW') : 9) + w) / 2 && Math.abs(S.py - y) < ((EMB ? ez('hitH') : 11) + h) / 2;
   let hurt = false;
   for (const e of S.en) if (touch(e.x, e.y, 12, 12)) { e.hp = 0; e.dead = true; killEnemy(e, 2); hurt = true; }
   for (const b of S.eb) if (touch(b.x, b.y, 5, 5)) { b.y = -99; hurt = true; }
@@ -996,7 +1005,7 @@ function mis_explode(x, y) {
 }
 function gainXp(n) {
   S.xp += n;
-  while (S.xp >= S.xpNeed) { S.xp -= S.xpNeed; S.plv++; S.xpNeed = Math.round(25 + S.plv * 18); S.lvUps++; pop(S.px, S.py - 30, 'LEVEL UP！', '#9fe8ff'); sfx.up(); }
+  while (S.xp >= S.xpNeed) { S.xp -= S.xpNeed; S.plv++; S.xpNeed = Math.round((25 + S.plv * 18) * (EMB ? .65 : 1)); S.lvUps++; pop(S.px, S.py - 30, 'LEVEL UP！', '#9fe8ff'); sfx.up(); }
 }
 function lava(dt) {
   if (S.level !== 2 || S.boss) { S.geys = []; return; }
@@ -1040,7 +1049,7 @@ function miniDown() {
   const m = S.mini; S.mini = null; S.gust = null;
   const pts = m.kind === 'mini' ? 200 : m.kind === 'mid' ? 400 : 800;
   S.score += pts;
-  S.shake = 16; S.stop = .14; for (let i = 0; i < 5; i++) burst(m.x + (i - 2) * 12, m.y, '#ffdd6c', 10, true);
+  S.shake = 10; S.stop = .06; for (let i = 0; i < 5; i++) burst(m.x + (i - 2) * 12, m.y, '#ffdd6c', 10, true);
   S.eb = S.eb.filter(b => b.y < 0 || b.y > H);
   pop(m.x, m.y, m.name + '擊倒！+' + pts, '#ffdd6c'); sfx.win();
   S.items.push(Object.assign(mkItem(WEP_KEYS[Math.floor(Math.random() * WEP_KEYS.length)]), { x: m.x - 10, y: m.y }));
@@ -1052,7 +1061,6 @@ function levelClear() {
   try { const u = +localStorage.getItem('sunnuShooterLevel') || 0; if (S.level + 1 > u) localStorage.setItem('sunnuShooterLevel', Math.min(2, S.level + 1)); } catch (e) {}
   const gr = S.lvHits === 0 ? 'S' : S.lvHits <= 1 ? 'A' : S.lvHits <= 3 ? 'B' : 'C';
   S.grades.push(gr); S.score += { S: 1000, A: 500, B: 200, C: 0 }[gr];
-  if (EMB) { S.state = 'win'; sfx.win(); S.shake = 10; show('過關！', resultHTML(), '好'); return embedEnd(true); }
   if (S.level >= 2) return win();
   S.score += 300 + S.lives * 50; S.pendingNext = true;
   openUpgrade(S.noHit);
@@ -1071,7 +1079,7 @@ function win() {
   const all = STAMP_ORDER.every(k => S.stamps[k]) && S.stamps.boss;
   if (all) S.score += 500;
   sfx.win(); S.shake = 10;
-  show('過關！風獅爺被打趴了', resultHTML() + (all ? '<p><b>全集章！+500</b></p>' : ''), '再玩一次');
+  show('過關！風獅爺被打趴了', resultHTML() + (all ? '<p><b>全集章！+500</b></p>' : ''), '再玩一次'); if (EMB) embedEnd(true);
 }
 function lose() { S.state = 'lose'; sfx.boom(); S.shake = 12; show('飛機墜毀…', resultHTML(), '再來一次'); if (EMB) embedEnd(false); }
 function bestScore() { let b = 0; try { b = +localStorage.getItem('sunnuShooterBest') || 0; if (S.score > b) { localStorage.setItem('sunnuShooterBest', S.score); return { b: S.score, nw: true }; } } catch (e) {} return { b, nw: false }; }
@@ -1100,8 +1108,9 @@ function jumpBoss() {
   spawnBoss();
 }
 function start(lv) {
+  if (EMB && EMB_DONE) return;
   S = newRun(); S.state = 'play';
-  if (EMB) { S.lives = 8; S.maxLives = 8; S.dmgLv = 2; S.shotLv = 2; S.rateLv = 2; S.pierceLv = 1; S.invBonus = 1.5; S.shield = 1; S.heat = 70; S.regen = true; S.aegis = true; S.aegisInt = 10; S.magnet = true; }
+  if (EMB) { const st = Z[DF].start; S.lives = S.maxLives = st.lives; S.dmgLv = st.dmg; S.shotLv = st.shot; S.rateLv = st.rate; S.pierceLv = st.pierce; S.invBonus = st.inv; S.shield = st.shield; S.heat = st.heat; S.regen = st.regen; if (st.aegis) { S.aegis = true; S.aegisInt = st.aegis; } }
   if (lv) { S.level = lv; S.stage = lv; }
   const wq = location.search.match(/weapon=(\w+)/);
   if (wq && WEAPON[wq[1]]) { S.weapon = wq[1]; S.wepT = 999; }
@@ -1271,7 +1280,7 @@ function draw() {
     const b = S.boss;
     const lk = ['lionA', 'lionB', 'lionC'][bossPhase()];
     if (b.cut > 0 || b.ult > 0 || b.intro > 0) { const zz = Math.round(72 * (b.intro > 0 ? 1 + b.intro / 3.8 * .9 : 1.2 + .06 * Math.sin(S.t * 20))); ctx.drawImage(sp(lk), Math.round(b.x - zz / 2), Math.round(b.y - zz / 2), zz, zz); }
-    if (S.flash > .3) { ctx.globalAlpha = .55; ctx.drawImage(sp(lk, 'red'), Math.round(b.x - 38), Math.round(b.y - 36), 72, 72); ctx.drawImage(sp(lk, 'blue'), Math.round(b.x + 2 - 36), Math.round(b.y - 36), 72, 72); ctx.globalAlpha = 1; }
+    if (false) { ctx.globalAlpha = .55; ctx.drawImage(sp(lk, 'red'), Math.round(b.x - 38), Math.round(b.y - 36), 72, 72); ctx.drawImage(sp(lk, 'blue'), Math.round(b.x + 2 - 36), Math.round(b.y - 36), 72, 72); ctx.globalAlpha = 1; }
     ctx.globalAlpha = .28; ctx.drawImage(sp(lk, 'shadow'), Math.round(b.x - 36) + 10, Math.round(b.y - 36) + 14, 66, 66); ctx.globalAlpha = 1;
     for (const [ox, oy] of [[-3, 0], [3, 0], [0, -3], [0, 3]]) ctx.drawImage(sp(lk, 'dark'), Math.round(b.x - 36) + ox, Math.round(b.y - 36) + oy, 72, 72);
     ctx.drawImage(sp(lk), Math.round(b.x - 36), Math.round(b.y - 36), 72, 72);
@@ -1422,7 +1431,7 @@ function draw() {
   if (S.lives === 1) ctx.drawImage(VIG, 0, 0);
   ctx.font = 'bold 10px Cubic11,"Noto Sans TC",sans-serif'; ctx.textAlign = 'center';
   for (const q of S.pops) { ctx.fillStyle = '#3b2a1e'; ctx.fillText(q.txt, Math.round(q.x) + 1, Math.round(q.y) + 1); ctx.fillStyle = q.c; ctx.fillText(q.txt, Math.round(q.x), Math.round(q.y)); }
-  if (S.flash > 0) { ctx.fillStyle = 'rgba(255,246,220,' + Math.min(.6, S.flash * 1.6).toFixed(2) + ')'; ctx.fillRect(0, 0, W, H); }
+  if (S.flash > 0) { ctx.fillStyle = 'rgba(255,246,220,' + Math.min(.22, S.flash * .6).toFixed(2) + ')'; ctx.fillRect(0, 0, W, H); }
 }
 
 // ---------- HUD（只在數值改變時才寫 DOM）----------
@@ -1458,7 +1467,7 @@ function frame(ts) {
   if (!lastTS) lastTS = ts;
   let frameDt = Math.min(.1, (ts - lastTS) / 1000); lastTS = ts;
   if (fpsOn) { fpsN++; fpsT += ts - (fpsLast || ts); fpsLast = ts; if (fpsT >= 500) { $('fps').textContent = 'FPS ' + Math.round(fpsN * 1000 / fpsT) + '｜子彈 ' + S.eb.length; $('fps').style.display = ''; fpsN = 0; fpsT = 0; } }
-  accum += frameDt;
+  accum += frameDt * (EMB ? 1.2 : 1);
   let steps = 0;
   const t0 = performance.now();
   while (accum >= DT && steps < 6) { step(DT); accum -= DT; steps++; }
