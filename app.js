@@ -837,7 +837,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
 
   /* 稱號與成就 */
   /* 等級與稱號：經驗值、稱號門檻、地區徽章名稱都在試算表「稱號設定」分頁 */
-  const LV_DEF = { titles: [[1, '新手旅人'], [3, '冷門見習生'], [6, '冷門探險家'], [10, '冷門達人'], [15, '冷門大師'], [20, '傳說中的孫女粉']], xp: { place: 10, quest: 30, chest: 5, base: 30, step: 10, max: 20 }, badges: {} };
+  const LV_DEF = { titles: [[1, '新手旅人'], [5, '冷門見習生'], [10, '冷門探險家'], [15, '冷門達人'], [22, '冷門宗師'], [30, '傳說中的孫女粉']], xp: { place: 10, quest: 30, chest: 5, base: 60, step: 20, max: 30 }, badges: {} };
   function normLv(d) {
     const o = { titles: LV_DEF.titles, xp: Object.assign({}, LV_DEF.xp), badges: {} };
     if (!d || typeof d !== 'object') return o;
@@ -1059,12 +1059,17 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     const old = OLD_ACH.filter(([n]) => n !== '夾褲CEO終結者' || true); const od = old.filter(([n]) => hasAch(n)).length;
     return list + '<section><h4>🔓 越獄與魔王<small>' + od + '/' + old.length + '</small></h4><ul class="smv3-ach">' + old.map(([n, d]) => { const ok = hasAch(n); return '<li class="' + (ok ? 'ok' : '') + '"><b>' + (ok ? '🏆 ' : '🔒 ') + esc(n) + '</b><span>' + esc(d) + '</span><small>' + (ok ? '已達成' : '未達成') + '</small></li>'; }).join('') + '</ul></section>';
   }
+  /* 夾褲 CEO 造型：除了花錢買，也可以打贏夾褲 CEO 三次（整場三連戰通關）免費解鎖 */
+  const CEO_SKIN = 'CEO夾褲', CEO_NEED = 3;
+  const ceoWinCnt = () => { const c = (ST().clears || {}).ceo || {}; return Math.max((c.easy || 0) + (c.normal || 0) + (c.hard || 0), (gameState.boss && gameState.boss.jiaku && gameState.boss.jiaku.defeats) || 0); };
+  function ceoSkinGrant() { const sh = gameState.shop; if (ceoWinCnt() < CEO_NEED || sh.skin.includes(CEO_SKIN) || !extras.skin.some(k => k.n === CEO_SKIN)) return false; sh.skin.push(CEO_SKIN); saveGameState(); return true; }
   function shopHtml() {
+    ceoSkinGrant();
     const sh = gameState.shop, bal = coinBal(), tk = gameState.player.tickets || 0;
     const row = (icon, name, desc, price, own, eq, key) => '<li><span class="ic">' + icon + '</span><div><b>' + esc(name) + '</b><small>' + esc(desc) + '</small></div>' + (own ? '<button type="button" data-eq="' + esc(key) + '" aria-pressed="' + !!eq + '" aria-label="' + (eq ? '取消使用 ' : '使用 ') + esc(name) + '"' + (eq ? ' class="on"' : '') + '>' + (eq ? '使用中（點一下取消）' : '使用') + '</button>' : '<button type="button" data-buy="' + esc(key) + '" aria-label="購買 ' + esc(name) + '，' + price + ' 幣' + (bal < price ? '，零用錢不夠' : '') + '"' + (bal < price ? ' class="dim"' : '') + '>💰 ' + price + '</button>') + '</li>';
     let h = '<section><h4>🛍️ 孫女小舖<small>你有 💰 ' + bal + '</small></h4><ul class="smv3-shop"><li><span class="ic">🎫</span><div><b>保釋券</b><small>被抓時可以直接免費保釋　目前持有 ' + tk + '／' + TICKET_MAX + '</small></div><button type="button" data-buy="ticket" aria-label="購買 保釋券，' + TICKET_PRICE + ' 幣' + (tk >= TICKET_MAX ? '，已經帶滿了' : bal < TICKET_PRICE ? '，零用錢不夠' : '') + '"' + (bal < TICKET_PRICE || tk >= TICKET_MAX ? ' class="dim"' : '') + '>' + (tk >= TICKET_MAX ? '已滿' : '💰 ' + TICKET_PRICE) + '</button></li></ul></section>';
     h += '<section><h4>🚌 專屬座駕<small>買了之後走遠路都搭它</small></h4><ul class="smv3-shop">' + SHOP_VEH.map(([k, n, p]) => row('<img src="' + sprite(k) + '" alt="">', n, '遠距離移動固定搭乘', p, sh.veh.includes(k), sh.eqVeh === k, 'veh:' + k)).join('') + '</ul></section>';
-    if (extras.skin.length) h += '<section><h4>🎭 孫女造型<small>買了之後出門都是這個造型</small></h4><ul class="smv3-shop">' + extras.skin.map(s => row('<img src="' + sprite(s.a) + '" alt="">', s.n, '變身造型', SKIN_PRICE, sh.skin.includes(s.n), sh.eqSkin === s.n, 'skin:' + s.n)).join('') + '</ul></section>';
+    if (extras.skin.length) h += '<section><h4>🎭 孫女造型<small>買了之後出門都是這個造型</small></h4><ul class="smv3-shop">' + extras.skin.map(s => row('<img src="' + sprite(s.a) + '" alt="">', s.n, s.n === CEO_SKIN && !sh.skin.includes(s.n) ? '變身造型　打贏夾褲 CEO ' + CEO_NEED + ' 次免費解鎖（' + Math.min(CEO_NEED, ceoWinCnt()) + '/' + CEO_NEED + '），或花錢買' : '變身造型', SKIN_PRICE, sh.skin.includes(s.n), sh.eqSkin === s.n, 'skin:' + s.n)).join('') + '</ul></section>';
     return h;
   }
   function shopBuy(key) {
@@ -1969,9 +1974,12 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   const DIFFS = {
     easy: { k: 'easy', n: '簡單', ico: '🥉', sp: .8, dd: -1, lv: 1, coin: .7, first: 10, faces: 3 },
     normal: { k: 'normal', n: '普通', ico: '🥈', sp: 1, dd: 0, lv: 0, coin: 1, first: 25, faces: 2 },
-    hard: { k: 'hard', n: '困難', ico: '🥇', sp: 1.4, dd: 2, lv: -1, coin: 2, first: 70, faces: 1 }
+    hard: { k: 'hard', n: '困難', ico: '🥇', sp: 1.47, dd: 2, lv: -1, coin: 2, first: 70, faces: 1 }
   };
   const DK = ['easy', 'normal', 'hard'];
+  /* 個別遊戲的難度微調（依玩家回報）：覆蓋 DIFFS 的欄位 */
+  const MON_ADJ = { '排隊三小時怪': { hard: { sp: 1.21 } }, '夏天蚊子': { hard: { sp: 1.17, lv: 0 } }, '打卡拍照怪': { hard: { sp: 1.17, lv: 0 } } };
+  const dfOf = (n, k) => Object.assign({}, DIFFS[k] || DIFFS.normal, (MON_ADJ[n] || {})[k] || {});
   const lastDm = e => (gameState.stats.dm || {})[e.boss ? 'ceo' : e.n] || 'normal';
   const dfSelHtml = (e, sel) => { const cl = (gameState.stats.clears || {})[e.boss ? 'ceo' : e.n] || {}; return '<div class="dfsel" role="radiogroup" aria-label="選擇難度">' + DK.map(k => '<button type="button" role="radio" data-dm="' + k + '" aria-pressed="' + (k === sel) + '"><b>' + DIFFS[k].ico + ' ' + DIFFS[k].n + '</b><small>' + (cl[k] > 0 ? '已通關 ×' + cl[k] : '金幣 ×' + DIFFS[k].coin) + '</small></button>').join('') + '</div>'; };
   function arenaOpen(e, again) {
@@ -1989,7 +1997,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     box.innerHTML = '<div class="smv3-arena' + (e.boss ? ' boss' : '') + '" role="dialog" aria-label="' + esc(encName(e)) + '"><header><img src="' + sprite(e.s) + '" alt=""><b>' + esc(encName(e)) + '</b><button type="button" data-x>逃跑</button></header>' + (e.boss ? '<div class="stg"><b>第 ' + (e.si + 1) + '／' + e.boss.st.length + ' 關</b><img class="bmood" src="' + sprite(['ic_cool', 'ic_meh', 'ic_devil'][Math.min(2, e.si)]) + '" alt="" style="position:static;width:20px;height:20px;image-rendering:pixelated"><span class="bhp"><i style="width:' + Math.max(0, 100 - e.si * 33.34) + '%"></i><s style="left:33.3%"></s><s style="left:66.6%"></s></span><u>面子 ' + '■'.repeat(e.faces || 0) + '□'.repeat(Math.max(0, 2 - (e.faces || 0))) + '</u></div>' : '') + '<div class="say"></div><div class="hud" hidden><div class="sc"></div><div class="row"><span class="l"></span><span class="r"></span></div><div class="bar"><em></em></div></div><div class="stage ' + e.t + (fish ? ' fish' : '') + (e.boss && !fish ? ' bz' : '') + '"></div><div class="acts"></div></div>';
     const q = s => box.querySelector(s);
     const c = A = { e, g, fish, rec, dead: false, t: 0, pen: 0, timers: [], ivs: [], raf: 0, st: q('.stage'), say: q('.say'), hud: q('.hud'), acts: q('.acts'), mod: fish && g !== '釣魚-沉默' && g !== '釣魚-共用魚池' && Math.random() < .7 ? pick(Object.keys(MODS)) : '' };
-    c.df = DIFFS[e.dm || lastDm(e)] || DIFFS.normal; c.dmKey = c.df.k;
+    c.df = dfOf(e.n, e.dm || lastDm(e)); c.dmKey = c.df.k;
     c.play = mk('', 'play'); c.st.appendChild(c.play);
     c.after = (ms, f) => { c.timers.push(setTimeout(() => { if (!c.dead) f(); }, ms)); };
     c.on = (el, ev, f) => el.addEventListener(ev, event => { if (!c.dead && !c.finishing) f(event); });
@@ -2082,7 +2090,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       } else if (e.boss) {
         const s = ST(), fin0 = e.si === e.boss.st.length - 1;
         if (win) { const df = c.df || DIFFS.normal; let cn = [20, 30, 40][Math.min(2, e.si)], cupLine = ''; if (fin0) { cn += gameState.boss.jiaku.defeats <= 1 ? 100 : 40; if (s.ceoLoss === 0) s.ceoNoFace = 1; } cn = Math.round(cn * df.coin);
-          if (fin0) { const cl = (s.clears.ceo = s.clears.ceo || { easy: 0, normal: 0, hard: 0 }), firstDf = !(cl[df.k] > 0); cl[df.k] = (cl[df.k] || 0) + 1; if (firstDf) { cn += df.first; cupLine = '<br>🏆 獲得獎盃：CEO 夾褲・' + df.ico + df.n + '通關！'; } }
+          if (fin0) { const cl = (s.clears.ceo = s.clears.ceo || { easy: 0, normal: 0, hard: 0 }), firstDf = !(cl[df.k] > 0); cl[df.k] = (cl[df.k] || 0) + 1; if (firstDf) { cn += df.first; cupLine = '<br>🏆 獲得獎盃：CEO 夾褲・' + df.ico + df.n + '通關！'; } if (ceoSkinGrant()) cupLine += '<br>🎭 解鎖造型：' + CEO_SKIN + '（打贏夾褲 CEO ' + CEO_NEED + ' 次）！到「圖鑑→商店」使用'; }
           cn = addCoins(cn); coinLine = '<br>' + df.ico + df.n + '難度　💰 零用錢 +' + cn + '（共 ' + coinBal() + '）' + cupLine; }
         else s.ceoLoss++;
       }
@@ -2107,8 +2115,8 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     q('.acts').onclick = ev => { if (ev.target.closest('[data-x]')) arenaClose(); else if (ev.target.closest('[data-again]')) arenaOpen(e.boss ? {...e, faces: Math.max(0, (e.faces || 0) - 1)} : e, true); else if (ev.target.closest('[data-redo]')) arenaOpen(bossEnc(e.boss, 0), true); else if (ev.target.closest('[data-next]')) arenaOpen({...bossEnc(e.boss, e.si + 1), faces: e.faces, dm: e.dm, fset: true}, true); else if (ev.target.closest('[data-go]')) go(); };
     q('header').onclick = ev => { if (ev.target.closest('[data-x]') && !gameState.prison.phase) { const ar = q('.smv3-arena'); if (!ar.classList.contains('flee')) { fleeSfx(); ar.classList.add('flee'); setTimeout(arenaClose, 420); } } };
     const go = () => {
-      const dmKey = (e.boss && e.si > 0 ? e.dm : null) || c.dmSel || e.dm || 'normal'; c.df = DIFFS[dmKey]; c.dmKey = dmKey; e.dm = dmKey; (gameState.stats.dm || (gameState.stats.dm = {}))[e.boss ? 'ceo' : e.n] = dmKey;
-      if (e.boss && e.si === 0 && !e.fset) { e.faces = c.df.faces; e.fset = true; }
+      const dmKey = (e.boss && e.si > 0 ? e.dm : null) || c.dmSel || e.dm || 'normal'; c.df = dfOf(e.n, dmKey); c.dmKey = dmKey; e.dm = dmKey; (gameState.stats.dm || (gameState.stats.dm = {}))[e.boss ? 'ceo' : e.n] = dmKey;
+      if (e.boss && !e.fset) { e.faces = c.df.faces; e.fset = true; }
       c.e = Object.assign({}, e, { d0: e.d, d: Math.max(1, Math.min(7, e.d + c.df.dd)) }); saveGameState();
       c.acts.innerHTML = ''; const it = c.st.querySelector('.intro'); if (it) it.remove(); let n = 3; const cd = mk('', 'cd'); c.st.appendChild(cd);
       const tick = () => { if (n === 0) { cd.remove(); c.say.textContent = (fish && c.mod ? MODS[c.mod] + ' ' : '') + c.how.how; if (c.mod === 'wind') c.play.classList.add('wind'); if (c.mod === 'glare') { const gl = mk('', 'glare'); c.st.appendChild(gl); c.ivs.push(setInterval(() => { gl.classList.add('on'); setTimeout(() => gl.classList.remove('on'), 380); }, 4200)); } bossRun(c, g); return; }
@@ -2118,8 +2126,8 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     c.say.textContent = pick(e.i.length ? e.i : [e.n + ' 出現了！']);
     c.acts.innerHTML = e.t === 'npc' ? '<button type="button" data-go class="main">來啊</button><button type="button" data-x>不要，我只是路過</button>' : '<button type="button" data-go class="main">看懂了，開始！</button><button type="button" data-x>算了</button>';
     const h = c.how = V2_GAMES[g] || g === '釣魚-共用魚池' ? HOW[g] : howOf(g, GAMES[g].tip);
-    c.st.appendChild(mk('<div class="how"><div class="hd"><img src="' + sprite(e.s) + '" alt=""><b>' + esc(g === '記憶' ? '一二三木頭人' : g.replace('釣魚-', '釣魚・')) + '</b><small>怎麼玩？</small></div><ul><li><i>🎯</i><span><u>目標</u>' + esc(h.goal) + '</span></li><li><i>👆</i><span><u>操作</u>' + esc(h.how) + '</span></li><li><i>⚠️</i><span><u>注意</u>' + esc(h.tip) + '</span></li></ul><div class="demo ' + h.gest + '"><em>' + esc(h.demo) + '</em><span>' + (h.gest === 'swipe' ? '👆' : '👆') + '</span></div></div>', 'intro'));
-    { const how = c.st.querySelector('.how'); if (how && e.t !== 'npc' && !(e.boss && e.si > 0)) { c.dmSel = e.dm || lastDm(e); how.insertAdjacentHTML('beforeend', dfSelHtml(e, c.dmSel)); how.addEventListener('click', ev => { const b = ev.target.closest('[data-dm]'); if (!b) return; c.dmSel = b.dataset.dm; how.querySelectorAll('[data-dm]').forEach(x => x.setAttribute('aria-pressed', x === b)); }); } else { c.dmSel = e.dm || 'normal'; if (how && e.boss && e.si > 0) how.insertAdjacentHTML('beforeend', '<div class="dfnote">難度：' + DIFFS[c.dmSel].ico + ' ' + DIFFS[c.dmSel].n + '</div>'); } }
+    c.st.appendChild(mk('<div class="how"><div class="hd"><img src="' + sprite(e.s) + '" alt=""><b>' + esc(g === '記憶' ? '一二三木頭人' : g === '群怪' ? '閃巴掌' : g === '頂風' ? '空中大戰' : g.replace('釣魚-', '釣魚・')) + '</b><small>怎麼玩？</small></div><ul><li><i>🎯</i><span><u>目標</u>' + esc(h.goal) + '</span></li><li><i>👆</i><span><u>操作</u>' + esc(h.how) + '</span></li><li><i>⚠️</i><span><u>注意</u>' + esc(h.tip) + '</span></li></ul><div class="demo ' + h.gest + '"><em>' + esc(h.demo) + '</em><span>' + (h.gest === 'swipe' ? '👆' : '👆') + '</span></div></div>', 'intro'));
+    { const how = c.st.querySelector('.how'); if (how && e.t !== 'npc' && !(e.boss && e.si > 0 && e.dm)) { c.dmSel = e.dm || lastDm(e); how.insertAdjacentHTML('beforeend', dfSelHtml(e, c.dmSel)); how.addEventListener('click', ev => { const b = ev.target.closest('[data-dm]'); if (!b) return; c.dmSel = b.dataset.dm; how.querySelectorAll('[data-dm]').forEach(x => x.setAttribute('aria-pressed', x === b)); }); } else { c.dmSel = e.dm || 'normal'; if (how && e.boss && e.si > 0) how.insertAdjacentHTML('beforeend', '<div class="dfnote">難度：' + DIFFS[c.dmSel].ico + ' ' + DIFFS[c.dmSel].n + '</div>'); } }
   }
   const GAMES = {
     '釣魚-猛拉': { tip: '狂點畫面！連點越快連擊越高，每 5 下釣上一條魚', run(c) { const S = c.scene(); let taps = 0, last = 0, combo = 0, lt = -9;
@@ -2284,7 +2292,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       const bananaArt=art(16,16,[['#3b2a1e',11,1,4,3],['#6b4a1a',12,2,2,2],['#3b2a1e',9,3,4,3],['#f5d23a',10,3,2,3],['#3b2a1e',7,5,4,3],['#f5d23a',8,5,2,3],['#3b2a1e',5,7,4,3],['#f5d23a',6,7,2,3],['#3b2a1e',2,9,5,4],['#f5d23a',3,9,3,3],['#c9a21a',3,11,3,1],['#3b2a1e',2,13,6,1],['#fff4da',1,1,1,1],['#fff4da',14,12,1,1],['#fff4da',2,14,1,1]]),holeArt=art(16,16,[['#3b2a1e',1,1,14,14],['#f5bf43',1,1,3,3],['#f5bf43',12,1,3,3],['#f5bf43',1,12,3,3],['#f5bf43',12,12,3,3],['#0b0c16',3,3,10,10],['#2a2e44',3,3,10,2],['#6a6f85',5,6,6,1]]);const umbrellaArt=art(16,16,[['#c0453c',4,2,8,1],['#c0453c',2,3,12,1],['#c0453c',1,4,14,2],['#fff4da',5,4,2,2],['#fff4da',9,4,2,2],['#3b2a1e',8,6,1,7],['#3b2a1e',6,13,3,1]]),puddleArt=art(16,16,[['#3a6fa0',1,7,14,6],['#6fa8d8',3,8,7,2],['#fff4da',4,8,2,1],['#3a6fa0',3,6,10,1],['#3a6fa0',3,13,10,1]]);const ticketArt=art(16,16,[['#3b2a1e',1,3,14,10],['#fff4da',2,4,12,8],['#c0453c',3,5,10,2],['#3b2a1e',4,8,2,2],['#3b2a1e',7,8,2,2],['#3b2a1e',10,8,2,2]]);
       const SRC={scooter:[0,1,2].map(scooter),delivery:[delivery()],car:CARC.map((_,k)=>car(k)),bus:[bus()],cart:[sprite('gi_trolley')],luggage:[sprite('gi_luggage')],cutter:[sprite('gi_pax')]};
       const WID={scooter:1,delivery:1,car:2,bus:3,cart:1,luggage:1,cutter:1};
-      const BASE=[1.9,2.4,1.5,2.8,2.6],TY=[['scooter','delivery','scooter','cart'],['car','scooter','cart','luggage','car'],['car','bus','scooter','car','bus']];const RC=ROADS.map((r,k)=>{const z=k<5?0:k<10?1:2,nt=k>=10?.7:0,gl=Math.max(1.4,1.95-k*.04)+nt,gh2=Math.max(2.4,3.8-k*.08)+nt;return {row:r,dir:k%2?-1:1,spd:BASE[k%5]*(1+Math.min(k,10)*.04),types:TY[z],g:[gl,gh2]};});
+      const BASE=[1.9,2.4,1.5,2.8,2.6],TY=[['scooter','delivery','scooter','cart'],['car','scooter','cart','luggage','car'],['car','bus','scooter','car','bus']];const RC=ROADS.map((r,k)=>{const z=k<5?0:k<10?1:2,nt=(k>=10?.7:0)+(c.df.k==='hard'&&k>=7?.9:0),gl=Math.max(1.4,1.95-k*.04)+nt,gh2=Math.max(2.4,3.8-k*.08)+nt;return {row:r,dir:k%2?-1:1,spd:BASE[k%5]*(1+Math.min(k,10)*.04),types:TY[z],g:[gl,gh2]};});
       let rushT=0,wetUntil=0,umbUntil=0,checkRow=0,col=3,row=0,maxRow=0,hits=0,score=0,ticket=false,jump2=false,invuln=0,stunUntil=0,lastMove=-1,cheated=false,done=false,nearN=0,popN=0,popAt=-9,cutT=5,thoughtAt=-9,frameKey='';
       const vehicles=[],items=[];
       const gpop=(txt,x,y,colr)=>{const now=c.t||0;if(now-popAt>.8)popN=0;popAt=now;c.pop(txt,x+(popN%2?44:-44)*(popN?1:0),y+popN*22,colr);popN++;};
@@ -2341,7 +2349,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     '頂風': { tip: '孫女開飛機！手指拖曳移動、飛機自動射擊，撿道具換武器，闖過三關、打倒風獅爺就過關。', run(c) {
       setupV2(c); c.st.classList.add('shoot'); c.st.innerHTML = '';
       const base = /^(localhost|127\.|\[::1\])/.test(location.hostname) ? location.origin + '/上線/shooter/' : 'https://love12548.github.io/sunnu-map-data/shooter/';
-      const f = document.createElement('iframe'); f.src = base + 'shooter.html?embed=1&v=7&diff=' + (c.dmKey || 'normal'); f.allow = 'autoplay'; f.title = '孫女開飛機'; f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000'; f.onload = () => { try { f.focus(); } catch (e) {} }; c.st.appendChild(f);
+      const f = document.createElement('iframe'); f.src = base + 'shooter.html?embed=1&v=9&diff=' + (c.dmKey || 'normal'); f.allow = 'autoplay'; f.title = '孫女開飛機'; f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000'; f.onload = () => { try { f.focus(); } catch (e) {} }; c.st.appendChild(f);
       const h = ev => { if (ev.source !== f.contentWindow || !ev.data || !ev.data.sunnuShooter) return; window.removeEventListener('message', h); const d = ev.data; f.style.pointerEvents = 'none'; if (d.win && String(d.grade) === 'S') ST().shooterS++; if (d.win && !d.hits) ST().shooterNoHit++; c.after(1300, () => c.end(!!d.win, { challenge: !!d.win && !d.hits, key: c.g, you: d.score | 0, rv: 0, unit: '分' })); };
       window.addEventListener('message', h); c.ivs.push(setInterval(() => { if (c.dead) window.removeEventListener('message', h); }, 400));
     } },
@@ -2373,6 +2381,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       const trapLit=(()=>{const v=document.createElement('canvas');v.width=v.height=16;const g=v.getContext('2d');PROPS.batt.forEach(([t,x,y,w,h])=>{g.fillStyle=t==='a'?'#a83227':'#f0a090';g.fillRect(x,y,w,h);});return v.toDataURL();})();const PROPSAY={pole:'我只是電線桿',sign:'別點我，我是招牌',bin:'裡面沒有怪，只有垃圾',tree:'我是樹，樹不用訊號',vend:'投幣才有東西',scoot:'我只是機車',crate:'我是紙箱，不是怪'},CHARSAY=['我只是路過的','別點我，我在上班','你認錯影子了','我今天沒有訊號'];
       const chars=['npc_long','my_4','otter','rabbit','cow','deer','duck','goat','enc_closed','enc_photo','enc_nav','enc_mosq','enc_ghost','enc_queue','enc_notouch','enc_wind'].filter(k=>hasSprite(k)&&k!==c.e.s);
       const LV=[{n:8,batt:1,limit:24,fake:0,hop:0,shy:0,sneak:0,shuf:0,black:false,txt:'8 個影子。手電筒會耗電，找電池充電'},{n:16,batt:2,trap:1,limit:40,fake:2,hop:0,shy:1.2,sneak:75,shuf:9,black:true,wander:{n:7,v:50},imp:5,cloud:true,txt:'出現 2 個冒牌訊號怪！影子亂走、烏雲遮光、小心假電池'},{n:20,batt:2,trap:2,limit:50,fake:4,hop:0,shy:1.1,sneak:90,shuf:9,black:true,wander:{n:7,v:55},imp:5.5,cloud:true,txt:'第一次點中真的怪，牠會閃開換位置！'}];
+      if(c.df.k==='hard')LV.forEach(L=>{L.limit=Math.round(L.limit*.74);L.n+=3;L.fake=(L.fake||0)+2;if(L.shy)L.shy*=1.25;if(L.sneak)L.sneak*=.8;});
       let lv=0,wrongs=0,wrongsLv=0,score=0,phase='play',lt=0,limit=24,items=[],mon=null,light={x:fw/2,y:fh*.62},down=null,lastBeep=0,hopT=0,hopWarn=false,peekT=0,peekUntil=0,blackAt=9,blackWarn=false,sigShown=-1,graceUntil=0,energy=100,flashUsed=false,flashUntil=0,flashSwap=false,echoAt=-99,echoUntil=0,echoVec=null,lowWarn=false,shyT=0,flashBtn=null,sneakT=0,sneakGoal=null,shufT=0,shufWarn=false,dodged=false,impT=0,cloud={x:-999,y:0,w:0,h:0};
       const baseR=Math.max(28,fw*.085);let radius=baseR;
       const meter=mk('','','position:absolute;left:6px;top:6px;z-index:8;display:flex;gap:3px;align-items:flex-end;pointer-events:none;background:rgba(11,12,22,.7);border:2px solid #3b2a1e;padding:3px 6px');const mlabel=mk('訊號','','color:#fff4da;font-size:12px;font-weight:bold;margin-right:3px;align-self:center');meter.appendChild(mlabel);const mbars=[0,1,2,3].map(i=>{const b=document.createElement('b');b.style.cssText='display:block;width:9px;height:'+(7+i*5)+'px;background:#3a3f5e;border:2px solid #0b0c16;box-sizing:border-box';meter.appendChild(b);return b;});field.appendChild(meter);const eb=mk('','','position:absolute;left:6px;top:46px;z-index:8;width:92px;height:12px;background:rgba(11,12,22,.7);border:2px solid #3b2a1e;pointer-events:none;box-sizing:border-box'),ef=mk('','','position:absolute;left:0;top:0;bottom:0;width:100%;background:#59d68a');eb.appendChild(ef);const et=mk('電量','','position:absolute;left:102px;top:44px;z-index:8;font-size:11px;font-weight:bold;color:#fff4da;text-shadow:1px 1px #0b0c16;pointer-events:none;white-space:nowrap'),ee=mk('','','position:absolute;left:6px;top:62px;z-index:8;font-size:11px;font-weight:bold;color:#fff4da;text-shadow:1px 1px #0b0c16;pointer-events:none;white-space:nowrap');field.append(eb,et,ee);
@@ -2450,7 +2459,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
         screech:()=>{GS.tone(2600,700,.38,{type:'sawtooth',vol:.045});GS.tone(2650,760,.38,{type:'square',vol:.025});GS.noise(.3,{f:4000,f1:1500,vol:.05});},
         beat:()=>{GS.tone(62,40,.1,{type:'sine',vol:.16});GS.tone(58,38,.1,{type:'sine',vol:.12,d:.15});}};
       c.st.style.height='';c.st.style.background='#07090c';c.label.style.display='none';c.say.textContent='這站…沒有人下車。';
-      const W=180,H=320,HZ=74,BOT=300,DIFF={easy:{n:'簡單',cup:'🥉 銅獎杯・新手下車',lim:75,bw:[12,4],sp:.078,turn:.55,watch:[1.1,1.7],cd:[.36,.5],sq:[8,4.2],pen:0},normal:{n:'普通',cup:'🥈 銀獎杯・準時下車',lim:50,stop:.18,snap:.12,bw:[18,8],sp:.062,turn:.32,watch:[1.9,2.7],cd:[.25,.39],sq:[11,3.1],pen:2,fake:.35},hard:{n:'困難',cup:'🥇 金獎杯・月台精剋星',lim:36,stop:.28,snap:.25,bw:[21,10],sp:.057,turn:.22,watch:[2.3,3.3],cd:[.19,.33],sq:[13,2.7],pen:3,fake:.5,two:1,back2:1}};let D=DIFF.normal,LIMIT=60;
+      const W=180,H=320,HZ=74,BOT=300,DIFF={easy:{n:'簡單',cup:'🥉 銅獎杯・新手下車',lim:75,bw:[12,4],sp:.078,turn:.55,watch:[1.1,1.7],cd:[.36,.5],sq:[8,4.2],pen:0},normal:{n:'普通',cup:'🥈 銀獎杯・準時下車',lim:50,stop:.18,snap:.12,bw:[18,8],sp:.062,turn:.32,watch:[1.9,2.7],cd:[.25,.39],sq:[11,3.1],pen:2,fake:.35},hard:{n:'困難',cup:'🥇 金獎杯・月台精剋星',lim:44,stop:.25,snap:.21,bw:[20,9],sp:.059,turn:.26,watch:[2.15,3.05],cd:[.21,.35],sq:[12.5,2.9],pen:2,fake:.45,two:1,back2:1}};let D=DIFF.normal,LIMIT=60;
       const HIDE=[.22,.47,.72],SQ=.9,R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
       const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
       const pool=(places||[]).filter(p=>p.category==='冷門車站'&&/車站/.test(p.name)&&!/(旅遊|商店|服務|加盟)/.test(p.name)),TOTAL=Math.max(pool.length,1);
@@ -3490,7 +3499,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       const fine = matchMedia('(pointer:fine)').matches; const setBtns = r => { bD.style.display = r === 2 ? 'flex' : 'none'; bD.innerHTML = '⬇ 蹲'; bW.style.width = bU.style.width = r === 2 ? 'calc(33.3% - 10px)' : 'calc(50% - 12px)'; bW.innerHTML = r === 2 ? '⬅ 閃' : '汪'; bU.innerHTML = r === 2 ? '閃 ➡' : '嗚'; bW.style.background = r === 2 ? '#f0c24a' : '#ff6a5a'; bU.style.background = r === 2 ? '#f0c24a' : '#5aa0ff'; };
       const finMiss = why => { S.st = 'play'; S.hp = 12; B.dmg(1 - S.hp / HPMAX); S.gap = 1.2; hurtMe(why, 1); bark(.6, .18, 1, 'a'); K.banner('夾褲還沒倒！', '再打到沒血一次', '#e8564a', 1.1); };
       const goDown = () => { S.st = 'down'; S.downs++; S.cnt = 0; S.cntT = 0; S.gu = 0; S.waves = []; S.drums = []; S.strikes = []; S.counter = 0; S.tired = 0; setStars(); GS.ko(); K.shake(12); K.banner('DOWN！', '狂點！別讓牠爬起來！', '#f0c24a', 1.2); };
-      const dmgCEO = n => { if (S.st !== 'play') return; n *= c.df.k === 'easy' ? 1.25 : c.df.k === 'hard' ? .8 : 1; S.hp = Math.max(0, S.hp - n); B.dmg(1 - S.hp / HPMAX); S.hurt = .35; K.shake(5); GS.bossHit(); K.burst(HX, HY + 10, ['#fff', '#ffdd6c', '#ff8a7a'], 12, 100); K.pop('-' + Math.round(n), HX + R(-22, 22), HY - 8, '#ffdd6c', 15);
+      const dmgCEO = n => { if (S.st !== 'play') return; n *= c.df.k === 'easy' ? 1.25 : c.df.k === 'hard' ? .76 : 1; S.hp = Math.max(0, S.hp - n); B.dmg(1 - S.hp / HPMAX); S.hurt = .35; K.shake(5); GS.bossHit(); K.burst(HX, HY + 10, ['#fff', '#ffdd6c', '#ff8a7a'], 12, 100); K.pop('-' + Math.round(n), HX + R(-22, 22), HY - 8, '#ffdd6c', 15);
         if (S.hp <= 0) { if (!S.downs) goDown(); else { S.st = 'final'; S.finT = 0; S.strikes = []; S.counter = 0; S.tired = 0; S.jabs = 0; setStars(); K.banner('最後一擊！', '圈縮到最小的瞬間按！', '#e8564a', 1.1); GS.siren(); S.slow = .3; } }
         else if (roundOf() > S.round) { S.round = roundOf(); S.st = 'bell'; S.bellT = 2.6; S.waves = []; S.drums = []; S.strikes = []; cRd.textContent = 'ROUND ' + (S.round + 1); setBtns(S.round); setStars(); S.rt0 = S.t + 2.6; K.banner('ROUND ' + (S.round + 1), RN[S.round] + (S.round === 2 ? '！上勾拳按中間「蹲」' : '！'), '#f0c24a', 2); [0, .25, .5].forEach(d => GS.tone(1500, 1500, .15, { d, vol: .06 })); bark(.72, .16, 1, 'a'); } };
       /* ---- 聲音 ---- */
