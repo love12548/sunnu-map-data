@@ -79,7 +79,7 @@ const EMB = /[?&]embed=1/.test(location.search), DF = ((location.search.match(/[
 const Z = {
   easy:   { hpEn: [.45, .6, .8], fire: [2.3, 1.8, 1.4], bul: [.55, .7, .85], spawn: [1.4, 1.25, 1.1], pick: [8, 11, 14], bossHp: [.4, .6, .8], regenK: [10, 15, 20], cap: [2, 1.7, 1.4], hitW: [3, 4, 5], hitH: [4, 5, 6], start: { lives: 7, dmg: 2, shot: 2, rate: 2, pierce: 1, inv: 1.5, shield: 1, heat: 70, regen: true, aegis: 10 } },
   normal: { hpEn: [.5, .7, .9], fire: [2, 1.5, 1.15], bul: [.65, .8, .95], spawn: [1.3, 1.1, 1], pick: [10, 14, 18], bossHp: [.5, .7, .9], regenK: [15, 20, 30], cap: [1.8, 1.4, 1.1], hitW: [3, 5, 7], hitH: [4, 6, 8], start: { lives: 5, dmg: 1, shot: 1, rate: 1, pierce: 0, inv: 1, shield: 1, heat: 50, regen: true, aegis: 14 } },
-  hard:   { hpEn: [.55, .9, 1.1], fire: [1.6, 1.2, 1], bul: [.7, .95, 1.1], spawn: [1.15, 1, .9], pick: [11, 14, 18], bossHp: [.5, .9, 1.1], regenK: [25, 30, 35], cap: [1.3, 1.05, .95], hitW: [3.5, 6, 8], hitH: [4.5, 7, 9], start: { lives: 4, dmg: 1, shot: 1, rate: 1, pierce: 0, inv: 1, shield: 1, heat: 35, regen: true, aegis: 18 } }
+  hard:   { hpEn: [.575, .95, 1.15], fire: [1.52, 1.15, .96], bul: [.735, 1, 1.16], spawn: [1.1, .96, .86], pick: [11.5, 14.5, 18.5], bossHp: [.525, .95, 1.15], regenK: [25, 30, 35], cap: [1.3, 1.05, .95], hitW: [3.5, 6, 8], hitH: [4.5, 7, 9], start: { lives: 4, dmg: 1, shot: 1, rate: 1, pierce: 0, inv: 1, shield: 1, heat: 35, regen: true, aegis: 18 } }
 };
 const ez = k => EMB ? Z[DF][k][Math.min(2, (S && S.level) | 0)] : 1;
 let EMB_DONE = false;
