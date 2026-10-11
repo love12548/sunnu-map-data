@@ -1017,7 +1017,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     const y = new Date(); y.setDate(y.getDate() - 1);
     s.dayStreak = s.lastDay === ymd(y) ? s.dayStreak + 1 : 1; s.days++; s.lastDay = t; saveGameState();
   }
-  const SHOP_VEH = [['veh_bike', '腳踏車', 120], ['veh_scooter', '機車', 200], ['veh_bus', '公車', 300], ['veh_train', '火車', 400], ['veh_boat', '小船', 500], ['veh_balloon', '熱氣球', 600], ['veh_plane', '飛機', 800], ['veh_ufo', '飛碟', 1200]];
+  const SHOP_VEH = [['veh_bike', '腳踏車', 80], ['veh_scooter', '機車', 120], ['veh_bus', '公車', 180], ['veh_train', '火車', 250], ['veh_boat', '小船', 320], ['veh_balloon', '熱氣球', 400], ['veh_plane', '飛機', 550], ['veh_ufo', '飛碟', 800]];
   const SKIN_PRICE = 400, TICKET_PRICE = 80, TICKET_MAX = 5;
   const OLD_ACH = [['跑得掉算你厲害', '成功越獄 1 次'], ['刺激1995', '越獄成功 5 次，其中有 1 次完美逃脫'], ['越獄慣犯', '越獄成功 10 次'], ['湯匙大師', '挖牆越獄一次都沒被抓到'], ['無聲潛行', '挖牆越獄時把噪音壓在 70 以下'], ['老鼠剋星', '挖牆越獄時打倒 3 隻老鼠'], ['零用錢大亨', '一次越獄撿到 30 枚金幣'], ['完美逃脫', '追逐戰完全沒被打中'], ['典獄長的噩夢', '追逐戰裡擊退典獄長且沒被他打中'], ['妳床位還留著', '被抓進監獄 3 次'], ['夾褲CEO終結者', '擊敗 CEO 夾褲']];
   const hasAch = n => gameState.achievements.includes(n);
@@ -1060,34 +1060,39 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     return list + '<section><h4>🔓 越獄與魔王<small>' + od + '/' + old.length + '</small></h4><ul class="smv3-ach">' + old.map(([n, d]) => { const ok = hasAch(n); return '<li class="' + (ok ? 'ok' : '') + '"><b>' + (ok ? '🏆 ' : '🔒 ') + esc(n) + '</b><span>' + esc(d) + '</span><small>' + (ok ? '已達成' : '未達成') + '</small></li>'; }).join('') + '</ul></section>';
   }
   /* 夾褲 CEO 造型：除了花錢買，也可以打贏夾褲 CEO 三次（整場三連戰通關）免費解鎖 */
-  const CEO_SKIN = 'CEO夾褲', CEO_NEED = 3;
+  const CEO_SKIN = 'CEO夾褲', CEO_NEED = 5, CEO_PRICE = 888;
+  const skinPrice = n => n === CEO_SKIN ? CEO_PRICE : SKIN_PRICE;
   const ceoWinCnt = () => { const c = (ST().clears || {}).ceo || {}; return Math.max((c.easy || 0) + (c.normal || 0) + (c.hard || 0), (gameState.boss && gameState.boss.jiaku && gameState.boss.jiaku.defeats) || 0); };
   function ceoSkinGrant() { const sh = gameState.shop; if (ceoWinCnt() < CEO_NEED || sh.skin.includes(CEO_SKIN) || !extras.skin.some(k => k.n === CEO_SKIN)) return false; sh.skin.push(CEO_SKIN); saveGameState(); return true; }
+  /* 座駕可以多選：遠路時從勾選的座駕裡隨機搭一個；一個都沒勾就從全部擁有的裡面隨機 */
+  const vehSel = () => { const sh = gameState.shop; if (!Array.isArray(sh.eqVehs)) sh.eqVehs = []; if (!sh.eqVehs.length && sh.eqVeh) { sh.eqVehs.push(sh.eqVeh); sh.eqVeh = ''; } return sh.eqVehs; };
+  /* 造型也可以多選：每次出門從勾選的造型裡隨機變一個；一個都沒勾就維持原本的孫女 */
+  const skinSel = () => { const sh = gameState.shop; if (!Array.isArray(sh.eqSkins)) sh.eqSkins = []; if (!sh.eqSkins.length && sh.eqSkin) { sh.eqSkins.push(sh.eqSkin); sh.eqSkin = ''; } return sh.eqSkins; };
   function shopHtml() {
     ceoSkinGrant();
     const sh = gameState.shop, bal = coinBal(), tk = gameState.player.tickets || 0;
     const row = (icon, name, desc, price, own, eq, key) => '<li><span class="ic">' + icon + '</span><div><b>' + esc(name) + '</b><small>' + esc(desc) + '</small></div>' + (own ? '<button type="button" data-eq="' + esc(key) + '" aria-pressed="' + !!eq + '" aria-label="' + (eq ? '取消使用 ' : '使用 ') + esc(name) + '"' + (eq ? ' class="on"' : '') + '>' + (eq ? '使用中（點一下取消）' : '使用') + '</button>' : '<button type="button" data-buy="' + esc(key) + '" aria-label="購買 ' + esc(name) + '，' + price + ' 幣' + (bal < price ? '，零用錢不夠' : '') + '"' + (bal < price ? ' class="dim"' : '') + '>💰 ' + price + '</button>') + '</li>';
     let h = '<section><h4>🛍️ 孫女小舖<small>你有 💰 ' + bal + '</small></h4><ul class="smv3-shop"><li><span class="ic">🎫</span><div><b>保釋券</b><small>被抓時可以直接免費保釋　目前持有 ' + tk + '／' + TICKET_MAX + '</small></div><button type="button" data-buy="ticket" aria-label="購買 保釋券，' + TICKET_PRICE + ' 幣' + (tk >= TICKET_MAX ? '，已經帶滿了' : bal < TICKET_PRICE ? '，零用錢不夠' : '') + '"' + (bal < TICKET_PRICE || tk >= TICKET_MAX ? ' class="dim"' : '') + '>' + (tk >= TICKET_MAX ? '已滿' : '💰 ' + TICKET_PRICE) + '</button></li></ul></section>';
-    h += '<section><h4>🚌 專屬座駕<small>買了之後走遠路都搭它</small></h4><ul class="smv3-shop">' + SHOP_VEH.map(([k, n, p]) => row('<img src="' + sprite(k) + '" alt="">', n, '遠距離移動固定搭乘', p, sh.veh.includes(k), sh.eqVeh === k, 'veh:' + k)).join('') + '</ul></section>';
-    if (extras.skin.length) h += '<section><h4>🎭 孫女造型<small>買了之後出門都是這個造型</small></h4><ul class="smv3-shop">' + extras.skin.map(s => row('<img src="' + sprite(s.a) + '" alt="">', s.n, s.n === CEO_SKIN && !sh.skin.includes(s.n) ? '變身造型　打贏夾褲 CEO ' + CEO_NEED + ' 次免費解鎖（' + Math.min(CEO_NEED, ceoWinCnt()) + '/' + CEO_NEED + '），或花錢買' : '變身造型', SKIN_PRICE, sh.skin.includes(s.n), sh.eqSkin === s.n, 'skin:' + s.n)).join('') + '</ul></section>';
+    h += '<section><h4>🚌 專屬座駕<small>可以多選：走遠路時從勾選的座駕裡隨機搭一個（都沒勾就從全部擁有的隨機）</small></h4><ul class="smv3-shop">' + SHOP_VEH.map(([k, n, p]) => row('<img src="' + sprite(k) + '" alt="">', n, '遠距離移動時會隨機搭乘（可多選）', p, sh.veh.includes(k), vehSel().includes(k), 'veh:' + k)).join('') + '</ul></section>';
+    if (extras.skin.length) h += '<section><h4>🎭 孫女造型<small>可以多選：每次出門從勾選的造型裡隨機變一個（都沒勾就是原本的孫女）</small></h4><ul class="smv3-shop">' + extras.skin.map(s => row('<img src="' + sprite(s.a) + '" alt="">', s.n, s.n === CEO_SKIN && !sh.skin.includes(s.n) ? '變身造型　打贏夾褲 CEO ' + CEO_NEED + ' 次免費解鎖（' + Math.min(CEO_NEED, ceoWinCnt()) + '/' + CEO_NEED + '），或花錢買' : '變身造型', skinPrice(s.n), sh.skin.includes(s.n), skinSel().includes(s.n), 'skin:' + s.n)).join('') + '</ul></section>';
     return h;
   }
   function shopBuy(key) {
     const sh = gameState.shop, bal = coinBal(); let price = 0;
     if (key === 'ticket') { price = TICKET_PRICE; if ((gameState.player.tickets || 0) >= TICKET_MAX) return toast('保釋券已經帶滿了', 1800); }
-    else if (key.startsWith('veh:')) price = (SHOP_VEH.find(v => v[0] === key.slice(4)) || [0, 0, 0])[2]; else if (key.startsWith('skin:')) price = SKIN_PRICE; else return;
+    else if (key.startsWith('veh:')) price = (SHOP_VEH.find(v => v[0] === key.slice(4)) || [0, 0, 0])[2]; else if (key.startsWith('skin:')) price = skinPrice(key.slice(5)); else return;
     if (!price || sh.veh.includes(key.slice(4)) || sh.skin.includes(key.slice(5))) return;
     if (bal < price) { beep([220], .12); return toast('零用錢不夠，再去贏幾場', 1800); }
     gameState.player.coinsSpent += price;
-    if (key === 'ticket') gameState.player.tickets = (gameState.player.tickets || 0) + 1; else if (key.startsWith('veh:')) { sh.veh.push(key.slice(4)); sh.eqVeh = key.slice(4); } else { sh.skin.push(key.slice(5)); sh.eqSkin = key.slice(5); }
+    if (key === 'ticket') gameState.player.tickets = (gameState.player.tickets || 0) + 1; else if (key.startsWith('veh:')) { sh.veh.push(key.slice(4)); vehSel().push(key.slice(4)); } else { sh.skin.push(key.slice(5)); skinSel().push(key.slice(5)); }
     saveGameState(); SFX.fanfare(); dexShow(); dexOpen();
   }
   function shopEquip(key) {
     const sh = gameState.shop;
-    if (key.startsWith('veh:')) sh.eqVeh = sh.eqVeh === key.slice(4) ? '' : key.slice(4); else if (key.startsWith('skin:')) sh.eqSkin = sh.eqSkin === key.slice(5) ? '' : key.slice(5);
+    if (key.startsWith('veh:')) { const k = key.slice(4), a = vehSel(), i = a.indexOf(k); if (i >= 0) a.splice(i, 1); else a.push(k); sh.eqVeh = ''; } else if (key.startsWith('skin:')) { const k = key.slice(5), a = skinSel(), i = a.indexOf(k); if (i >= 0) a.splice(i, 1); else a.push(k); sh.eqSkin = ''; }
     saveGameState(); dexOpen();
   }
-  function bikeGift() { const sh = gameState.shop; if (sh.bikeGift) return; if (ST().wins >= 5 || seenCount() >= 15) { sh.bikeGift = true; if (!sh.veh.includes('veh_bike')) { sh.veh.push('veh_bike'); saveGameState(); reward(['<img src="' + sprite('veh_bike') + '" alt="">新手禮物：腳踏車！到「圖鑑→商店」可以使用']); } else saveGameState(); } }
+  function bikeGift() { const sh = gameState.shop; if (sh.bikeGift || !game) return; sh.bikeGift = true; if (!sh.veh.includes('veh_bike')) { const first = !sh.veh.length; sh.veh.push('veh_bike'); if (first) vehSel().push('veh_bike'); saveGameState(); reward(['<img src="' + sprite('veh_bike') + '" alt="">新手禮物：腳踏車！走遠路會騎它，到「圖鑑→商店」可以挑座駕']); } else saveGameState(); }
   function cupHtml() {
     const cl = ST().clears, ceoB = bosses.find(b => b.code === 'ceo');
     const rows = [...encs.filter(x => x.t !== 'npc').map(x => [x.n, encName(x), x.s]), ['ceo', 'CEO 夾褲', ceoB ? bossSpr(ceoB) : 'boss_corgi']];
@@ -1118,7 +1123,8 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   function vehicleFor(from, to, km) {
     const own = (gameState.shop.veh || []).filter(v => RIDE_NAME[v]);   /* 只有買到（或獲贈）的載具才會出現 */
     if (km <= 2 || !own.length) return 'walk';
-    return own.includes(gameState.shop.eqVeh) ? gameState.shop.eqVeh : pick(own);
+    const sel = vehSel().filter(v => own.includes(v));
+    return pick(sel.length ? sel : own);
   }
   const RIDE = { veh_plane: '搭飛機飛去', veh_train: '搭火車去', veh_boat: '搭船去', veh_bus: '搭公車去', veh_scooter: '騎機車去', veh_bike: '騎腳踏車去',
     veh_balloon: '坐熱氣球飄去', veh_ufo: '被外星人載去', walk: '走路去' };
@@ -1146,7 +1152,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     stopCam();
     const zoom = Math.max(map.getZoom(), 15), km = from ? map.distance(from, to) / 1000 : 0;
     if (!from || reduced() || km < .02) { setWalker(to, 'girl_wave'); map.setView(to, zoom, { animate: !reduced() }); if (!from || km >= .02) encMaybe(p); return; }
-    skin = (gameState.shop.eqSkin && gameState.shop.skin.includes(gameState.shop.eqSkin) && extras.skin.find(k => k.n === gameState.shop.eqSkin)) || null;   /* 變身只有買到的造型 */
+    { const pool = skinSel().filter(n => gameState.shop.skin.includes(n)).map(n => extras.skin.find(k => k.n === n)).filter(Boolean); skin = pool.length ? pick(pool) : null; }   /* 變身只有買到的造型 */
     const veh = vehicleFor(prev, p, km), left = to.lng < from.lng, t0 = performance.now();
     toast('<img src="' + sprite(veh === 'walk' ? gk('girl_a') : veh) + '" alt="">' + (skin ? esc(skin.n) : '孫女') + rideTxt(veh) + '<em>' + esc(p.name) + '</em>', 2600);
     SFX.go();
@@ -1222,7 +1228,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       boss: Object.assign({}, boss, { jiaku: Object.assign({}, jiaku, { encounterCounter: countV2(jiaku.encounterCounter === undefined ? Number(store('sunnuBoss')) : jiaku.encounterCounter), defeats: Math.max(countV2(jiaku.defeats), countV2(ceo.win), ceo.trophy ? 1 : 0), currentStage: countV2(jiaku.currentStage), achievements: [...new Set([...(Array.isArray(jiaku.achievements) ? jiaku.achievements : []), ...(achievements.has('tr_ceo') ? ['tr_ceo'] : [])])] }) }),
       prison: Object.assign({}, prison, { arrests: countV2(prison.arrests), escapeAttempts: countV2(prison.escapeAttempts), successfulEscapes: countV2(prison.successfulEscapes), arrestGraceMoves: countV2(prison.arrestGraceMoves), phase: ['choice','hole','serve','escape'].includes(prison.phase) ? prison.phase : '', deadline: countV2(prison.deadline), escapeHits: Math.min(3,countV2(prison.escapeHits)), bailFee: countV2(prison.bailFee), lockUntil: countV2(prison.lockUntil), perfectEscapes: countV2(prison.perfectEscapes) }),
       stats: Object.assign({ wins: 0, losses: 0, runW: 0, bestRun: 0, challengeWins: 0, comeback: 0, monWins: {}, bails: 0, bailStreak: 0, exact: 0, brokeServes: 0, nightWins: 0, days: 0, dayStreak: 0, lastDay: '', allStreak: 0, allLast: '', chaseAct: 0, ceoLoss: 0, ceoNoFace: 0, shooterS: 0, shooterNoHit: 0, lastMon: '', sameCnt: 0, firstWinDay: '', clears: {}, dm: {} }, objectV2(saved.stats), { monWins: Object.assign({}, objectV2(objectV2(saved.stats).monWins)) }),
-      shop: Object.assign({ veh: [], skin: [], eqVeh: '', eqSkin: '', bikeGift: false }, objectV2(saved.shop)),
+      shop: Object.assign({ veh: [], skin: [], eqVeh: '', eqVehs: [], eqSkin: '', eqSkins: [], bikeGift: false }, objectV2(saved.shop)),
       achievements: [...achievements] });
   }
   let gameState = loadGameState();
