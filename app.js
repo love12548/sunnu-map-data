@@ -108,7 +108,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   /* 只綁一個處理器；沒有商品設定時直接捲到本頁地圖，避開 SHOPLINE 的 base URL。 */
   root.querySelector('.smv3-cta').onclick = e => {
     e.preventDefault();
-    if (ctaLinks.length) window.open(ctaLinks[Math.floor(Math.random() * ctaLinks.length)], '_blank', 'noopener');
+    if (ctaLinks.length) openExt(ctaLinks[Math.floor(Math.random() * ctaLinks.length)]);
     else $('smv3-explore').scrollIntoView({ behavior: motion(), block: 'start' });
   };
   function header() {
@@ -214,8 +214,14 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   $('smv3-ftags').onclick = e => { if (e.target.closest('button')) { clearFilters(); } };
   root.addEventListener('click', e => {
     const a = e.target.closest('a[href]'); if (!a || !/^https?:/i.test(a.getAttribute('href') || '')) return;
-    e.preventDefault(); e.stopPropagation(); window.open(a.href, '_blank', 'noopener');
+    e.preventDefault(); e.stopPropagation(); openExt(a.href);
   }, true);
+  /* 開外部連結：手機（觸控）直接在原分頁跳走，YouTube／地圖 App 會被叫起來，不留空白分頁；電腦開新分頁（不帶 noopener 字串，避免先開 about:blank） */
+  function openExt(url) {
+    if (matchMedia('(pointer:coarse)').matches && phone()) { location.href = url; return; }
+    const w = window.open(url, '_blank');
+    if (w) { try { w.opener = null; } catch (err) {} } else location.href = url;
+  }
   function fsum() {
     const f = [...new Set([state.area, state.region, state.category, state.video && ('🎬 ' + vtitle().slice(0, 16))].filter(Boolean))];
     $('smv3-fsum').textContent = f.length || ''; $('smv3-ftags').innerHTML = f.length ? '篩選中：' + f.map(esc).join(' › ') + '<button type="button">✕ 清除</button>' : '';
