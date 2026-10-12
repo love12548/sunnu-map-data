@@ -205,6 +205,10 @@ const VIG = (() => { const o = document.createElement('canvas'); o.width = W; o.
 
 // ---------- 音效 ----------
 let AC = null;
+/* iOS 來電、鎖螢幕、切換 App 後音效引擎會變成 interrupted，每次觸碰、回到分頁都叫醒它 */
+const acWake = () => { try { if (AC) { if (AC.state === 'closed') AC = null; else if (AC.state !== 'running') AC.resume(); } } catch (e) {} };
+['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => addEventListener(ev, acWake, { capture: true, passive: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) acWake(); }); addEventListener('pageshow', acWake); addEventListener('focus', acWake);
 let muted = /mute=1/.test(location.search);
 function beep(f0, f1, dur, vol, type) {
   if (muted) return;
@@ -1115,7 +1119,7 @@ function start(lv) {
   const wq = location.search.match(/weapon=(\w+)/);
   if (wq && WEAPON[wq[1]]) { S.weapon = wq[1]; S.wepT = 999; }
   document.getElementById('card').classList.remove('on');
-  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {}
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state !== 'running') AC.resume(); } catch (e) {}
   banner(LEVELS[S.level].name, 2.4); rollMod();
   preloadSfx(); music('');
   if (/boss=1/.test(location.search)) jumpBoss();
