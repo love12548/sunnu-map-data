@@ -675,7 +675,7 @@ $('#bkpick').addEventListener('pointerdown', ev => { ev.stopPropagation(); const
 /* ---- 牌桌 ---- */
 function fit() {
   const fl = $('.field'); if (!fl || !S) return; const cols = S.slots.length === 4 ? 2 : 4, gap = 7, w = fl.clientWidth, h = fl.clientHeight;
-  const cw = Math.max(34, Math.floor(Math.min((w * .92 - (cols - 1) * gap) / cols, (h / .94 - (cols - 1) * gap) / (cols * 1.367), cols === 2 ? 110 : 96)));
+  const cw = Math.max(34, Math.floor(Math.min((w * .8 - (cols - 1) * gap) / cols, (h / .94 - (cols - 1) * gap) / (cols * 1.367), cols === 2 ? 110 : 96)));
   const b = $('#board'); b.style.setProperty('--cw', cw + 'px'); b.style.setProperty('--cols', cols);
 }
 function buildBoard() {
