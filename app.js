@@ -1463,7 +1463,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   /* 手機遊戲視窗：點上方那條細說明列展開／收起 */
   document.addEventListener('click', ev => { const t = ev.target.closest && ev.target.closest('.smv3-arena .say'); if (t) t.classList.toggle('open'); });
   let trainTravel = '';   /* 冷門列車駕駛路線結算後，回到地圖時孫女直接站在最後停的那一站 */
-  function arenaClose() { arenaStop(); const b = $('smv3-arena'); b.hidden = true; b.innerHTML = ''; const tt = trainTravel; trainTravel = ''; const np = tt && places.find(x => x.name === tt || x.name.startsWith(tt)); if (np && (!here || here.id !== np.id)) setTimeout(() => select(np.id, true), 350); }
+  function arenaClose() { arenaStop(); const b = $('smv3-arena'); b.hidden = true; b.innerHTML = ''; const tt = trainTravel; trainTravel = ''; const np = tt && (places.find(x => x.name === tt) || places.find(x => x.name.startsWith(tt)));   /* 先找名稱完全相同的（暖暖、大華、嘉義會被同名開頭的景點搶先） */ if (np && (!here || here.id !== np.id)) setTimeout(() => select(np.id, true), 350); }
   let prisonTimer=0,prisonFrame=0,jailRun=null;
   const coinBal = () => Math.max(0, gameState.player.coinsEarned - gameState.player.coinsSpent);
   const lossGet = () => Number(store('sunnuLoss')) || 0;
@@ -4846,7 +4846,7 @@ var TrainGame = (function () {
     function finishRoute() {
       st.mode = 'final'; st.finT = 0; st.notch = NMID; clearInput(); var rb = RT.best; if (RT.total > rb.score) { rb = { score: RT.total, stops: RT.stops }; try { localStorage.setItem(routeKey(), JSON.stringify(rb)); } catch (e) {} RT.newBest = true; RT.best = rb; }
       au.sfx(RT.stops > 0 ? 'great' : 'fail');
-      if (!st.reported) { st.reported = true; if (o.onEnd) { try { o.onEnd({ route: true, win: RT.stops > 0, challenge: RT.stops >= 2 && RT.fails === 0 && RT.stars3 === RT.stops, stars: RT.stops ? Math.min(3, Math.max(1, Math.round(RT.stars3 / RT.stops * 2) + 1)) : 0, score: RT.total, stops: RT.stops, fails: RT.fails, legs: RT.infos.length, stars3: RT.stars3, last: (function () { for (var i = RT.results.length - 1; i >= 0; i--) if (RT.results[i].why === 'stop' && RT.infos[RT.results[i].idx]) return RT.infos[RT.results[i].idx].full; return ''; })() }); } catch (e) { if (window.console) console.error(e); } } }
+      if (!st.reported) { st.reported = true; if (o.onEnd) { try { o.onEnd({ route: true, win: RT.stops > 0, challenge: RT.stops >= 2 && RT.fails === 0 && RT.stars3 === RT.stops, stars: RT.stops ? Math.min(3, Math.max(1, Math.round(RT.stars3 / RT.stops * 2) + 1)) : 0, score: RT.total, stops: RT.stops, fails: RT.fails, legs: RT.infos.length, stars3: RT.stars3, last: (function () { var bi = -1, bd = 1e18; for (var i = 0; i < RT.infos.length; i++) { var d = Math.abs(RT.lines[i] - sim.x); if (d < bd) { bd = d; bi = i; } } return bi >= 0 ? RT.infos[bi].full : ''; })() }); } catch (e) { if (window.console) console.error(e); } } }
     }
 
     /* ——— 結果 ——— */
