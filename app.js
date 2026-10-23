@@ -324,7 +324,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     const s = e.target.closest('[data-sug]'); if (!s) return;
     state.category = s.dataset.sug; state.area = state.region = state.q = ''; $('smv3-search').value = ''; update(true);
   });
-  $('smv3-detail').addEventListener('click', e => { if (e.target.closest('[data-jeep]')) { e.preventDefault(); arenaOpen({ ...JEEP_ENC }); return; } { const td = e.target.closest('[data-traindir]'); if (td) { e.preventDefault(); store('sunnuTrainNS', td.dataset.traindir); const bx = td.closest('.smv3-trainbox'); bx.querySelectorAll('[data-traindir]').forEach(b => b.setAttribute('aria-pressed', String(b === td))); const gb = bx.querySelector('[data-traingo]'), sn = trainStn({ id: gb.dataset.tid, name: gb.dataset.tname }), rt1 = sn && trainRouteFrom(sn.full), nb = gb.querySelector('.tk-st b:last-child'); if (rt1 && rt1.stations[1] && nb) nb.textContent = String(rt1.stations[1].full || '').replace(/火車站$|車站$/, '').replace(/ \(.*\)$/, ''); return; } } { const tb = e.target.closest('[data-traingo]'); if (tb) { e.preventDefault(); trainStart(tb.dataset.tid, tb.dataset.tname); return; } } const n = e.target.closest('[data-near]'); if (n) { select(n.dataset.near, true); return; } const b = e.target.closest('[data-favbtn]'); if (b) toggleFav(b.dataset.favbtn); });
+  $('smv3-detail').addEventListener('click', e => { if (e.target.closest('[data-jeep]')) { e.preventDefault(); arenaOpen({ ...JEEP_ENC }); return; } { const rb = e.target.closest('[data-ring]'); if (rb) { e.preventDefault(); const ic = rb.dataset.ic; arenaOpen({ ...GYM_ENC, ...(ic && hasSprite(ic) ? { ic } : {}) }); return; } } { const db = e.target.closest('[data-dofu]'); if (db) { e.preventDefault(); const ic = db.dataset.ic; arenaOpen({ ...DOFU_ENC, ...(ic && hasSprite(ic) ? { ic } : {}) }); return; } } { const td = e.target.closest('[data-traindir]'); if (td) { e.preventDefault(); store('sunnuTrainNS', td.dataset.traindir); const bx = td.closest('.smv3-trainbox'); bx.querySelectorAll('[data-traindir]').forEach(b => b.setAttribute('aria-pressed', String(b === td))); const gb = bx.querySelector('[data-traingo]'), sn = trainStn({ id: gb.dataset.tid, name: gb.dataset.tname }), rt1 = sn && trainRouteFrom(sn.full), nb = gb.querySelector('.tk-st b:last-child'); if (rt1 && rt1.stations[1] && nb) nb.textContent = String(rt1.stations[1].full || '').replace(/火車站$|車站$/, '').replace(/ \(.*\)$/, ''); return; } } { const tb = e.target.closest('[data-traingo]'); if (tb) { e.preventDefault(); trainStart(tb.dataset.tid, tb.dataset.tname); return; } } const n = e.target.closest('[data-near]'); if (n) { select(n.dataset.near, true); return; } const b = e.target.closest('[data-favbtn]'); if (b) toggleFav(b.dataset.favbtn); });
   $('smv3-fsbar').addEventListener('click', e => { const b = e.target.closest('[data-fs]'); if (!b) return; drawerSet('half'); drSide().scrollTop = 0; render(); });
   $('smv3-dock').onclick = e => {
     const b = e.target.closest('button'); if (!b) return; const k = b.dataset.a, a = areaEl();
@@ -598,7 +598,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
 
   const STYLE = 'https://tiles.openfreemap.org/styles/positron';
   const styleReady = fetch(STYLE).then(r => { if (!r.ok) throw new Error('style'); return r.json(); }).then(s => { rawStyle = JSON.parse(JSON.stringify(s)); return sunnuStyle(s); }).catch(() => STYLE);
-  const SPRITES = {"boss_corgi":".51o3.12o3.6Oo4.8o4O.6ooppoo.6ooppoo.5oop3o4λλo4p3oo.4ooppo4λ4o4ppoo.4oΑΑo4λ6o7.4oΑΑo3λ8o6.4o5λ10o5.4o4λxDλ6DxλooΒΒ.4o4λ12ooΒΒ.4o3λ5x4λ5oΒΒ.4ooλ6x4λ6ΒΒ.4ooλ5xxppxxλ5oo.4ooλ7ppλ7oo.4ooλ7ppλ7ΒΒ.3OOoλ16ΒΒO..o3λ16ΒΒo.3o3λ11δ3ΒΒo.5ooλ9δ5ΒΒ.7λ7..λ7.8δδλ5..λ5δδ.28","boss_corgi_ko":".....................................................oooo.......oooo.........Oooo.......ooOo.........OOOoooooooooOOo........OOOOoooooooooOOOo.......OOOOoooooooooOOOo.......ooooooooooooooooo.......oooooCoooooCooooo......oooCCCCOOOoCCCCCoo......oooCCWWOoOWWWCCCooo.....oooCWWWWWWWWWWCCooo.....ooCCWWWWWWWWWWCCCoo.....ooCCWWWWWWWWWWCCCoo.....oooCWWWWWWWWWWCCooo.....oooCCWWWCCWWWCCCooo.....ooooCCCCCCCCCCCoooo......oooCCCCCCCCCCCooo........oOOOoooooooOOOo..........OOOoooooooOOO...........OOO.......OOO...........ooo.......ooo.....................................................","npc_long":".54ddD7dd.12dD11d.3εB.6dD11E.3BB.4ddD13dd.BB.6s15.BB.6s14S.BB.6D6dD6.3BB.6sD11s..B.8sD11S..θ.9s3S3s5.3θ.8dD11dεB.9dD11dBθ.7ddD3dD9BBe.6ssD4ddD6x..E.6ssD4ddD6x..E.8D12x..E.9D10x.3r.9D10x.3R.9DDx.5DDx.12x4.5x4.11x4.5x4.30","enc_ghost":".56w9.13w12.12w11Ι.11w15.9w3xw6xxwwΙ.9w3xw6xxwwΙ.9w3xw6xxwwΙ.9w6p3w5Ι.9w6p3w5Ι.9w6x3w5Ι.9w14Ι.9wwδw11Ι.9wXδw9XwΙ.9wXXw9XwΙ.9wXXw9XwΙ.9Xw5X3w4XX.9XwwΙ..XXe.w3Xe.9XwwΙ..XXe.w3Xe.10XX.12X.75","enc_platform":".51ιιy16.6yyY16.6yyY16.6yyYw12Y3.6yyYwwxw6xxwY3.6yyYwwxw6xxwY3.6yyYιw11Y3.6yyYιwwx6w3Y3.6yyYw3x6w3Y3.6yyYw12Y3.6y17Y.6y17Y.14E3.21EEd.21EEd.21EEd.21EEd.21EEd.18E10.78","enc_nav":".56L8r.13LLr10.12r11R.11Lrrw9rLr.9r3wxxw3xwwrrR.9r3wxxw3xwwrrR.9rrLLw8rrR.9r3w3x3w3rrR.9r3w3x3w3rrR.10r3w6rrR.12RRr9R.12RRr9F.14Rr6RR.16RRr3R.18RRr3F.20R3.154","enc_closed":".51εεB16.6BBK15θ.6BBK15θ.6BBKb12KKθ.6BBKbεεw8bKKθ.6BBKbbw9bKKθ.6BBKbbwxxw3xwwbKKθ.6BBKbbw9bKKθ.6BBKbbw9bKKθ.6BBKbbwx6wwbKKθ.6BBKb12KKθ.6BBKb12KKθ.6BBK15θ.6BBK6yK8θ.6BBK6yK8θ.6BBK15θ.6B17θ.6B17θ.99","enc_statue":".57H6.17HN6ηH.15HN6Hκ.13ηHN3xN3xxH.12HHN9κ.12HHN9κ.12HHN4xxN3κ.14HN6HH.15HN6Hκ.12H4N6H5.7ηHN3ηηN10H.6HHN15κ.6HHN3HN6HHN3κ.8H3.HHN3H..H3.9HHκ.HHN3κ..HHκ.12E9.13eEe9E.12EEe9d.12E11d.78","enc_nosignal":".54d12.11dD12Ed.9dD12dE.9dDDu9DdE.9dDDuxxu3xuuDdE.9dDDuxxu3xuuDdE.9dDDu9DdE.9dDDu3x3u3DdE.9dDDu3x3u3DdE.9dDDu9DdE.9dD12dE.9dD12dE.9dD3wwD7dE.9dDDUw3D6dE.9dDDw4D6dE.9dD12dE.10d12.12d11E.102","enc_queue":".75ττp.3ιιy.3οοc.9ppρ.3yyY.3ccΞ.8τp5.y3ιιy..c3οcc.3pxxpxxpyyxyyxιycxxcxx.3pxxpxxpyyxyyxyycxxcxx.3p6.y6..c6.3r6.o6..u6.3r5R.o5α..u6.3r5R.o5α..u6.3r5R.o5α..u6.3r5R.o5α..u6.3rrR.LR.βoα..α..uuU.uu.3D3.DD.D3..D..D3.DD.3DDx.Dx.DDx..x..DDx.DD.169","enc_notouch":".57d6.17dw6Ed.15dw6dE.13Edw3D3w3d.12ddwDDw3DwwE.12ddwDDw3DwwE.12ddw3D3w3E.14dw6dd.15dw6dE.16d6.20r3.21rrR.19LLr4.17Lrrw3rLr.15r3w3rrR.15rrLLr4R.15E9.15E8d.13EEe9E.78","enc_wind":".52Λ.14Λ.8Λ3.10Λ3.9ΛΙΛ10ΙΛΛ.9ΛΙ12Λ.10ΛΙΚ9ΙΙΛ.10ΙΙΚΚΙ6ΚΚΙΛ.10ΙΚΚdΚΙ4ΚdΚΚΛ.10ΙΙΚ3Ι4Κ3ΙΛ.9ΛΙ4Κ6Ι4Λ.8ΛΙΙxW8xΙΙΛ.8ΛΙΙxΙx6ΙxΙΙΛ.9ΛΛxΙx6ΙxΛΛ.11ΛΛΙΚ6ΙΛΛ.10R6ΚWWΚr6.8RFR3ΙΙWWΙΙr5.7RRFR3Ι7r5.6RFR3Ι8Κr4.6RFR3Ι8Κr4.6RFRRΚΙ8ΚΚr3.6RRΛ4Κ6Λ4r3.5R.Λ4.6Λ4r3.26","enc_mosq":".75οοc.12οοc.6ccΞ.12ccΞ.5cw3cc.9cw3οc.3cw5c.6οcw4cc.3cw5Ξ.6ccw4cc.4ccwwοοccEEdcw5c.8cw3d6w3cc.9cw3d6w3cΞ.12dD6dd.13EdDxxD3xDDd.12ddDxxD3xDDE.12ddD9E.14dD6dd.15dD6dE.16d6.3LL.12d.6Ed.15E.6dE.103","enc_typhoon":".54E6..E4.11Ee7Ee5E.9Ee6EEe4Ed.7eEe4xxe4xxe3E.6EEe15d.6EEeeΙΙe11d.6EEe6x3e6d.8Ee12EE.9Ee12Ed.10E12.9cu.3u.3uu.3u.9uU.3U.3uU.3U.11u.3uu.3u.3uu.7cu.3u.3cu.3u.9uU.3U.3uU.3U.11u.3uu.3u.3uu.148","enc_photo":".56ε6h.15εεh7εh.13h10B.13s11.13ssxs5xsS.13ssxs5xsS.13s10S.15sS3ssS.3D5.9sS3ssS.3D5.6c3A7ccADDwDD.6A13D5.6A13D5.6AUUA9U.12A10U.13A10U.13a3.5a3.13aax.5aax.13aax.5aax.12x4.5x4.78","fish_s":".200c5u.15c3u6ccu.3u.8u11U.3U.6ccuxxu10ccucu.4u6οοu3U4u5.4u11U4u5.6U12a..u3.9U5a.4cu.12U5a.4uU.172","fish_gold":".200ι5y.15ι3y6ιιy.3o.8y11Y.3α.6ιιyxxy10ββoβo.4y6ιιy3Y4o5.4y11Y4o5.6Y12J..o3.9Y5J.4βo.12Y5J.4oα.172","puffer":".81ιj.ιj.19jy.jy.18j3yj5.13ιjy9j.12jjy10.11jy3xxy3xy3ιj.9jy12jy.9jy12jy.9jy5p3y4jy.9j3y9j..ιιj.6j3ιιy8..j3.7j3y6j8.9j8y.3y.11j8y.3y.171","boot":".77ε6b.17b6ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5b7.11bB11bεb.9bBBεB8bbζ.9bBBεB9bζ.9b14ζ.9b14ζ.172","bobber":".83ΙΙe.21eeE.21eeE.19LLr4.18r5R.17r9.15w9.15w8Ι.15w8Ι.16w5Ι.18wLLwwΙ.20wwΙ.226","youtiao":".66y3.18ιιyYYOιy.16y3YYOyy.15ιyyYOOyYY.13ιιyYYOyyYOO.13y3JYOyyYOO.12ιyyYOOyYYO.12ιιyYYOyyYOO.13y3YYOyyYOγ.12ιyyYOOyYYO.12ιιyYJOyyYOO.13y3γYOyyYOγ.12ιyyYOOyYYO.12ιιyYYOyyYOO.13y3YYOyyYOγ.12ιyyYOOyYYO.14yYYOyyYOO.15yYYOyyYOγ.16O3YYO.87","shavedice":".57wwεεbw.17wb6εbw.14wb8Ι.12wwb4BBb3c.11w3bwwbbλBwwbοc.9w3bwwb3BwwbcΞ.9w3bw3bbw3bcΞ.7w8bw5bc3.6w8bw5bccΞ.6w15ccΞ.5wB3wwτy3w3p3wwcοc.3wB3w3y3w3p3wwc3.3w16c5.3c19uu.3c19uu.4u3wwu6wu5U.8u13UU.9u13Ua.10u9U3.14U8a.15U9.31","douhua":".56w.6ww.13ww.6w.15wΙ.6Ι.15c12.9οοcw12οοc.6c3w12ccΞ.5cw3b5w6nw3οc.3cwwb3Bιbbw3ιnNw3cc.3cwwb3Bb3w3nnNw3cc.3cw3b3w3nnNw3nnNuu.3uWWw13W3uu.3uWWw13W3uu.3u19UU.4uuwu5wu5wuuU.6uuwu5wu5wuua.6u17a.8u13UU.9u13Ua.10U12.14U8a.15U9.31","shaobing":".80ι8y.15y8Y.12ιy3ιwy6Y3.7ιιywwy3Y3wY6.6y3wwy3Y3wYιY3J.5ιy3Y3wwY6wY3αO.3ywwY9wY6OO.3ywwY9wY6OO.3yY5xY6xxY3wOO.3yYYwppY3x3Y3pY3OO.3yYYwppY3x3Y3pY3OO.3Y19OO.3YwwY6wY5wYYO3.3YwwY6wY5wYYO3.4Y15OOγ.6O17γ.6O17γ.9O11γ.78","noodles":".68bBB.19εbB.21bbθ.20bBB.13ι5yεbB.15y6bbθ.15yyYyyY.18yyYyyJ.18yyιyyJ.12w6ιyYyYYw6.5wo3y5YyyYyyoggbww.3wo3y5YyyYyyoggbww.3w19WW.3r19RR.3r19RR.4r3wwr6wr5R.8r13RR.9r13RF.10R12.14R8F.15R9.31","meal":".51b18.5bn18εB.3bn18BB.3bw3WWw4bbyo6BB.3bw8Wbboyyo3OBB.3bw8Wbboyyo3OBB.3bw5r3wbbo3yooOBB.3bwwWwwrRRwbbOoJo3OBB.3bwwWλwrRRwbbOo5OBB.3bw3λw5b9BB.3bw6WWwbbgGGgwwyBB.3bw6WWwbbgGGgwwyBB.3bWWw7bbg4wwyBB.3bw6W3bbGggGw3BB.3bw6W3bbGggGw3BB.3bB20.3B21.3B21.97","drumstick":".53ιιyβ4oo.13ιιy3o4YYββo.10y5o4YYooα.9ιyyo4YYo6O.8yo6ββo4YYoαO.6yo12YYoOγ.6o4xxo4xxo4Oγ.6o3po3xxo3pooOOγ.6o3po3xxo3pooOOγ.7o6YYo4O4γ.9Oo8O3γ.11Oo8O3γ.14O3o3O3γ.20OwwW.20OwwΚ.23w6.18w4WW.18w4WW.16w5W.18wwW.21wwW.30","jipai":".54ββoβo.3oββo.9β3ooyooββoyo3βoO.6o5yo5yo5γ.5oy3o9YYo3OαO.3oyyo3Yo9YYoOO.3oyyo3Yo5ββooYYoOO.3o6xo6xxo4OO.3o6po6ppo3O3.3o6po6ppo3O3.4o9YYo4OOγ.6n17N.6n17μ.6n17μ.6n15NNμ.6n15NNμ.6nnr13RRμ.6n15NNμ.6n15NNμ.6n15NNμ.6N17μ.6N18.27","soda":".57r6.18R6.18R5F.18wwc3u.18ccwccU.18ccwccU.17οccwc4u.13οοc7u3.12c3λc5uuU.12ccwλc7U.12w11W.12w11Κ.12wwr9Κ.12w11Κ.12w11Κ.12ccwc8u.12c3wwc6U.12c3wwccΞc3U.12c11U.14u9.15u9.31","mochi":".81w6.18w5Ι.15w4λλw6.11w3nw6nnwWW.9w3nw6nnwWΚ.7w17W.6wwnw11nwwΚ.6wwnw11nwwΚ.5w6xw6xxw3W3.3w4ppw3x3w3pwwW3.3w4ppw3x3w3pwwW3.3wnnw13nnW3.3w16W5.3w16W5.4WWw12W3Κ.8W14Κ.9W14Κ.7g17G.9G12.12G12.30","tangyuan":".81w6.18w5Ι.17w7WW.10τ4pwxxw3xWWτ3p.6p5wxxw3xWWp3ρ.5pwwp3Pw5p3wp3PP.3p6Pw5Wp6PP.3p6Pw5Wp6PP.3p4P3W6p5P3.3rn5ττn11rr.3rn18rr.3r19RR.3rw18RR.3rw18RR.4r15R3.8r12RRF.9r12RRF.10R11F.14R8F.15R9.31","tofu":".81Φlwlgl.18llwggΧ.15llgllwgglggl.11lggwgglggwllgΦl.9lggwgglggwllglΧ.6ι3y3lwwgllgwwy4YY.3y19YY.3y7JJy10YY.3y4YYky5Ykky4YY.3oOOoOOko5Okko3O3.3oOOoOOko5Okko3O3.3o4OOkxxoxxOkkoOOoOO.3Oo3OOko5Okko4OO.3Oo3OOko5Okko4OO.3o3O3kooOooOkkOo3OO.3O6kO6kkO6.3O6kO6kkO6.3e19EE.4E18.6E18.27","watermelon":".74gΦlL14rllg.3gllr15lgg.3gllrxxr9xrrlGG.3gllr15lGG.3gllrττr12lGG.3gllr3xr6xxr3lGG.3gllrppr3x3r3prrlGG.3gllrppr3x3r3prrlGG.3gllr15lGG.4gglrrxr6xxrllG.6gglrrxr6xxrllZ.6g3llr9lGGZ.8g3lr6llGGZ.9g3lr6llGGZ.10g3l6GGZ.14G8Z.15G8Z.103","breakfast":".51b8.3b7.5bn8εεbn7εb.3bn8b3n7bb.3bn5ιιn11BB.3bn5w9n4BB.3bn5w9n4BB.3bn3w12n3BB.3bnnw4y6w5NBB.3bnnw4y6w5NBB.3bnnw3y9WwwNBB.3bnnw3yxxy3xyyWwwNBB.3bnnw3yxxy3xyyWwwNBB.3bnnw3yppy3pYYWwwNBB.3bnnw4Y6W3N3BB.3bnnw4Y6W3N3BB.3bn3w5W6N4BB.3bn5N13BB.3bn5N13BB.3bN18BB.4B18.6B18.27","duck":".81ι5y.18y5Y.15ι3yyιιyyιyY.11ιy12YY.9y13YJ.9y3xy6xxyYJ.9yppyo6yypYJ.9yppyo6yypYJ.9y6O3y4YJ.6ω3Ny11YNNωωN.3N4y11YN5.3w19WW.3wu18UU.3wu18UU.4w15W3.8w12WWΚ.9w12WWΚ.10W11Κ.14W8Κ.15W9.31","fish":".81uuU.21UUa.20U6.6uuU.6ο3cu6.3cuU3.6ccοοu5U.3uuU3.4c3u9cu.uuU3.3cuuxwwu9cuuU3.3cuuxwwu12U3.3cuux3u4UUu6U3.3u12Uu5U3.3u12Uu5U3.3pw11uU3uuU3.4w9WWUUa.uuU3.4w9WWUUa.uuU3.6W7UUa.5U3.9U3.21UUa.109","icecream":".56τppτ5p.12τ3pwwp7PP.9p4wwp7Pσ.7ττpwwppττp8P.6p5xp6xxp3σ.6p5xp6xxp3σ.6p3rrp3x3p3rppσ.5τp17P3.3p18P3.3PppP3pP5pP8.4yyYyyYyyYyyYyyYyyO.6yyYyyYyyYyyYyyYyyγ.8YyyYyyYyyYyyYOO.9yYYyYYyYYyYYyOγ.9yYYyYYyYYyYYyOγ.10YYyYYyYYyYYO.14yYYyYYyOO.15yYYyYYyOγ.16YYyYYO.20YOO.21YOO.34","taroice":".54v3I8v.11vw3v10V.9vw3v9Va.9vwIIvvVv6Va.9v9Vv3Va.9v9Vv3Va.9v3xv6xxvVa.9vppv3x3v3pVa.9vppv3x3v3pVa.9v3Vv9Va.9v9Vv3Va.9v9Vv3Va.9vVVv10Va.9V14a.9V14a.13n3NN.19n3Nμ.19n3Nμ.19n3Nμ.19N4μ.19N5.34","teaegg":".57bbε3b.15εbιnnb4εBb.12bbn3b4BBζ.11bnnb3Bb6εB.9nb5ηηBb4Bθ.9nb5B3b4Bθ.7εbnbbBb5B3b3B.6b3BBb9Bbbθ.6b3BBb9Bbbθ.6b3xxb9xbbθ.6bbpb5x3b4ppθ.6bbpb5x3b4ppθ.6b5B3b6Bbbθ.6bbB3b4B3b3BBθ.6bbB3b4B3b3BBθ.8b6Bb3B4θ.9Bb5Bb5BBθ.9Bb5Bb5BBθ.10B11θ.15B5θ.18B6.33","herbtea":".63Lrw.20wrR.21wrR.12e9rwwe4.6Ιec9wrrc4eE.4eec9wrrc4EE.6lq8rwwq3E.8lqqcq3wwrq5d.8lqqcq3wwrq5d.8lqqlq3rrwqqcqqd.8lqqlq11d.8lq14d.9llq3xq3xxqEE.10llqppqxxqppqEd.10llqppqxxqppqEd.10llq9QEd.10llq7Q3Ed.10llq7Q3Ed.12Q9Z.78","coffee":".57ww.4ww.15wwΙ.3wwΙ.15wwΙ.3wwΙ.15Ι.5Ι.132wwb12W.9w14WeeE.6w3λw10WEEd.6w3xxw4xxw3W3d.6wwpw3xxw3pwwW3d.6wwpw3xxw3pwwW3d.6w14WEEd.8w10WWΚ.11w10WWΚ.8ce17E.6E17.7E17.28","tealeaf":".59l.21ΦΦlgG.19l3GZ.19llgGZ.6l3.12G.5ΦΦlg3.12Z.5l3g3.12q..l3g3G3.12qΦlg4GGZ.14Φllg4GGZ.5Φll.6qg3G4Z.6lggllg.3qG4Z.9lg4G.3qG4Z.9lg8Q.15g3G5Q.15g3G5Q.17G3Z..Q.23Q.23Q.23Q.23Q.23Q.36","pork":".63w3.20w4WW.18w4WΚ.10b3ε4bw3W.9εεboonb5BbbΚ.9b3oonb5BbbΚ.8boonb11BεB.6bnnb13B3.5bnnb13BBθ.5b4xxbεεb3xb3BBθ.5b3pb5xb3ppbBBθ.5b3pb5xb3ppbBBθ.5b16BBθ.6b14BBθ.7b14BBθ.6Ιeege3B8e3E.5e15ge4E.3e15ge3EE.4E18.75","dumpling":".125wWWwWWw.15w9WW.13w9WΚ.12w12W.11w3xw5xwwWwwWww.6w3xw5xwwWwwWwΙ.6wppw3xw11W.5w6λλw11WW.3w19WW.4W6w3xxw4xxwWW.10wwpw3xxw3pWW.10wwpw3xxw3pWW.4ο5cw11W3.3οc8W10uu.3c9W10uu.4u15U3.75","crab":".51Lr.Lr.9r..r.6rrLrR.9rLLR.6r4R.9r3R.6rrR3.ww.3w..rR3.8rRF.xx.3x..rRF.9rRF.xD.3D..rRF.9r3LrrL3rLLr3.7LLr15R.6r17F.5Lr3xxr7xxr3RrR.3r3pr5x3r3prrR3.3r3pr5x3r3prrR3.3r16R5.4r14R3F.6r14R3F.5R..R14F.rR.3F..F.3RF.3F.3RF.RR.3F..F.3RF.3F.3RF.RR.4RR.3R.6RR.3R.75","bread":".128o3β5o.12ββoy3o7αO.9o3y3o7Oγ.7ooyββo4yyo4O3.5oyyo4yyo6yooOαO.3oyyo4yyo6yooO3.3o4yyo6yo5O3.3o4xxo6xo5O3.3o4xxo6xo5O3.3o3po5xo5pooO3.3o18O3.3o18O3.3Oo17O3.4O17γ.6O17γ.8B15.76","peanut":".56ιnnι3n.15ιιnNNn4ωN.13n3NNn4Nμ.12ιn5ιιNn3N.11nNNn9μ.11nNNn9μ.11n3xn5xnnμ.11nppn3xn3ppμ.11nppn3xn3ppμ.12n9NN.15nNNn3N.17nNNn3μ.15ιιn4NNnNN.12ιnnNn8N.11n3Nn8μ.11n7NNn3μ.11nNNn7NNμ.11nNNn7NNμ.12NNn6NNμ.15N6μ.17N7.33","hotpot":".77ΦΦl.7ττp.11llΧ.7ppρ.9ΦΦlggl.5pPPpPP.6Φllg3GΦl.w3ppP3o.5l3g3GlΧ.w3ppP3α.5lg3G3llyw3WWPooOoo.3lggG3y3YW3r3o3OO.3lggG3y3YW3r3o3OO.3e19EE.3deeE15d3.3deeE15d3.3de3xxE9xEEd3.4e3E12ppE.6eepE12ppE.6eeE13ddE.8E12ddE.9E12ddE.10d11E.78","ricebag":".80w9.15w8Ι.12w4WWw3Ww5.7ιnwWWw9WwwN.6nnwWWw9Wwwμ.6n17μ.6n17μ.6n17μ.5ιn17NωN.3n4ιr10n3N3.3n4ιr10n3N3.3n4rrwrrwrrwrrn3N3.3n4r3w5r3n3N3.3n4r3w5r3n3N3.3n4rrwrrwrrwrrn3N3.3n4r11n3N3.3n4r11n3N3.3nNNn13N5.4N17μ.6N18.27","shop":".75ε16bB.6b17θ.6bby15θ.6B17θ.6B17θ.5Lrrw3r3w3r3w3rLr.3r3w3r3w3r3w3r3.3r3w3r3w3r3w3r3.3R3W3R3W3R3W3R3.4N3ιιN13.6N17μ.6nnc9nb5μ.6nny3r3g3nb5μ.6nny3r3g3nb5μ.6nnB9nb3yyμ.6nnoOOp3uUUnb5μ.6nnoOOp3uUUnb5μ.6nnN9nb5μ.5Ιe17EeE.3e18E3.25","convenience":".74w19WW.3w19WW.3u19UU.3y19YY.3y19YY.3g19GG.3w19WW.3w5οw13WW.3wc4οcddc3dc6WW.3wccyrrcddc3dccgoocWW.3wccyrrcddc3dccgoocWW.3wc6ddc3dc6WW.3wccrggcddc3dccuyycWW.3wccrggcddc3dccuyycWW.3wc6ddceedc6WW.3wE6ddc3dE6WW.3wE6ddc3dE6WW.3W7ddc3dW8.3e19EE.3e19EE.25","herb":".59gΦlg..Lrr.13lgGllggGR.15ggGllgGGR.18G3.18ιnxnnxωN.16nnxnnxNμ.15nNNn4N3.12w11W.12w11Κ.11u13UU.7w17W.6w3λw13Κ.6w3λwr7w3WWΚ.6w5rn5rw3WWΚ.6w5rn5rw3WWΚ.6w5rn5rw3WWΚ.6w5r7w3WWΚ.6w5r7w3WWΚ.8u13UU.10W12.12W12.30","lingjiao":".131vvV.18IIvV3vvV.15v3V5a.13IIvIIV7.8I4vvV10vvVkk.3v6V13kk.3vVV.VVxV6xxa..Vkk.3V.3VVpV6ppk.3kk.3a.3VVpV6ppx.3kk.7V5x3V3x.12V9kkx.12V9kkx.14V6kkx.16k5x.18k5x.105","lettuce":".54Φl.ΦΦl..l..l.9Φl.llΦl3ΦΦlΦΦΧ..l.6lΧ.l11Χ..Χ.5l3wlΦΦl9Φlgll.3gl18GG.3gl18GG.3gllGl12GGlGG.3g3lxxl9xllG3.3g3lxxl9xllG3.3g3lppl3x3l3pllG3.3lg3l14Gll.3lg3l14Gll.3gGGg3l9gG5.4ggGllgl6ggGllZ.6ggGllgl6ggGllZ.5lg3GGg7G6ll.4llgG3g5G6l.6llgG3g5G6Χ.8lG12ll.76","potato":".78ι4nω3N.15n5N3μ.14n3N7ωNb.9ιnN4ηηN7εb.7nnN13bζ.6nN3BBN12b.5nN5xN6xxN3ζ.5nN5xN6xxN3ζ.5nN3ppN3x3N3pNNbεb.3N15BNNb3.3N15BNNb3.3bN15b5.4bbN3BN8b3ζ.6bbN3BN8b3ζ.8b3N6b5ζ.10b11ζ.12b11ζ.102","garlic":".59Wnn.21wWW.21wWΚ.19w5W.17w6W3.15wwλλwwWWΚ.12w12W3.7Lrw13WWR.6rrw13WWF.5rw3xxw7xxw3WrR.3rw3ppw3x3w3pwwWRR.3rw3ppw3x3w3pwwWRR.3rw6WWw3Ww5WRR.3r3Ww3WWy3Ww3WWR3.3r3Ww3WWy3Ww3WWR3.3rrR.W3w5W4..R3.3r4..eWWeWWe.3rrR3.3r3R..eWWeWWE.3R5.3r6.9R6.73","loofah":".57G3.20lg3lgG.3τp.τp.9lg5Z.3pρ.pp.7Φlg9GppPpp.7llg7GGZ..p.9llg7GGZ..ρ.9llgxxg3xggZ.12llpg5pggZ.12llpg5pggZ.12llg3x3g3Z.12lΦgGGg3GggZ.12lΦgGGg3GggZ.12llgGGg3GggZ.11lg3GGg3Gg4G.9lg3GGg3Gg3GZ.9lg3GGg3Gg3GZ.9lg3GGg3GggGGZ.9lg3GGg3GggGGZ.10G11Z.78","meatball":".59yYY.18nωωN4εb.15nN6bζ.13nnNxxN3xNNb.12NNpNηηN3ppζ.12NNpN6ppζ.14b9.15nN6bζ.15nN6bζ.13nnNxxN3xNNb.12NNpNNx3Nppζ.12NNpNNx3Nppζ.14b9.15nN6bζ.15nN6bζ.13nnNxxN3xNNb.12NNpN6ppζ.12NNpN6ppζ.14b9.18yYY.21yYY.34","melon":".57GGg3G.20GGZ.21GGZ.18lggl3gΦl.12l3ΦΦlg4l4g.9lg3llg4llggG.7llgllg3lgglg3llG.5lg3xxgllg3lxxg3lgG.3lg3xxgllg3lxxg3lGG.3lgglg5lg6llgGG.3lggpg3llx3lg3ppgGG.3lggpg3llx3lg3ppgGG.3lgglg3llg3lg3llG3.4g5lg3llg3lGGZ.6g5lg3llg3lGGZ.6GGgllg3lg3llgGGZ.8G3g3lggG5Z.9G3g3lggG5Z.12G8Z.79","bee":".54xx.9x.14x.6xx.15D.6xD.15yι5yYY.12ι3yιιy7YY.9y13YJ.6w3y3xy6xxyYYw3.3wccy3py6ppyYYcww.3wccy3py6ppyYYcww.3wccy6x3y4YYcww.4wwx15w.6wwx15Ι.8y13YY.9x15.9x14D.10y9Y3.14Y8J.15Y8J.18x3.82","turtle":".57eeΙ3e.17exxe3xeE.15exxe3xEd.15eppe3pEd.9ΙΙe.3d9.3eeE.3eeE.3d8E.3eEE.3e4dde9EddE3.4dde3d7E5d.6dde3d7E6.6ddedde6EddE4.6ddedde4E3ddE4.6ddedde4E3ddE4.6ddEddΛΛE5ddE4.6ddE3d7E6.6ddE3d7E6.5ΙeedE12ddEeE.3eEE.3d9.3E3.3eEd.3d8E.3E3.12eEE.82","rabbit":".54w3.6w3.11wppΙ.6wwpWW.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.10w11W.11w13WW.9w13WΚ.7w3xxw7xxwW3.6wwpw5Pw5pWWΚ.6wwpw5Pw5pWWΚ.8w12WWΚ.9Ww3δw7WWΚ.9Ww3δw7WWΚ.7w15W3.5w6Ww6WWw3W3.3w6Ww6WWw3W3.3w6Ww6WWwW5.4W5Κ.6W5Κ.6W6.6W6.27","lion":".54EEeeE.3e3E.9eeEddE3e3E3deeE.6E3ddE9dEEd.5EddE3de6ddE3deE.3E3de12ddE3.3E3de12ddE3.3dEEewΙxe6wwxeeEdd.3E3e6E3e6E3.3E3e6E3e6E3.3Eddeppew6eepeedEE.3dEEe4r6e5Edd.3dEEe4r6e5Edd.4EEde12d3.6EEdE3ddE3dE3d3.6EEdE3ddE3dE3d3.8E3e9E3.7ΙΙe4EEe3Ee5E.6e6EEe3Ee5d.5E20d.3d21.3d21.25","mazu":".51y3ιιyιιy3ιyyιyyY.6rr.yyYyyr3yY3..r.6rR.yyYyyr3yY3..R.6rR.ιhyssy3syyh..R.6rR.hhsxxs3xssB..R.6rR.hhsxxs3xssB..R.9hhspps3pssB.14s8S.15s8S.12L3r3y3r5R.7LLr6y3r4R3.6r8y3r4RRF.6r5s3W3s3rRRF.6r8W3r4RRF.6r8W3r4RRF.6r3y12RRF.6r8yr6RRF.6r8yr6RRF.5r9y3r6R3.3y18Y3.3y18Y3.25","hand":".60ΙΙe.17ΙΙe.eeE..ΙΙe.12eeE.eed..eeE.12eEE.eed..eEE.7ΙΙe..eEd.eed..eEd.7eeE..eEd.eed..eEd.7eeE..eEd.eed..eEd.7eed..eEd.eed..eEd.7eed..eEd.eed..eEd.7eeEΙΙeΙEΙeeEΙΙeEEΙee.4e6Ιe8EEeEE.4e15EEeEE.4e15E5.4e15EEd.6e15EEd.8e12EEd.9e12EEd.9e12EEd.6ε3be11Eb3εB.3b19BB.3b19BB.25","statue":".59yYY.18ι3y3Y3.15y6YYJ.12y12Y3.12s9.15s8S.13nsxs6xxs.12sspssr3sppS.12sspssr3sppS.9sscu14s.8u13UU.9u13Ua.10ΞΞu9U.12U5.3U3a.12U4a.3U3a.9eeΙe14E.8eE12dd.9eE12dE.9e13EEd.6EEd15E.6d18.27","otter":".54ε11b.9εBεb12εbB.6BBb15θ.8b3xb6xxbBB.7εεbppn9pbbB.6b3ppn9pbbθ.6bbnBBn3x3n3Bnnθ.8bn12BB.9bn12Bθ.10bbn9B.12bbn9b.12bbn9ζ.11εbbηn8bεB.bb.6b3ηn6BBbBBbBB.6b3Bn6BBbBBbBB.6b3n9bBBbBB.6b4n6b3BBbBB.6b4n6b3BBbBB.7b11B4.9B5.3B3θ.12B5.3B4.30","goat":".53eEE.22eeE.21eed.18w6EEwpp.12w9W.14w9Κ.14w3xw3WWΚ.14w19.5w18Ι.6WWw16WW.4WWw15W3.4WWw7δδw6W3.6Ww14W3.7W14Κ.9W14Κ.9w3..w3.w3..w3.7wwΙ..wwΙ.wwΙ..w3.7wwΙ..wwΙ.wwΙ..w3.7d3..d3.d3..d3.73","cow":".51W3.12W3.8W3.9WWΚ.9WWΚ.9WWΚ.9w9x4WΚ.6ττpw9x4wwττp.3p3w9x4wwp3.3pPPw10x3wwP3.4w3xxδδw7xwwW.6w3xxw9xwwΚ.6w17Κ.6wwpw12ppΚ.6wwpw12ppΚ.5τp18PP.3p4xxp9xp3PP.3p4xxp9xp3PP.3p16P5.4p14P3σ.6p14P3σ.8P14σ.15yYY.21yYY.34","deer":".50B.3εB.18BεB.B3.17BBθ.BBθ.18B4θ.19o6εb.16o6bζ.15xooxo5.16o5α.18o5α.18o6β5oβ4ow3.6owwo3ββowo6OO.6owwo6wo6OO.6o6wo5wo3OO.6Oo14O3.6Oo14O3.7O14γ.9o3..o3.o3..oβo.7ooα..ooα.ooα..o3.7b3..b3.b3..b3.73","bird":".80L3rrR.18r4RF.16r8R.14w6x6.12w6x5D.9Eddwxxw4x5B.11w3pw3x8.9w3pw3x7D.10w6xxwxxwxD.10w5x3wxxwx3.9w5x3wxxwxxD.9w6x3wwx3D.11w3δxxwx8.9w4xxwx8.9w6x9.10w5xxD.3x3.10w5xxD.3x3.10y3..y.81","dino":".59l6g.15llg7lgG.12g11Z.8o.3g6wwxggGgG.6oβo.g11G3.6ooα.g11G3.4ββooα.g3ppg3x3G3.4oog3lg8G3Z.6oog12G3Z.5og4ΦΦl6ggZ.8g6l9ggG.6g6l9gGZ.6g6l7ggGGZ.6G.3ggl6gG4Z.6G.3ggl6gG4Z.12gG7Z.15g3.3gGZ.15ggG.3gGZ.15G3.3GGZ.79","whale":".53c..c..c.18οοcοc.19c4Ξ.21Ξ.11uUU.4c5uc5u.3cuU.6u11U.3uua.5cu12cu.uua.5u15cuua.5u18a.5uwwxuοοu9UUa.5u3pu11UUa.6u3pu11UUa.6uc11u3UUa.6c3Wc3WWc3WUUa.8c3Wc3WWc3WUUa.9c11UUa.12U9.15U8a.106","beetle":".50εhh.21hbb.21hbζ.21h4.21h3εh.3ε6h.9h4B.3h6B.9h8b6hεεh.5εh5bwwb3h7εh.3h6bwwb3h9.3hxxhb5hhεεh8.4h5b3h10kk.4h5b3h10kk.4h17k3.6hkkh10kkx.8hkkh10kkx.8x.3xx.4xx.10xx.3x.5x.12xD.3D.5D.11xxD.xxD.3xxD.81","starfish":".59ββo.19ββo3O.18o5γ.18o5γ.17βo5OαO.15ooββooOOγ.9oβ5o9ββoαOO.4o5xo6xxo3γ.6o5xo6xxo3γ.8oppo3x3o3pOO.10o11O.12o11γ.12o9OOγ.11βo5Oo5OαO.9o6Oo5OOγ.9o4OO.3o4Oγ.7ββo3O.6o3O3.6o5γ.6o3OOγ.6o3OO.9oOOγ.5oOO.15OαO.3oOO.15O3.25","station":".59rRR.19Lrw3R.18rrw3F.17rwwxw3rR.13LLrwwx3wR3.12r3wwx3wRRF.11Lr5w3R4rR.7LLr9R7.6r11R6F.5r12R9.4wwxwwx3wxxwx3wwW.6wwxwwx3wxxwx3wwΚ.6n17N.6nncΕΕn3b3n3c3μ.6nnc3n3b3n3c3μ.6nnuccn3bBBn3uccμ.6n8bBBn6μ.6n8bBBn6μ.6N8bBBN6μ.5Ιe19E.3e19EE.25","steamtrain":".51w3WW.18w7WW.15w7WΚ.16x6WΚ.4rrLr4R.6d3.3yYY.3rc3RR.6ddE.3yYJ.3rc3RR.4E14rc3RR.3yd14rc3RR.3yd14rc3RR.3d5eed8r4RR.4d14r4RR.4d14r4RR.3r19RR.4rrR.5rRR.4rrR.6rrF.5rRF.4rrF.5re3rRdLre3Rddre3rR.3re3RF.rre3F..re3RR.3re3RF.rre3F..re3RR.4R3.5R3.4R3.5Ιe3Ι5e3Ι4e4E.3e19EE.25","bridge":".74L18rrR.3r19RR.3rc3LLc4r3c6RR.3r3c6rc3rrc4RR.3r3c6rc3rrc4RR.3rccrc3rrc6rc3RR.3rc3r3c9r3RR.3rc3r3c9r3RR.3R21.3d21.3d21.3ueeEu11eEEu3.3ueeEuucu6ccueeEuu.3ueeEuucu6ccueeEuu.3ueeEu5cu6eeEUU.3UeeEU3u6U3eeEUU.3UeeEU3u6U3eeEUU.3UeeEU12eeEUU.3U21.3U21.25","tunnel":".51l16gG.5lg17GgG.3lg17G3.3R21.3r3Rr11Rr3RR.3r3Rrγr9Rr3RR.3rRRrrγe9rRRrRR.3r4eex9Er3RR.3r4eex9Er3RR.3rRRex12EErRR.3r3ex12EErRR.3r3ex12EErRR.3rRRex12EErRR.3r3ex12EErRR.3r3ex12EErRR.3rRRex3eex3ex3EErRR.3EeeE3wb6wwEeeE3.3EeeE3wb6wwEeeE3.3eE3wwE9wEEeEE.3E3wb12wwE3.3E3wb12wwE3.25","gas":".53L9rRR.10LLr12R.9r14F.9rrw10rrF.9rrwc8wrrRx3.6rrwc8wrrRxxD.6rrwccxccxccwrrF..xEd.4rrwc8wrrF..xdd.4rrwc8wrrF..xdd.4rrw10rrF..D.6r4λr9F..D.6r4λr9F..D.6r3w8r3F..D.6r3wwy3Ywwr3F..D.6r3wwy3Ywwr3F..D.6r3w8r3RxxD.6r14F.9r14F.8d18.6E19.5E19.27","temple":".50r.18rR.3rLr.6ιιy.6rRR.3rrR.6yyY.6R3.4r3y12rrF.6r15RRF.6r15RRF.5r18RrR.3R21.3R21.4y17Y.6rrRn12rrR.6rrRn12rrF.6rrRnnb9nrrF.6rrRnnιιyb3ybbnrrF.6rrRnnbyyb3ybbnrrF.6rrRnnb9nrrF.6rrRnnbyyb3ybbnrrF.6rrRnnbyyb3ybbnrrF.5e20E.3E21.3E21.25","tudigong":".51Lr.15R.6r3.3ι5y.3rrF.6rrR.3y5Y.3RRF.8rL3r6LrRRF.7LLr13R3.6r15RRF.5R21.6rB12RF.9rB12RF.9rB5y3B4RF.9rB5s3B4RF.9rLB4s3B4RF.9rLB4w3B4RF.9rB3y6B3RF.9rB3y6B3RF.9r6xrrxr3RF.7ΙΙe4YYy3Ye5E.6e6YYy3Ye5d.6e6Y6e5d.5eE18eE.3E21.25","shelltemple":".50p.18PP.3pτp.6w3.6P3.3ppρ.6wwΙ.6P3.4p3w12PPσ.6p15PPσ.6p15PPσ.5p18P3.3P21.3P21.4c3wwpPPpPPpPPc3u.6ccwppPpτPppPppPccU.6ccwppPpτPppPppPccU.6ccwppPppPppPppPccU.6c3wwPppPppPppc3U.6c3wwPppPppPppc3U.6rrc3PppPppPccoccU.6rrcP3ppPppP3o3U.6rrcP3ppPppP3o3U.5e20E.3E21.3E21.25","stonetemple":".50e.18eE.3eΙe.6ΙΙe.6eEE.3eeE.6eeE.6E3.4e3EEeE5eE3eed.6e5Ee5Ee3EEd.6e5Ee5Ee3EEd.5e3Ee5Ee5EeeE3.3d21.3d21.4e3EEe7EEe3E.6eeEeΙx9eEEd.6eeEeΙx9eEEd.6e5x3y3x3e3d.6EEe3x3Y3x3eEEd.6EEe3x3Y3x3eEEd.6e3EExr6xxEeed.6eeEe5Ee6EEd.6eeEe5Ee6EEd.5E21.3d21.3d21.25","torii":".50r.14R.8rL13rF.8r15F.9R14.12rRF.6rRF.12rRF.6rRF.10r14R.11rRR.6rRR.ΙeE.8rRF.6rRF.eed.8rLF.6rRRe3E3.6rLF.6rRF.yyd.8rRF.6rRF.yyd.8rRF.6rRRe3E3.6rRF.6rEE.eed.8rRF.6rEd.eed.8rRF.6EEd.eed.8rRF.6EEd.eed.8rRF.6EEd.eed.6e3E3.3e3EEe3E3.3lg6l3g9GG.3g19GG.25","lighthouse":".59rrR.12y.6LLrR3.6ιy.3Y.6r3RRF.6yy.4y3..xyywy3xx.y3.9ιyxy6xxy.12yyxy6xxY.12d12.14w7WW.15w7WΚ.15δδw5WΚ.15r7RR.15r7RF.13r5xr3R3.12w11W.12w11Κ.12w11Κ.12r11R.12r11F.11r6br5R3.7ΙΙe13E3.6e15E3.27","fort":".59xL3rr.18xrrR.20xrrR.11ΙΙe.ΙΙe..e3.ΙΙe..eeE.3e3Ιe3ΙΙe3Ιe3ΙΙeEE.3e19EE.3eEEe6Ee6EEeEE.3e4EEe7EEe4EE.3e4EEe7EEe4EE.3exxeΙΙe12xEE.3e4EEe3x3e3Ee3EE.3e4EEe3x3e3Ee3EE.3eEEe4x6e3EEeEE.3e7BBb3Be6EE.3e7BBb3Be6EE.3e3Ee3BBb3BeeEe3EE.3Ee6BBb3Be5E3.3Ee6BBb3Be5E3.3E7BBb3BE8.3d21.3d21.25","castle":".59rrR.19LLrR3.18r3RRF.12Lr.4r3RRF.5R.5LrrR..Lr3R3rR.LrRrR.3r3F..r4R4F.rrR3.3y3Y..y7YY.y3YY.3yxxJ..y3cy3YJ.yyxYY.3yxxJ..y3cy3YJ.yyxYY.3y3Yιιy13YY.3y3Yy11Yy3YY.3y3Yy11Yy3YY.3yxxYyyιy8YyyxYY.3y3Yyyιyyb3y3Yy3YY.3y3Yy5b3y3Yy3YY.3y3Yy3b6yyYy3YY.3y3Yy3b6yyYy3YY.3y3Yy3b6yyYy3YY.3Y7b6Y8.3e19EE.3e19EE.25","cannon":".89ΙΙeEEd.18e3Edd.15e3E4dd.12ΙΙeE4d5.12e3E4d5.9e3E3Ιd5E.8ΙΙeE4dΙd3E.11e3E4d5E.9ddE4d5E.14r6b4.14r6b3ζ.12LLr4bbBbbBbb.9Lr5bBB.bζ.BBb.8r6bBθ.bζ.BBζ.8RrrR..b4yyb3ζ.8R3.3bBB.bb.BBζ..d.5RRF.3bBθ.bζ.BBζ..E.12bbBbbBbb.EdEEd.12B3θ..Ed5.12B4..d6.25","pagoda":".59yYY.19ggqQ3.18q3QQZ.14q..gq5QqQ.qQ.9qggq7QQqQZ.9q10Q4Z.12rRRy3rRR.15rRRy3rRF.15rRRy3rRF.9q.5q6Q3.4qQ.3qg5q7QQq4QQ.3q5Lq7Q8.6rRL.y5Y.3rrR.8rRF.9rRR.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.7e17E.5eE18eE.3E21.25","minnan":".50r.18rR.3rLrR.12r3RR.3r3F.12R5.4r3R14F.6r17F.6r17F.5r18RrR.3R21.3R21.3o3Oo11Oo3OO.3o4ΕΕo13OO.3o19OO.3oddWddrb5BrrdWWdOO.3oddWddrb5BrrdWWdOO.3oddWddrb5BrrdWWdOO.3o4OOrb5BrrOo3OO.3oOOo3rb5Brro3O3.3oOOo3rb5Brro3O3.3W21.3e19EE.3e19EE.25","stonehouse":".77E14d.9d14E.7EEdeed6ed5EEd.3Ed20.3d21.4e3EEe4EEe6E.6e3xxΙe6xxreed.6e3xxre6xxreed.6e3xxre6xxrEEd.6EEe6Ee8d.6EEe6Ee8d.6e3EEe3u4EEe3d.6e8uUUue3EEd.6e8uUUue3EEd.6eeEe5uUUue5d.6e5EeeuUUuEEe3d.6e5EeeuUUuEEe3d.6E17d.5lg19G.3g19GG.25","house":".63εεb.15LrR.3bbB.15rrF.3bbθ.14Lr3R3bbθ.12LLr6R4.12r8R3F.11Lr9R3rR.7LLr12R4.6r14R3F.5r5ΕΕr8R6.4n17N.6n17μ.6nny4n5b4nnμ.6nnywwyn5b3Bnnμ.6nnywwyn5b3Bnnμ.6nny4n5byybnnμ.6nngppgn5b3Bnnμ.6nngppgn5b3Bnnμ.6N11b3BNNμ.5lg19G.3g19GG.25","hut":".59yYY.19ιιyY3.18y3YYJ.17yNNyNNY3.13ιιy3Ny3Y3.12y5Ny3YYJ.11yNNyyιιyyNyyY3.7ιιy4NNy6NY3.6y6NNy6NYYJ.5y3Ny6NNy6Y3.3Y21.3Y21.4bbBb3BBb3Bb3BBb.6bbBbbx6b3BbbB.6bbBbbx6b3Bbbθ.6bbBbbx6bBBb3θ.6bbBbbx6b3Bbbθ.6bbBbbx6b3Bbbθ.5B21.4Bθ.Bθ.9θ..θ.6BB.BB.9B..B.27","totem":".51ww.ιy.Lr.3r..y..w.6w3y3rrL3rιιywwΙ.6w3y3r6y3wwΙ.9b11B.12bbxb5xbbθ.12bbxb5xbbθ.12b3rrbrrb3θ.12bbw7bbθ.12bbw7bbθ.12B11θ.12εbbr3b5θ.12εbbr3b5θ.12bbrb3rrb3θ.12b3xxbxxb3θ.12b3xxbxxb3θ.12b11θ.12b3w5b3θ.12b3w5b3θ.12bbBb6BBθ.9Ι3e13E.7e15EE.28","museum":".59wWW.18w6W3.15w6WWΚ.12w6y3W6.6w13W8.3w13W8.3E21.4wwWddwWWdb3ddwWWd.6wwWddwWWdb3ddwWWE.6wwWddwWWdb3ddwWWE.6wwWλdwWWdb3ddwWWE.6wwWλdwWWdb3ddwWWE.6wwWddwWWdbbBddwWWE.6wwWddwWWdbbBddwWWE.6wwWddwWWdbbBddwWWE.5e19EE.3W21.3W21.3e19EE.3E21.3E21.25","school":".50eLLr.20er3LLr.17er5R.17er4R.18E.6L11rrR.3E.6r12RR.3E.5r12R3.3E.3ιιn13NN.3E.3n15NN.3E.3nncnncn5cnncNN.3E.3nnu4y3u6NN.3E.3nnu3ΕΕyyu6NN.3E.3r15RR.3E.3nncnncnnb3nccnNN.3E.3nncnncnnb3nccnNN.3E.3nnu3n3bBBnu3NN.3E.3n8bBBn4NN.3E.3n8bBBn4NN.3d.3N8bBBN6.3gl3g15GG.3g19GG.25","treehouse":".54l8g.12Φllg9l4gG.6llg15Z.5lg6rrRg10G.3g4r3ΦΦrR3g6GG.3g4r6R3g6GG.3g3r9R3g4GG.3gGGgb9BBgGGgGG.3gGGgb9BBgGGgGG.4GGgbbcb6BBgG3.8Gb9BBGGZ.9Gb9BBGGZ.10B12.14b..bBθ.18ζ..bBθ.18beebBθ.18ζ..bBθ.18ζ..bBθ.18beebB3.15εεb6BεB.13b8B3.31","buddha":".59YαO.18YαOYOOYαO.15YOOYOOYOγ.13YYOYYOYYOYYO.12YYy9Y.12YYy9J.11YyyO3y3O3yYY.9Yy12YJ.9Yy12YJ.10YYy3O3y3Y.14Yy6YY.15Yy6YJ.10yyY4ιιY9O.5yY6OOY3OY6αO.3yY6OOY3OY6OO.3yY5Oy6OOY4OO.3Y19OO.3Y19OO.3pPPpPPpPPpPPpPPpPPpPP.4P18.6P18.27","monument":".59eeE.19ΙΙeE3.18e3EEd.18e3EEd.18eedEEd.18eedEEd.18eeΙEEd.18eeΙEEd.18eedEEd.18e3EEd.18eedEEd.18eedEEd.18e3EEd.15Ι3e3E3eeE.12e6E5d.11e9E4eE.7eeE16.6E17d.5gppge8E6gpp.3G21.3G21.25","info":".50c9u3c6uuU.3u9w3u7UU.3u9w3u7UU.3u9w3u7UU.3u19UU.3u19UU.3u3οu3w5u7UU.3u3οu5w3u7UU.3u9w3u7UU.3u9w3u7UU.3u7w6u6UU.3u7w6u6UU.3U21.6bBB.9bBB.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.6l3g3l9g5G.3g19GG.25","nightmarket":".51x18.5rwwrwwrwwrwwrwwrwwrrR.3rwwrwwrwwrwwrwwrwwrRR.3rwwrwwrwwrwwrwwrwwrRR.3RWWRWWRWWRWWRWWRWWR3.3RWWRWWRWWRWWRWWRWWR3.4rr.3r.6rr.3r.5rYYr..b.5rYYr..b.5rYYR..ζ.5rYYR..ζ.5r3ι..ζ.5r3R..ζ.6yy.3ζ.6yy.3ζ.6yY.3ζ.6yY.3ζ.6bb.3oyyOoo.6ζ.6bbw15ζ.6bbw15ζ.6yyYyyYyyYyyYyyYyyY.6b17B.6b17θ.6bbB15θ.6BB.15θ.6BB.15B.27","island":".54g3.6llg.9llgllglg.3lg5G.6g3llggG.3g4GGZ.5gllG4ggbggG7gg.3G.6b3BBb.6GG.3G.6b3BBζ.6GG.9b3B.3BB.16ΦΦθ.21bbθ.23bεB.21bBθ.21bBθ.21bBθ.16ι4nbBBιιn.13n5bBBnnκ.10ι3n12ωN.6un15N3cu.3un15N3uu.3cu3N14u3.4uuU16.6uuU16.27","beach":".57LLrw3Lr.13L3rrw4r3ww.10r5w4r3wΙ.9Lr3w6r5w.6LLr3w7r6ww.4r5w7r6ww.3R6W7R6WW.12bBB.21bBθ.21bBθ.21bBθ.21bBθ.12cu8bBBu4ccu3.3U9bBBU9.3U6ιιUbBBU9.3n9bBBn7NN.3n4w3n8oOON3.3n4w3n8oOON3.3n3wW3n9N5.4N17μ.6N18.27","rockarch":".56e4Ι4e.12ΙΙew4e7E.9e3w4e5EEd.7ΙΙewwe7E6.6e12E5dEd.4e5Ιe6E5d3.3Ιe4ΙE.6eeE3d3.3e4EE.9eEEd3.3e4Ed.9eEEd3.3e3E.12EEd3.3e3d.12EEd3.3e3d.12EEd3.3e3d.12EEd3.3eEEd.12EEd3.3eEEd.12EEd3.3eEEd.12d5.3d4ο7cwο3ccd3.3d4c8wc5d3.3cu6wwu10cc.4U18.6U18.27","mountain":".57wwe.20w4eE.18w4Ed.16w5eE3.15wwgwwgEEd.3Ιe.10wwgwwgEEd.3eE.9lg8GgGw3E.8lg4ΦΦg3GGwggEeE.6lg9GGwggE3.4Φlg10G3g3GG.4llg4llg6G3gGG.4llg4llg6G3gGG.3lg5lg8G6.3lg3llg10G5.3lg3llg10G5.3lg15G5.3g16G5.3g16G5.3G21.4G17Z.6G18.27","park":".53g3l5g.13lgl3g8G.10ggl3g7GZ.9gl3g9G3.8gllg9G3Z.8gllg9G3Z.8g8ΦΦG5Z.8g9G6Z.8g9G6Z.9ggG11Z.16bbB.21bbθ.21bbθ..b9.10bbθ..B9.10bbθ..B9.10bbBb11.10bbB4.6BB.10bbB3θ.6BB.3l7bbB4l6BB.3G21.3G21.25","paint":".66r3.11ι6n..rRR.12n6κ..rRF.9ιn9εbB.9ιιnr3n3y3bbBιn.7n3r3n3y3bbBnκ.7nnr3Rnny3Yn5N.5ιn9YYn6NωN.3n7ιιnYYn6N3.3nu3n14N3.3nuuUn4κ.3n6N3.3nuuUn4κ.3n6N3.3n8κ.3n4NNμ.5ng3n5ι3n4NNμ.5ng3n12NNμ.5nggGn6v3nnNNμ.7n9vvVNNμ.9n9vvVNNμ.11N3n4N4μ.15N5μ.18N6.34","lantern":".59B3.18Yιιy3Y3.15Yy5YYJ.12r12RrR.7Lrw3r10R3.6rrw3r10RRF.6R17F.5rwwr6y3r6RrR.3rwwrrLLrry3r6R3.3r7yyY3yr5R3.3R7yyY4R8.3R7yyY4R8.3r9yYYr6R3.4r15RRF.6r15RRF.8R14F.12Yy5Y3.15Yy5YYJ.18rRR.19LLrR3.18r3R3.33","posttruck":".74g14q.9q14Q.9ql14q.8qllq13οοc.5qllq13ccΞ.5q3w9q4c5.3q3Ww6WWq4ccq3.3q3Ww6WWq4ccq3.3q3wWWw3Wwwq9.3q3w3W3w3q9.3q3wgwW3w3q9.3q3wgw7q7yy.3Q21.3Q21.3Qd6Q6d6QQ.4dde3E.6dde3E.6dde3E.6dde3E.6dde3E.6dde3E.8d3.9d3.9d3.9d3.28","road":".54c5w3cοοc.9οοcw9c3wwc.6c3w9c3wwΞ.5οc14w4οc.3c21.3c21.3g9E3g7GG.3l7E6l6GG.3l7E6l6GG.3g7EEy3Eg6GG.3l6EΛΛE6l6.3l6E9l6.3g6E3y3E3g4GG.3l4E12l5.3l4E12l5.3g4E5y3E4g3GG.3l3E15l3.3l3E15l3.3gE8y3E7GG.4E17d.6E18.27","bike":".150x5.4x5.10x4D.4x4D.12r.8r.14rL8R.14r9R.14rrR.4rrR.11dLrdrR.3rddrEd.9drrdrR.3rddrdE.7dd.rR.rR.Lr.3R..d.5d.3rR.3LrR.3R.3Ed.3E.3rR.3rrR.3R.3dd.3E.3eeR3x3.3e.3dd.3E.8d3.7dd.3E.8ddE.7dd.4dd.4dd.3d.5d.8E3d.6E4d.9d4.6d5.28","airplane":".56dx6dd.18rRR.21rRF.19w5W.18wwc3Κ.18wwc3Κ.12w8cuuW7.5Lr6w5Wr7R.3r7wwλλwWr6RR.3R7w5WR8.10w5Κ.18w5Κ.18w5Κ.20wWW.21wWΚ.21wWΚ.16L4rwWWL3r.12r5wWWr3R.12R5wWWR4.17rRR.21rRR.34","pinball":".54v11V.9IIvc12vvV.6v3c12VVa.5Ivvc4r3ccy3c4vV.3vc5rRRrccyYYc4VV.3vc5rRRrccyYYc4VV.3vc6rrc4yycu3VV.3vccu3c10uuUVV.3vccu3c10uuUVV.3vccuUUc12dVV.3vc8ec6EEdVV.3vc3οc4ec6EEdVV.3vc3οc13dVV.3vc3w3c6W3c3VV.3vc3w3c6W3c3VV.3vc5w3c3W3c4VV.3vc8.3c7VV.3vc7Ξ.3c7VV.3V21.4d3.12d3.6d3.12d3.27","fountain":".57ccw3c.15οοc..u3.οοc.12ccΞ..uuU.ccΞ.11c.5uUU.4cc.7οc.3Ι3e5E.3c.6cΞ.3e6EEd.3Ξ.6uu.w11E..u.6uU.E11d..U.6uU.E3οοE7..U.14eEd.13οc.6eEd.6c.6cΞ.6eEd.6Ξ.5Ιe11E8d.3ec6u11Udd.3ec6u11Udd.3eccu13U3dd.3e13E6dd.3e13E6dd.4E15d3.8d14E.9d15.28","toothpaste":".51wwcw3ccw.14w6cw5.12w6cw4Ι.13eeweeweewee.13e10E.13e10E.12u19UU.4U18.6U17a.29Ew15WW.6Ew15WΚ.6eWWw13WWccu.3Ew3xxw6xw3u5.3Ew3xxw6xw3u5.3eWWwppwx3wwpw3uuU3.3Ew15u5.3Ew15u5.3eW17u3.73","rocket":".59rRR.19LLr3R.18r5F.17r6R3.15w7WW.15w7WΚ.15wccu3wWΚ.15wu3UUwWΚ.15wu3UUwWΚ.15w7WΚ.13Lrλxxw3xWWR.12rrλxxw3xWWF.11Lrrwppw3pWWRrR.9r3w7WWRRF.9r3w7WWRRF.9rRR.E6..RRF.13ooy3o.18ooy3α.20yoo.21o.23o.36","toilet":".53p.8y..r.9τpyτp.4ιyoιyrwwr.6ppypρ.4yyoyyrwwR.8pgg.6ygg.rr.6w3W..g.3lg.gG.gg.6w3Κ..G.3gG.gG.gG.6w3Κ.3gg.g4G.gG.6w3Κ..ΙeeΙe5ΙeeE.5w3Κ..e12d.5w3Ww14W.5w3Ww3xxw4xxwWWΚ.5w3Ww3xxw4xxwWWΚ.6W3wwλλpwxxwppwWWΚ.9w11WWΚ.10w11WWΚ.12w7WWΚ.14w6WWΚ.15w6WWΚ.13w9W3.12W11Κ.12W12.30","flower":".53pτp.6yιy.10τpwp3.3ιyoy3.9ppwppρ.3yyoyyY.9p3PPρ.3y5Y..rLr.6pPσ.lg.3Ygg.Lrwrr.6pPσ.gG.3YgG.rrwrr.10gG.r3..g..rRR.6IIv.ggrwwrrRG.11vvV.ggrwwrRRG.9vvwv3ggr3RggG.11vVVnGGgRRnGGn.11vVVnGGgRRnGGκ.12n11N.12r4ββrrR4.12r8R3F.14n3r3nN3.14n6NNμ.15n6NNμ.16n3NNμ.20NNμ.21N3.34","farm":".57Φl.3G.14llg.llGΦlZ..o.11ggG.llGllZ..α.9ggl3gllG3gβoO.8gl3g3GGgr3o3.8gl3g3GGgr3ooα.8g3lg5r3RooO.8g6Grrwr3RRo.8g6Grrwr3RRα.9ggG4r5RRF.9ιnnN12ω5N.3n3N18.3bnnbnnbnnbnnbnnbnnbBB.3b18B3.3b4εεb12B3.3bBBbBBbBBbBBbBBbB5.4b15BBθ.6b15BBθ.6bbBbbBbbBbbBbbB3θ.8B14θ.9B15.28","book":".75w6.6w6.6w5Ι.6w5Ι.5w10kkw7WW.3we6w3kkwy5wWW.3we6w3kkwy5wWW.3w10kkwy5wWW.3we8wkkw7WW.3we4ΙΙeewkkw7WW.3w10kkwg5wWW.3we5w4kkg3G3gWW.3we5w4kkg3G3gWW.3w10kkw7WW.3we6w3kkw7WW.3we6w3kkw7WW.3w10kkw7WW.3W10kkW9.3W10kkW9.3r10R11.4R8.4R5F.6R8.4R6.27","hearttree":".53g4.6l4g.7lgl3glg.3lg5G.6ggl3ggG.3g6Z.5gl3g5lg8GgG.3gllg7ppPg3G5.3gllg7ppPg3G5.3g5ΦΦggp6gG5.4g8p4PPgGGZ.6g8p4PPgGGZ.8g7ppPggGGZ.10g11Z.12g11Z.14g3b3G3.16ggbBBZ.18ggbBBZ.20bBθ.21bBθ.21bBθ.18b4B5.12ΦΦlg11G.9l3g10GG.28","sakura":".65p3.9ττp.7τpyPPp.8ppρ.7ppyPPρ.6ppyPPp.5bBBp3.9p3.4εbBpp.12ppρ.4bbBpρ.16εεbBB.3p3.9ττp.bbB.3τpyPPp.8ppρ.bbθ.3ppyPPρ.6ppyPPεbbθ.5p3.9p3bBτ.ττp.14p3bBθ.ppρ.15bbB..pyyPpp.12εbbθ.3p3.14b3θ.3ppρ.12εεbBB.p3.15bbB..pyyPτp.13bbθ..pyyPpρ.12bBB.4p3.14B.23B.45","circus":".60L3rr.18BrrR.20BrrR.20B3.19Lrw3r.18rrw3R.17r3w3rRR.13Lrwrrw3rwwR.12rrwrrw3rwwF.11LrLwrrw3rwwRrR.7LLrwLwrrw3rw3R3.6r3w3rrw3rw3RRF.5yYYyYYyYYyYYyYYyYYyYY.4wwr3w3r3w3rRRW.6wwr3w3r3w3rRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6W6k6W5Κ.6W6k6W6.27","tree":".54g6..l3g.9llgl5gllg5Gg.6g3l5g7G3.5lggl3g12GgG.3gllg15G3.3gllg15G3.3g4ΦΦg9G6.3GggG3gG14.3GggG3gG14.4bb.b3B3b3..b..B.6bζ.bζ.bbBbζ.3ζ..θ.6bζ.bζ.bbBbζ.3ζ..θ.6bζ.4bbBb3..ζ..θ.6bζ.3εbbB3ζ.5θ.6bζ.3b3B3ζ.5θ.11b3B3ζ.15εεb3B4εb.13b5B4bζ.10g3b5B6bg3.5gG18gG.3G21.25","gourd":".59Ggg.19lgZ..llg.16ggZ..lgG.16y3YYlGGg.14ιy5Y3.15y6YYJ.15y6YYJ.16r3R3.18r3RRF.15yyιy6Y3.11ywιιy8Y3.9ywwy9YYJ.7ιιy3xy6xxyY3.6y3ppy3x3y3pYYJ.6y3ppy3x3y3pYYJ.6y15YYJ.6y14Y3J.6y14Y3J.8Yy9Y4J.12Y8J.15Y9.31","billiard":".50BεB.21bB3.20bBBθ.21bbBεB.21bB3.20bBBθ.21nnNBB.L5r.14uUU.r7R.12uUa.r6RF.12rw3r10R.9rwwr3w3r3R3.9rwwr3LLwr3R3.9r4w6rrR3.9r4w6R5.9r4w6R5.9r6W3R6.9r7R8.9r7R8.10R11F.15R5F.18R6.30","pipes":".50r12Lrr.cuU.5R12rRR.uua.5R12rRF.uua.17rRF.uua.5ι8y.3rRF.uua.5y8Y.3rRF.uua.5Y5LLYY.3rRF.uua.11yYJ.ΙeE3euua.11yYJ.eeE3euua.9eeE3e..rRR.uua.11yYY.3rRF.uua.11yYJ.3rRF.uua.8lg11.uua.8gG11.uua.8gG10Z.uua.8gGZ.yyY.5eE3ee.6gGZ.yyJ.6uuU.8gGZ.yyJ.6uua.6eeE3eyyJ.6uua.8gGG.yyJ.6uua.8gGG.yyY.6uuU.27","telescope":".54c8uU3.9c3u14U.6u15UUa.5cuud4u6d5UuU.3uddcwwdUUu3dccwddU3.3uddcwwdUUu3dccwddU3.3ud8Uuud6U3.4U17a.6U4οοU11a.12u3UUa.17cuuy3UuU.15u3y3UUa.15u4U4a.16uuUUa.19uuUUa.19uuUUa.19uuUUa.19uuUUa.16u6UUuuU.12uU12.11U13.30","speaker":".51wwe.11d4.5wd3ΙΙe.9bbB.5wd3eeE.9bbθ.5ed5Ee3.3Ed.bbθ.5ed5E4eeEd3bbθ.5ed5ΙE6d3bbθ.5ed5ΙEEd.3dE.bbθ.5ed3EEd.9bbθ.5ed3EEd.9bbθ.6e3.12bbθ.6wwE.12bbθ.6wwE.12bbθ.5wd3e3.9bbθ.5ed5EΙΙe.3Ed.bbθ.5ed5EeeE.3dE.bbθ.5ed5E7d3bbθ.5ed3E4d.4dE.bbθ.5ed3E4d.4dE.bbθ.6e3.12bbθ.18ε3bbBεB.16b5B3.25","sports":".57w5W.15w9W3.12w9WWΚ.11xw3x3w5xWW.9xwwx6w3xWΚ.9xwwx6w3xWΚ.7w5x6w3W4.6w6x3w5W3Κ.6w4δδx3w5W3Κ.6wwxw9xxW3Κ.8x3w6x3WWΚ.9x3w6x3WWΚ.9w4x3w3W4Κ.10W3x3W4Κ.13W3x3W4Κ.9lg5G7g6GG.3r19RR.3r19RR.3w21.3R21.3R21.25","firstaid":".51bbo.12oob.6oopβo.9oppo.6oopoα.9oppα.6oop3o.6βop3O.6o6w6o3OOγ.6o6w6o3OOγ.5βo5w3rw5oO3αO.3oBBo3wr5w3BooO3.3oBBo3wr5w3BooO3.3o3Boow3rw3BBo3O3.3o3w3o7w3ooO3.3o3wwββo6w3ooO3.3o3xwwo9xwwO3.3oBBon12ooOBB.3oBBon12ooOBB.4ppon5x3n4ppγ.6o3n12ooγ.6o3n12ooγ.8o3n3xnnxn3OO.10O12.12O12.30","lake":".51BB.13BB.7bb.13bb.7bζ.13bζ.7bbB.11bBB.7gg.εB.9g..B.6gG.Bθ.9G..θ.6ggGbb.9gGGb.6gG.gg.9G..g.6gG.gG.9G..G.8οc5ο6cοοc.6οοc3w3c10οc.4c5w3c12.3c4u12UUc3.3gccuοοu3g3Gu5Ucc.3gccu6g3Gu5Ucc.3g3cu5GggGu3UUc3.4GGc3u9U3Ξ.6GGc3u9U3Ξ.8Gc6U3c5.10G12.12G12.30","surf":".55h3.20hh..h5.18hhs4.18hhssDs.19s5.19s5.14s.3s3r3.14s5L4rr.15ss.r6s.17r5s3..s.13a5r.s4.12sa6..s.12as3a5.12s5a..aasaa.11s4.5as5.22ss.10W12ss.7W3λ15W3.5W16.6c20.5u18.27","fishingrod":".59bεBw.20bBθ.ww.18bBθ.wΙ.16εbB.5w.15bbθ.5Ι.15bbθ.5Ι.14bBB.6Ι.14bBθ.4βoO.14bBθ.4ooγ.12εbB.5oyyoOO.10bbθ.3βoxooxooO.9bbθ.3ooxooxooγ.8bBB.4oopo3ppγ.6εbBddE.5o4OOγ.6bbBd3.5o4OOγ.6bbθ..d.5o3OOγ.6bBB.10ooγ.8bBθ.10ooγ.8B.11oOOoOO.6θ.9βoO.3ooO.5B.9ooO.3ooO.27","plant":".57llg.17llg.ggllg.llg.11ggG.gglgG.ggG.9gglg5GgG.gglgg.6gllg3GggGg3llgGGg.5gllg3GggGg3llgG3.5gllg4G3g6G3.6g3G3..Z..g3GGZ.7g3GGZ..Z..g3GGZ.10GGZ..G4.20Z.23Z.17o12ααO.9O14γ.9O5ββO7γ.10o9OOγ.12o9OOγ.12o9OOγ.14o6OOγ.15O8γ.15O9.31","sunset":".74Ν20.4Ν7Oy4OΝ7.4Ν5Oyj6yOΝ5.4Ν4Oy10OΝ4.4Ν3Oy12OΝ3.4Ν3Oy12OΝ3.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOOy12OOΝΝ.4Ν3Oy12OΝ3.4Ν3OOy10OOΝ3.4Ξ20.4u6y9u5.4u20.4u8j5u7.4uc4u15.4u15U4u.50","boat":".59LLr.21r4.20r3R.20Br5.18θ.23θ.17w6θ.17wccwccwWW.15wccwccwWΚ.15w7WΚ.12L3r9L8r.3r21.3u18U3.4uuwu12UUa.6uuwuοοu9UUa.8U14a.7οc.3c3.4cc.3c.6cΞ.3ccΞ.4cΞ.3Ξ.5c6.c7Ξ.ccΞ.75","star":".59yYY.21yYJ.21yYJ.19ιιy3Y.18y5J.18yιιyyJ.11yι6y6ι4yY3.4y17J.6y17J.8y3xy6xxyYY.10ppy3x3y3pYJ.10ppy3x3y3pYJ.10y11Y.12y11Y3.10y11YYJ.9ιy3YY.3y3YYJ.9y3Y.6yyYYJ.9y3J.6yyYYJ.7ιιyYY.9YYJ.7yyY.12YJ.7yyY.12YY.28","girl_a":".55h9.14hhb7h3.11b5h10.8h6shhs3hhsh.7h6sshhs3hhssh.6h6sshhs3hhs3.6h5s5xs4xss.6h5s5xs4xss.6h5ssps8ps.7h6s10.9h6sS6sh.9rrRyj8yh.10rrRy9ss.10rry9Yss.11Ry9YY.14y8YY.14yJ7yy.14b8B.14S3.6s3.11W4.6w4.52","girl_b":".55h9.14hhb7h3.11b5h10.8h6shhs3hhsh.7h6sshhs3hhssh.6h6sshhs3hhs3.6h5s5xs4xss.6h5s5xs4xss.6h5ssps8ps.7h6s10.9h6sS6sh.9rrRyj8yh.10rrRssy9.10rryssy6YYy.11Ry9YY.14y8YY.14yJ7yy.14b8B.17ss..SS.17w3..W3.55","girl_wave":".54h9.14hhb7h3.12b4h10.9h3sshhs3h5.ss.5h3s3hhs3h6ss.5h3s3hhs3h6ss.5hhssxs4xs4h3ss.5hhssxs4xs4hh.ss.5hhsps3Rs3psshh.ss.6hhs11hhs3.6h3s8h3.ss.8rryj7ys5.8rry9s4.9ssy10.12ssy7YYy.14y7YY.15y9.15b7B.16ss.4SS.16w3.3W3.56","veh_plane":".74uuU.21uUa.21u3U.20u5U.4w6.8u4Ua.4w5Ι.8u4UUw4cch3cww.6u4w5ch6ccw3.3u4w5ch6ccw3.3w9chhsxxsccwrr.3Wu18rr.3Wu18rr.4W4δδW12.9wwe6E.15wwe6d.14we6EE.13wwe4EE.16wwe4Ed.109","veh_train":".75Ι17e.6e17E.5w21.3wc3wwch6ccwc3ww.3wc3wwch6ccwc3ww.3wc3wwchhsxxsccwc3ww.3w21.3w21.3u21.3U21.3U4οοU15.3w19yy.3W21.3W21.4ddxdd.7ddxdd.7d4E.7d4E.7d4E.7d4E.6E21.73","veh_boat":".84LrR.21rrF.21rrF.14Ι7e3Ι4e.9e14E.9wc3h6c3ww.9wc3hhsxxsc3wΙ.9wc3hhsxxsc3wΙ.9w14Ι.6w21.3w21.3r5LLr14.4R18.6R17F.8R14F.6c3uc3u3c3u3c4u.3cu3c3u3c3u3c3uu.3u3Uu3UUu3Uu3UUu3.4UUa.3U3.3U3.3UU.4U3.3U3.3U3.3UU.25","veh_bus":".125l14g.7llg16.6g17G.5gc3ggch6ccgc3οc.3gc3ggchhsxxsccgc5.3gc3ggchhsxxsccgc5.3gc3ggcs6ccgc5.3g21.3g21.3w19yy.3G4ΦΦG15.3G21.3G3d4G6d5G3.4ddx3E.6ddx3d.6ddx3E.6ddx3E.8d3.9d3.76","veh_scooter":".54rrL5r.15rwwr7.14rwwr6R.14r12.12h4s5xss.12h4s5xsS.12h4ssps4S.13y9ssEEd.10y9ssddE.9ry8Y..u3.7ccub8s..u3y.6u3b8S..u3Y.5u12S..u3U.5U4οοU6w3U3a.5U12w3U3a.6d3.11d3.6dE4d.7EdE3d.5dE3dE.7ddE4.5dE3dE.7ddE4.6d3.11d3.7d3.11d3.28","veh_bike":".56B6h.15h10.13h13.11h5s3hhshh.10h6s3hhsh3.9h6s7hh.10hhs3Ds3Dsshh.10hhs10h.11h3sps5psh.13hhs6h3.14j6h..ksk.12y5s.3s.14y5s5.14uU4ccsuu.10kk.uuU3uuc3uuk.7kWWuus.u4cc.uuWk.5kWu3k3uucsc.kWuuWk.4ku9k3.kWuuWk.4kWuWWk.4u.3kW4k.5kWWk.10kWWk.7kk.12kk.28","veh_balloon":".56LLrιιyLLr.12ywwr3y3r3yYY.9ywwr3y3r3yYJ.7Lrywwr3y3r3yYYR.6rry3r3y3r3yYYF.6rry3ιrry3r3yYYF.6rry3ιrry3r3yYYF.6rry3r3y3r3yYYF.6rry3r3y3r3yYYF.8y3r3y3r3YYJ.12R3Y3R3.15R3Y3RRF.13εbh9b.12bbhxxs3xhhζ.12bbhxxs3xhhζ.11b15.10bbBbbBbbBbbB.12bbBbbBbbBbbθ.12BBbBBbBBbBBb.14B8θ.15B9.31","veh_ufo":".81ο5c.18c5Ξ.17ch6cc.13οch9c.12cch9Ξ.12cchxxs3xhhΞ.12ccps6ppΞ.12ccps6ppΞ.9e15ΙΙe.5ew3e14EeE.3ew3e14E3.3e3re3yye3ge3uuE3.3E4ΙΙE15.3E21.4EEd16.8y.3yy.3y.3yy.9Y.3yY.3Y.3yY.100","chest_shut":".77ω14N.9N14μ.7εbyb12yyb.5εbbybbηηb8yyBεB.3b3yb12yyB3.3b3yb12yyB3.3y19YY.3y19YY.3b3yb3y6b3yyB3.3b3yb3yyx3Yb3yyB3.3b3yb3yyx3Yb3yyB3.3b3yb3Y6b3yyB3.3b3yb12yyB3.3b3yb12yyB3.3B3YB12YYB3.3y18Y3.3y18Y3.97","chest_open":".51ιιy16.6yyB15Y.6yyB15Y.6yyB15Y.6yyByyιιyBy3YYwyyY.6yyByywyyBy3YYwyyJ.5y3wy5Yy5wy3YY.3Y21.3Y21.3b3yb5y3b4yyB3.3b3yb5Y3b4yyB3.3b3yb5Y3b4yyB3.3b3yb12yyB3.3b3yb12yyB3.3b3yb12yyB3.3B3YB12YYB3.3y18Y3.3y18Y3.97","trophy":".51ι3yyι10y3.5ιy3wwy10Y5.3y4wwy10Y5.3Y..wy11YYJ.YY.3Y..wy11YYJ.YY.3Y..wy11YYJ.YY.4y3wwy9Y4.8y3ιy8YYJ.9y3ιy8YYJ.10y9YYJ.14y6YYJ.15y6YYJ.18yYY.21yYJ.21yYJ.18y6Y3.13εεb7B3.12b9BBθ.11b12BεB.9B14θ.9B15.28","scroll":".51nnι15n.5rwwn15NLr.3rwwn15Nrr.4N4ιιN11μ.8wW14.9wW13Κ.9wW13Κ.9wb9W4Κ.9wb9W4Κ.9wW13Κ.9wb8W5Κ.9wb8W5Κ.9wW13Κ.9wb11rWΚ.9wb11rWΚ.9wW13Κ.7ιιn16.6n17κ.5rwwn15Nrr.4N17μ.6N18.27","dexbook":".50RL16r.6Rr17w.5Rr17Ι.5Rr8yr8Ι.5Rr6y5r6Ι.5Rr6y5r6Ι.5Rr3y11r3Ι.5Rr5y7r5Ι.5Rr3Lry7r5Ι.5Rr3Lry7r5Ι.5Rr3y3r5y3r3Ι.5Rr3y3r5y3r3Ι.5Rr15RRΙ.5Rr3w9r3RRΙ.5Rr3w9r3RRΙ.5Rr15RRΙ.5R18Ι.5R18Ι.6W18.6R17.7R17.28","sparkle":".51ιy.6ιιy.12ιy3.5yyY.12y3Y.5yyY.13yY.6yyY.19ιιy4.18y5Y.18yywyyY.17ιyyw3yYY.15y3w3yYJ.9ι6yw6y6YY.3y7w6yyY6.3y7wwιιwwyyY6.9y3w3Y3.16y3YYJ.18y3YYJ.18yyY3J.5y.14yYJ.4ιιyιy.12yYJ.4y5.12yYJ.6Y.14YYJ.21Y3.34","ic_drop":".84rR.22RF.21rR3.20R3F.20R3F.18r2R4rR.16R7F.16R7F.15rR2LR6.14RL2R6F.14RL2R6F.14RL2R6F.14R9F.14R9F.15R7F.18R3F.20R3F.105","ic_water":".84uU.22Ua.21uU3.20U3a.20U3a.18u2U4uU.16U7a.16U7a.15uU2cU6.14Uc2U6a.14Uc2U6a.14Uc2U6a.14U9a.14U9a.15U7a.18U3a.20U3a.105","ic_gift":".128ι4y2ι2y.15y4J2y2Y.15y4J2y2Y.10L5r3y3r3L3r.6r8y3r6R.6r8y3r6R.6r8y3r6R.8R6y3R6.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.76","ic_cloak":".125c2AUcAu2UAuUc2A.9A3UA2U3AU2A2U.9A3UA2U3AU2A2U.6c3A3UA2U3AU2A3c2A.3A9yU2A9.3A9yU2A9.3A9U3A9.3A9U3A9.3A9U3A9.3A9yU2A9.3A9U3A9.3A9U3A9.3A9U3A9.6A6U3A5U.9A6U3A5U.9A6U3A5U.76","ic_hands":".60y2.21j.2j.20y.2y.12n7s.3sn5s.6s7S.ιys6S.6s7S.y2s6S.6s7S.3s6S.6s7S.3s6S.6s7S.3s6S.5ns7S.3s7ns.3s8S.3s9.3s8S.3s9.3s8S.3s9.6S4.6S5.9S3κ.6S4κ.9S3κ.6S4κ.9S3κ.6S4κ.9S3κ.6S4κ.100","ic_shoe":".219L4rwrRwr4R.10r5wR2wR4F.10r5w6R2F.10R14r5R.4R20.4R20.4R20.4R20.3w21.3w21.3w21.97","ic_lantern":".80ι8y.15y8Y.15y8Y.12r3R3F3R3r2R.9R6F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9R6F3R5F.9R6F3R5F.9R6F3R5F.12y9.15y8Y.15y8Y.19yY.22y2.34","ic_tripod":".78E11d.12d11E.12d2yd2u4d2E.12d5u4d2E.12d5u4d2E.12d5u4d2E.12d11E.12d11E.18x2.21x4.20x3D.20x3D.18x2.xD.x2.16xD.xD.xD.15x.3xD.3x.12x2.4xD.4x2.10xD.4xD.4xD.10xD.4xD.4xD.9x.6xD.6x.8x.6x2.6x.27","ic_bolt":".60ι2yι2y.18y2jy2Y.18y2jy2Y.17ιy2jyY.18y3jyY.18y3jyY.15ι3y5Y.15y8Y.15y8Y.18y7.17y6Y.17y6Y.15ι2y3Y.18y5Y.18y5Y.17ιy2Y.20y3Y.20y3Y.18y2.88","ic_stick":".53k9.15ku6kx.15ku6kx.15ku2cu3kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15k7e3.21e3Ιe.19e4E.21e4.21e3E4d.16e3d5.18ed5.19d5.19d5.25","ic_alert":".81Lr4R.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.66r5R.18R5F.18R5F.18R5F.81","ic_peace":".80n2s.3n2s.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s3n3s2S.15s8S.12n3s3S3s2S.12s6S3s2S.12s6S3s2S.12s11S.15s8S.15s8S.15s8S.79","ic_thumb":".81n4s.19s4S.19s4S.19s4S.19s4S.19s4S.19s4S.19s4S.16s12.9u3U2S10.9U5S10.9U5s9S.9U5S10.9U5S10.9U5s9S.9U5s9S.9U5s9S.9U5s9S.78","ic_shy":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9sS5y3S6y.8S6y3S6Y.8S6y3S6Y.6ιyS6y3S6yιy.4y20.4y20.4y20.6y15Y.8y15Y.8y4k6y5Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_cool":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9y16.6D2U4D6U5D.6D2U4D6U5x.6D18ιy.4D18y2.4D18y2.4y20.6y15Y.8y15Y.8y3k9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_dizzy":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8yk2yk2y4k2yk2Y.8yk2yk2y4k2yk2Y.6ι2y3ky8ky3ιy.4y3k2yk2y4k2yk2y3.4y3k2yk2y4k2yk2y3.4y20.6y15Y.8y15Y.8y4k6y5Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_eyes":".146w9.3w9.3w8Ι.3w9.3w8Ι.3w9.3w4D5.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w9.3w9.3w8Ι.3w9.3w8Ι.3w9.145","ic_zzz":".77I8v.15v8V.22vV.21v.23V.20v3.19Iv.22vV.21v.23vI7v6V.9v9V5a.22Va.21V.23a.21V2.21V.23a.23V6.76","ic_meh":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8y15Y.8y15Y.6ι2yk5y3k4y3ιy.4y20.4y20.4y20.6y15Y.8y15Y.8y3k9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_cop":".77U14a.9a14x.9a7y2a5x.9a14x.9a14x.7D18.6D17x.6D17x.9s14.9ns15.8s15S.8s4k2s4k2s3S.8s15S.8s15S.9s13S.10s3R6s4S.10s3R6s4S.12s9S.17s3S.20s4.33","ic_walker":".59s3S.18s2S4sS.16S7κ.16S7κ.16S7κ.16S7κ.18U4.17s2SU4s2S.14S3U4S2κ.14S3U4S2κ.14S3U4S2κ.14S3U4S2κ.17U3a.18U2a.2aUa.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.79","ic_takeout":".81k8.16k7x.15k.6kx.15x.6kx.15x.6kx.12r3Rr6R2r2R.9R14F.9R14F.9R14F.9w15.9w14Ι.9w14Ι.9R15.9R14F.9R14F.9R14F.9R14F.9R14F.76","ic_siren":".129L5r.18r5R.18r5R.15r2R7r2R.12R2LR8F.12R2LR8F.12R2LR8F.12R2LR8F.12R2LR8F.12R11F.12R11F.12R11F.11Ed12Ed.9d14E.9d14E.9d14E.76","ic_wind":".135u3cu.7ο11c.3uU.7c11Ξ.3uU.7c11Ξ.3uU.22uU.22uU.34ο14c.9c14Ξ.9c14Ξ.65u4.9ο10c.13c10Ξ.13c10Ξ.82","ic_rain":".126Ι7e.16e8Ι5e.10e13E.7Ι3e15.6e17E.6e17E.6e17E.6e17E.6e17E.6e17E.57uU.4uU.4uU.10Ua.4Ua.4Ua.10Ua.4Ua.4Ua.10Ua.4Ua.4Ua.76","ic_nosig":".80k9.15k8x.12r2Rku6kx.12R4u6kx.12R4u6kx.13R5u4kx.15R4u3kx.15R4u3kx.15kR5ukx.15ku2R4kx.15ku2R4kx.15ku3R5.15ku5R4.14ku5R3F.14ku6R3rR.12k9R4.11k9R3F.11k8x.R3rR.21R3.21R3.25","ic_wheat":".60ι2y.18ι3y3ι2y.15y8Y.15y8Y.15y8Y.15y8Y.15y2Y.3y2Y.18z2.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.82","ic_door":".78ε11B.12B11θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K7y2θ.12B2K7y2θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B11θ.78","ic_camera":".128E5d.18d5E.18d5E.13E5d7E3d3.6d8D4d3y2E.6d8D4d3y2E.6d6D8d3E.6d5D4u2D4d2E.6d5D4u2D4d2E.6d5D3u4D3d2E.6d5D4u2D4d2E.6d5D4u2D4d2E.6d6D8d3E.6d8D4d5E.6d8D4d5E.99","ic_fire":".60o2.22R2o.21R2α.20o3α.20Ro2α.20Ro2α.18β2o4βo.15βo7α.15o8α.15o8α.13r2Ro9.12R3o8α.12R3o2y4o2α.12R3y8α.12R3y8α.14Ry6o2.16o2y3o.18o2y3α.20o3.82","ic_warn":".84ιy.22yY.22y3.20ιy3ιy.18y5Y.18y5Y.16ιyk3y4.15y2k3y3Y.15y2k3y3Y.14ιy2k3y4ιy.12y3k3y5Y.12y3k3y5Y.10ι2y13.9y14Y.9y5k3y6Y.8ιy15ιy.6y18.6y18.73","ic_sign":".77ω14N.9N14μ.9N14μ.9Nk12Nμ.9Nk12Nμ.9N14μ.9Nk9N4μ.9Nk9N4μ.9N14μ.9N14μ.9N14μ.15B3.21B2θ.21B2θ.21B2θ.21B2θ.21B2θ.21B2θ.82","ic_bars":".65g2G.21G2Z.21G2Z.21G2Z.16g2G.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.12g2G.G2Z.2G2Z.12G2Z.G2Z.2G2Z.12G2Z.G2Z.2G2Z.12G2Z.G2Z.2G2Z.7g2G.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.76","ic_umb":".81r5R.18R5F.15rRwR6w2R.11rR2wR6w2RrR.9R3wR6w2R2F.7r2R3wR6w2R4.6R5wR6w2R3F.6R5wR6w2R3F.6R5wR6w2R3F.15k2.22kx.22kx.22kx.22kx.22kx.22kx.22kx.21k2x.82","ic_tea":".60Lr.22rR.22rR.22rR.22rR.22rR.16w6r2w4.12w11Ι.12w11Ι.14n9.15b9.15b8ζ.15b8ζ.15b8ζ.15b8ζ.15n9.15nk6nκ.15nk6nκ.15nk6nκ.79","ic_think":".78w12.12w11Ι.11w15.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.10w11Ι.59w3.21w2Ι.21w2Ι.42w.23w.45","ic_shield":".77u14U.9U14a.9U6c3U5a.9U6c3U5a.9U6c3U5a.9Uc12Ua.9Uc12Ua.9Uc12Ua.9U6c3U5a.9U6c3U5a.9U6c3U5a.10U5c3U3a.12U5c3U3a.12U5c3U3a.15U5a.18U5a.18U5a.105","ic_boom":".60ι2y.21y2Y.21y2Y.14ι2y.4y2Y.5ι2y.6y4.2βo3.3ι2y3.6y3Y.2o3α.3y5.7y2oβ2o4β2oy2Y.11o3R4o3yY.12o3R4o3yY.10β2oR8o3.6ι3yo3R8o3ι2y.3y4o3R8o3y3.3y4o3R8o3y3.9o3R4o2α.14o3R4o2α.14o10ιy.10ι2y3o3α.2y4.9y5o3α.2y3Y.8ιy2Y.3y3.3y3ιy.6y2Y.4y2Y.5y3.6y3.4y3.5y3.25","ic_clock":".59E2d.21d2E.21d2E.21w4.17w10.14w9Ι.12w6k2w6.9w7k2w7.8w7k2w6Ι.8w7k2w6Ι.6w9k2w9.4w9k2w9.4w9k5w6.4w20.4w20.6w15Ι.8w15Ι.8w15Ι.9w13Ι.12w9Ι.14w10.30","ic_magnet":".77w4.6w5.9w3Ι.6w4Ι.9w3Ι.6w4Ι.9R4.6R5.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R4r6R4F.9R14F.9R14F.76","ic_swirl":".83Uw2U.20Uw2a.17U3.4U3.12uU.3ο3c.3uU.10Ua.3c3Ξ.3Ua.9U.2οc2.4c3.2U.8a.2Ξ.2u3U.2Ξ.2a.8a.2Ξ.2U3a.2Ξ.2a.6uU.οc.u2a.2UuU.οc.uU.4Ua.cΞ.Ua.4Ua.cΞ.U2.4Ua.cΞ.Ua.4Ua.cΞ.U2.4Ua.cΞ.U3.2uUa.cΞ.U2.6U.2c.2Uu2a.2c.2U.8a.2Ξ.2U3a.2Ξ.2a.8a.2c3.4c2Ξ.2a.9uU.3ο3c.3uU.10Ua.3c3Ξ.3Ua.12U3.4U3.17u3U.20U4.33","ic_party":".81I2v.8u2U.10v2V.8U3.10v3r2R.5U3.13R2F.21R2F.26ι2y.21y2Y.21y2Y.33β2o.7l2g.11o2α.7g2G.11o4.6g2G.2r2R.4β2o3α.11R3.4o5α.11R3.4o6βo.15βo7α.15o8α.15o10.84","ic_medal":".56r8R.15R8F.15R8F.15R8F.15R8F.15R8F.15R8F.18y4.20y3Y.17ι3y4ι2y.14y3J3y3Y.14y3J3y3Y.12ι2y3J3y4ιy.10y5J3y5Y.10y5J3y5Y.10y5J3y5Y.12y3J3y3Y.14y3J3y3Y.14y9Y.17y3Y.20y4.33","ic_dash":".153Ι8e.15e8E.9Ι6e8E.9e14E.9e14E.9e8E.26Ι6e.17e6E.8Ι9e6E.8e15E.8e15E.8e11E.151","ic_bulb":".36j2.22jy.21ιy3.20y3Y.17ι3y4ι2y.14y9Y.14y9Y.12ι2yj2y7ιy.6ι2j.y14ι2j.3j2y.y14j3.7y13Y.12y9Y.14y9Y.14y9Y.15d6.18d5E.18d5E.18d5E.18d5E.20d2E.82","ic_bricks":".122F6WF14.3F6WF14.3F6WF14.3F6WF14.3W21.3W21.3F13W2F6.3F13W2F6.3F13W2F6.3W21.3F6WF14.3F6WF14.3F6WF14.3F6WF14.3R5FWR13F.97","ic_mag":".129ο4c.16ο3c5ο2c.13c10Ξ.13c2Ξ.5c2Ξ.12οcΞ.7c3.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.12c3.5οcΞ.13c3ο5cB3.12c9B2θ.15c4Ξ.B3εB.21B4.20B3θ.21B3εB.21B3.21B3.25","ic_target":".83r3R.20R3F.17r3R4r2R.12r2R3w4R3rR.10R5w4R4F.9rR2w10R3.8R3w3R4w3R2F.8R3w3R4w3R2F.6r2Rw3R8w3RrR.4R3w3R8w3R3.4R3w3R8w3R3.4R3w3R8w3R3.6R3w3R4w3R2F.8R3w3R4w3R2F.8R3w10R2F.9R5w4R4F.10R5w4R4F.12R9F.17R3F.20R4.33","ic_wrench":".87Ι5e.18e5E.18e2E.2E.18e3Ι2eΙe.16e8.18Ee5.16e2Ee5.16E3e5.15eE6.15e2E5d.16E7d.15eE5d.15e2E5d.16E7d.15eE5d.15e2E5d.16E7d.16E5d.18E4d.19E5.37","ic_check":".162l2g.21g2G.20lg2G.18l2g2G.19g4G.18lg2G.11l2g.6g2G.12g2G.6g2G.12g4.3l2g2G.13g3l3g2G.15g8G.17g5G.19g2G.21g2G.108","ic_cross":".125r2R.10r2R.8R4.8rR2F.8R3F.8R3F.9R3rR.4r2R2F.12R4.2rR2F.14R3F.2R3F.15R3r2R2F.18R3F.20R3F.18r2R4rR.15rR2F.2R4.14R3F.2R3F.12r2R2F.4R3rR.9rR2F.8R4.8R3F.8R3F.8R2F.10R2F.75","ic_sndon":".152E3d.6cu.12d3E.6uU.12d3E.6uU.7E5d3E.3cu.uU.7d8E.3uU.uU.7d8E.6uU.7d8E.6uU.7d8E.6uU.7d8E.3u2.uU.12d3E.6uU.12d3E.6uU.12d3E.6uU.148","ic_sndoff":".152E3d.20d3E.20d3E.3R2.4R2.4E5d3E.5R.2R.6d8E.5F.2F.6d8E.6rR.7d8E.6RF.7d8E.6RF.7d8E.5R.2R.11d3E.3rR.4rR.9d3E.3RF.4R2.9d3E.156","ic_devil":".77r2R.9r2R.9R2F.9R2F.9R2F.9R2F.9R2F.3I3v.2R2F.9R2F.3v3V.2R2F.9R3I3v4IvR2F.10v14.10v13V.10v13V.9Iv3y2v4y2v4.8v4y2v4y2v3V.8v15V.8v15V.8v15V.9v13V.10v3k6v4V.10v3k6v4V.12v9V.17v3V.20v4.33","ic_rocket2":".59R3.19w6.18w5Ι.18w5Ι.18w5Ι.18w5Ι.18w2Uw2Ι.18w5Ι.18w5Ι.18w5Ι.15r2Rw6r2R.12R3w6R2F.12R3w6R2F.12R2F.2o3.R2F.12R2F.2o2α.R2F.12R2F.2o2α.R2F.17o2α.21o2α.106","ic_flash":".78E11d.12d11E.12d2y9E.8ι2j.d2y9E.2ι2j.3j2y.d2y9E.2j3.7d11E.14E9.15E8d.15E8d.15E8d.15E8d.16k6.18k5x.18k5x.18k5x.18k5x.18k5x.18k5x.81","ic_bucket":".60d2.19E2d.2E2d.16d2E.2d2E.13d3.8d3.7eEdE3e8E3d.6E2dE15.6E18.8e15.9e14E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9e14E.9e14E.9ed12eE.76","ic_hand":".59n2s.16n2s.2s2S.n2s.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s3n2s3ns2S.9n3s11S.9s14S.9s14S.9s14S.9s14S.12s11S.12s11S.12s11S.14S9.15S8κ.15S9.31","ic_crown":".83ι2y.21y2Y.13y3.12y3.78ι17y.6y17Y.6y17Y.6y3R2y4U2y3Ry2Y.6y3R2y4U2y3Ry2Y.6y17Y.6y17Y.6y17Y.6J18.6J17γ.6J17γ.99","ic_money":".129N6.17k9.15k8x.16N6.15ω3N6ω2N.12N11μ.12N11μ.12N5J3N3μ.12N5J3N3μ.12N3J6N2μ.12N5J3N3μ.12N5J3N3μ.12N5J3N3μ.12N11μ.12N11μ.12N11μ.78","ic_bill":".146l20g.3g21.3gl18g2.3gl2Gl5G4l6g2.3gl2Gl5G4l6g2.3gl6G8l4g2.3gl6G8l4g2.3gl6G8l4g2.3gl6G8lG2lg2.3gl8G4l6g2.3gl8G4l6g2.3g21.145","ic_coin":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y3J4y3ιy.10y5J4y4Y.9ιy2J6yJ3y3.8y3Jy2J3y3Jy2Y.8y3Jy2J3y3Jy2Y.6ι2yJ2y3J3y4J2yιy.4y3J2y3J3y4J2y3.4y3J2y3J3y4J2y3.4y3J2y3J3y4J2y3.6y3Jy2J3y3Jy2Y.8y3Jy2J3y3Jy2Y.8y3J3y4J3y2Y.9y5J4y4Y.10y5J4y4Y.12y9Y.17y3Y.20y4.33","ic_love":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8y3ky6k2y3Y.8y3ky6k2y3Y.6ι2yk2y9ky3ιy.4y20.4y20.4y2i3y9i3y3.6y15Y.8y15Y.8y3R9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_paw":".129ε2h.2ε2h.16h2B.2h2B.16h2B.2h2B.12ε2h.h2B.2h2B.ε2h.8h2B.10h2B.8h2B.10h2B.8h2B.10h2B.11ε8h.15h8B.15h8B.15h8B.15h8B.15h8B.15h8B.15h8B.103","ic_skull":".83w4.20w3Ι.17w10.12w14.10w13Ι.10w13Ι.9wD5w3D4w3.8wD5w3D4w2Ι.8wD5w3D4w2Ι.8wD5w3D4w2Ι.8wD5w3D4w2Ι.9w6D2w5Ι.10w13Ι.10w13Ι.12w9Ι.14wD2w3DwΙ.15wD2w3DwΙ.15wD2w3DwΙ.79","ic_cry":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8yk5y3k4y2Y.8yk5y3k4y2Y.6ι2y3Uy6U2y4ιy.4y5Uy6U2y6.4y5Uy6U2y6.4y5Uy6U2y6.6y3Uy6U2y3Y.8y3Uy6U2y3Y.8y3Uk6U2y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_tomb":".128e8E.15E8d.15E8d.13e2E10.12E5d3E3d.12E5d3E3d.12E11d.12E3d6E2d.12E3d6E2d.12E11d.12E11d.12E11d.12E11d.12E11d.12E11d.9g3G12g2G.6G17Z.6G18.27","ic_cloud":".150Ι8e.15e8E.15e9Ι2e.12e11E.12e11E.9Ι3e12Ι2e.6e17E.6e17E.6e17E.6e17E.6e17E.6e17E.147","ic_wilt":".80r6R.17R6F.17R6F.17R6F4.14R6F3R.20F3R.12f2.4z2F3R.12fx.4z2F3R.18zΩ.22zΩ.22zΩ.22zΩ.19z4Ω.19z4Ω.18z.3zΩ.22zΩ.22zΩ.22zΩ.82","ic_lock":".83Ι3e.20e3E.18e2.4e2.15e.8e.14E.8E.14E.8E.14E.8E.14E.8E.11ι3ye2y4e2yιy.9y6e4y4Y.9y6e4y4Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y14Y.9y14Y.9y14Y.76","ic_unlock":".87Ι4e.19e4E.19eE.eE.19eE.eE.19eE.eE.22eE.22eE.22eE.9ι13y2.9y14Y.9y14Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y14Y.9y14Y.9y14Y.76","ic_van":".194w21.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3w21.3w21.3w21.3R21.6k4.6k5.9k3x.6k4x.9k3x.6k4x.9k3x.6k4x.9k4.6k5.28","ic_rice":".128w9.15w8Ι.15w8Ι.12w15.9w14Ι.9w14Ι.9w14Ι.7k2w15k.6k2w15x.6k3d12k2x.6k3d12k2x.6k3d12k2x.6k3d12k2x.6k17x.6k17x.99","ic_broom":".90ε2B.21B2θ.20εB2θ.18ε2B2θ.19B4θ.18εB2θ.20B2θ.21B2θ.19ε2B2θ.18εB2θ.20B3θ.12ι2yι3y6.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.81","ic_point":".59n2s.21s2S.21s2S.21s2S.21s2S.21s2S.21s2S.19n2s3n3s.15s8S.15s8S.15s8S.15s8S.14ns8S.14s9S.14s9S.14s9S.15s8S.15s8S.15s8S.78","ic_pin":".83r3R.20R3F.17r3R4r2R.14R9F.14R9F.12r2R4w2R4rR.10R5w4R4F.10R5w4R4F.10R6w2R5F.12R9F.14R9F.14R9F.15R7F.16R7F.42r3R.20R3F.45rR.22R2.34","ic_case":".81k6.18k5x.18kx.3x.18k5x.18k5x.12ε6B6ε5B.6B17θ.6B17θ.6B17θ.6k8y3k7.6k8y3k6x.6B8y3B7.6B17θ.6B17θ.6B17θ.6B17θ.6B17θ.6B17θ.75","ic_starO":".59E3.69E3.61E18.81e11E.12E11d.83E15.148","gi_hand":".30w12.12w11Ι.11ns12ns.9s14S.9s14S.5sn3s14S.5s18S.5s18S.5sSs16S.5sSs16S.5s4S15.9S14κ.9S14κ.9s3.s3.2s3.s3.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.16s2S.2s2S.16s3.2s3.31","gi_scratch":".30w12.12w11Ι.12s12.12s11S.12s11S.12S12.12S11κ.12s3.2s3.s3.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12p3.2s2S.p3.12p2ρ.2s2S.p2ρ.17p3.82","gi_swatter":".27d18.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cu2cu2cu2E.6d2cu2cu2cu2cu2cu2E.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cy2cu2cu2E.6d2cu2cu2cy2cu2cu2E.6d2uc2uc2yc2yc2uc2E.6d2cu2cu2cy2cu2cu2E.6d2cu2cu2cy2cu2cu2E.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cu2cu2cu2E.6d2cu2cu2cu2cu2cu2E.6d17E.14R3.21R2F.21R2F.21R2F.21R2F.21R2F.19f6.18f6.33","gi_staff":".54U6a2U3a.12a6y2a3x.12a6y2a3x.11D15.12s9.15s8S.15sk2s3ksS.15s8S.15s8S.15s3S3s2S.12U3a4R2a3U2a.9a7R2a5x.9a7R2a5x.9a4y2aR2ay2a2x.9a4y2aR2ay2a2x.9a7R2a5x.9sD12s2.9sD12sS.12a3.3a3.15a2x.3a2x.15a3.3a3.31","gi_pax":".56ε8h.15h8B.15h8B.15S9.15Sk2S3kSκ.15Sk2S3kSκ.15S8κ.15S8κ.15S8κ.10α3O2R9.10O3R12.9O3R11F.9O3R11F.9O3R11F.9O3R11F.9O3R11F.9O3S2R9S.9O3S2R9κ.14U3.3U3.15U2a.3U2a.15U3.3U3.31","gi_kid":".201ε5B.18B5θ.18B5θ.18S6.18S2kS2k.18S2kS2x.18S6.17ιy6ιy.15y8Y.15y8Y.16y5Y.18y5Y.18U6.18U5a.18U6.33","gi_luggage":".129k6.18k5x.18k5x.14Kε3B6ε3B2.9KB12y2.9KB12yY.9KB14.9K15.9K14b.9KB14.9KB13θ.9KB13θ.9KB12y2.9KB14.9KB13θ.9KB13θ.10k3.6k3.12k3.6k3.30","gi_trolley":".123E2d3.19dE.b2ε9b.9dE.b11ζ.9dE.b11y.9dE.b12.9dE.b11ζ.9dE.K12.9dE.b12.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.8Ed2Ed12E4d.3d21.3d21.6k4.6k5.9k4.6k5.28","gi_puddle":".342u8U4.9u3U8c3Uu2U.6U11c3U3a.5U4c5U12.4U17a.6U17a.9U11a.78","gi_boost":".75ι2y.6ι2y.12y2Y.6y2Y.12y3ιy.4y3ιy.12y4.5y4.11y3Y.5y3Y.12y2Y.6y2Y.12y3ιy.4y3ιy.10y4Y.4y4Y.12y4.5y4.12y2Y.6y2Y.12y2Y.6y2Y.11ιy2Y.5ιy2Y.9ι2y2Y.4ι2y2Y.10y4Y.4y4Y.10y2Y.6y2Y.11ιy2Y.5ιy2Y.11y3Y.5y3Y.9ι2y2Y.4ι2y2Y.10y2Y.6y2Y.12y3.6y3.33","gi_belt_f":".290l20g.3g21.3G21.3G3wG5wG5wG5.3G3wG5wG5wG5.3G4w2G4w2G4w2G3.3G3wG5wG5wG5.3G3wG5wG5wG5.3G21.73","gi_belt_b":".290L20r.3r21.3R21.3R6wR5wR5wR2.3R6wR5wR5wR2.3R4w2R4w2R4w2R3.3R6wR5wR5wR2.3R6wR5wR5wR2.3R21.73","corgi_sleep":".260O.10oO.19Oo.8o2O.19o3.6o3.19o2po2.4o2po2.18op3o2λ2o2p3o.18o6λ2o6.18o3Α3λ2Α3o3.18oΑ4λ4Α4o5.13oΑ5λ4Α5oΑ3o4.9oΑ5λ4Α5oΑ7o2.o.4o3Α4λ4Α4o3Α8oΑ2o.2o3x3λ6x3o3Α8o4.2o4xλ8xo4Α8o4.3op2λ3.x2.λ3p2oΑ3Β4Αo4.4o2λ4x4λ4o2Α2Β6o3.6o2λ4x2λ4o2Β10o.8oλ4p2λ4oΒ11o.9Βλ8Β13.9λ12Β2λ6Β2.10λδλδλ4δλδλΒ2λ6.14λ2.4λ2.114","paw_print":".79k2.6k2.13k4.4k4.12k4.4k4.12k4.4k4.13k3.4k3.14k2.6k2.9k3.14k3.4k3.14k3.4k4.12k4.4k4.12k4.5k3.12k3.11k8.15k10.13k12.12k12.12k12.12k12.12k12.13k3.k2.k3.55","corgi_nap":".409r2.r2.42r7.41r7.42r5.44r3.46r.375O.10oO.23h9.3Oo.8o2O.22h2b7h3.o3.6o3.22b5h10po2.4o2po2.20h6sh2s3h2shp2o2λ2o2p3o.19h6s2h2s3h2s2ho3λ2o6.19h6s2h2s3h2s3Α3λ2Α3o3.19h5s5xs4xs2Α2λ4Α4o5.15h5s5xs4xs2Α2λ4Α5oΑ3o4.11h5s2ps8psΑ2λ4Α5oΑ7o2.o.8h6s10Α3λ4Α4o3Α8oΑ2o.7h6sS6shx2λ6x3o3Α8o4.7r2Ryj8yhoxλ8xo4Α8o4.7r2Ry9s2pλ3.x2.λ3p2oΑ3Β4Αo4.8r2y9Ys2λ4x4λ4o2Α2Β6o3.10Ry9Y2o2λ4x2λ4o2Β10o.13y8Y2.oλ4p2λ4oΒ11o.13yJ7y2.2Βλ8Β13.14b8B.2λ12Β2λ6Β2.14S3.6s3λδλδλ4δλδλΒ2λ6.15W4.6w4.λ2.4λ2.307"};
+  const SPRITES = {"dofu_bowl":".129k.3k.18keD.keD.14k.3D2k.D2.2k.10keD.3keD.3keD.10D2k4D2k4D2.8k3w13k3.3k2w4X5w10k.kcw6X3w12k2c2w19k.kc5i2w3i2w4i2u3k.2kc4i2c3i2c2u2i2u3k.3kc3i2c3i2c2u2iu3k.5kc2ic4i2c2u5k.7k2c5i2c2u3k2.10k2u3iu4k2.14k8.80","boss_corgi":".51o3.12o3.6Oo4.8o4O.6ooppoo.6ooppoo.5oop3o4λλo4p3oo.4ooppo4λ4o4ppoo.4oΑΑo4λ6o7.4oΑΑo3λ8o6.4o5λ10o5.4o4λxDλ6DxλooΒΒ.4o4λ12ooΒΒ.4o3λ5x4λ5oΒΒ.4ooλ6x4λ6ΒΒ.4ooλ5xxppxxλ5oo.4ooλ7ppλ7oo.4ooλ7ppλ7ΒΒ.3OOoλ16ΒΒO..o3λ16ΒΒo.3o3λ11δ3ΒΒo.5ooλ9δ5ΒΒ.7λ7..λ7.8δδλ5..λ5δδ.28","boss_corgi_ko":".....................................................oooo.......oooo.........Oooo.......ooOo.........OOOoooooooooOOo........OOOOoooooooooOOOo.......OOOOoooooooooOOOo.......ooooooooooooooooo.......oooooCoooooCooooo......oooCCCCOOOoCCCCCoo......oooCCWWOoOWWWCCCooo.....oooCWWWWWWWWWWCCooo.....ooCCWWWWWWWWWWCCCoo.....ooCCWWWWWWWWWWCCCoo.....oooCWWWWWWWWWWCCooo.....oooCCWWWCCWWWCCCooo.....ooooCCCCCCCCCCCoooo......oooCCCCCCCCCCCooo........oOOOoooooooOOOo..........OOOoooooooOOO...........OOO.......OOO...........ooo.......ooo.....................................................","npc_long":".54ddD7dd.12dD11d.3εB.6dD11E.3BB.4ddD13dd.BB.6s15.BB.6s14S.BB.6D6dD6.3BB.6sD11s..B.8sD11S..θ.9s3S3s5.3θ.8dD11dεB.9dD11dBθ.7ddD3dD9BBe.6ssD4ddD6x..E.6ssD4ddD6x..E.8D12x..E.9D10x.3r.9D10x.3R.9DDx.5DDx.12x4.5x4.11x4.5x4.30","enc_ghost":".56w9.13w12.12w11Ι.11w15.9w3xw6xxwwΙ.9w3xw6xxwwΙ.9w3xw6xxwwΙ.9w6p3w5Ι.9w6p3w5Ι.9w6x3w5Ι.9w14Ι.9wwδw11Ι.9wXδw9XwΙ.9wXXw9XwΙ.9wXXw9XwΙ.9Xw5X3w4XX.9XwwΙ..XXe.w3Xe.9XwwΙ..XXe.w3Xe.10XX.12X.75","enc_platform":".51ιιy16.6yyY16.6yyY16.6yyYw12Y3.6yyYwwxw6xxwY3.6yyYwwxw6xxwY3.6yyYιw11Y3.6yyYιwwx6w3Y3.6yyYw3x6w3Y3.6yyYw12Y3.6y17Y.6y17Y.14E3.21EEd.21EEd.21EEd.21EEd.21EEd.18E10.78","enc_nav":".56L8r.13LLr10.12r11R.11Lrrw9rLr.9r3wxxw3xwwrrR.9r3wxxw3xwwrrR.9rrLLw8rrR.9r3w3x3w3rrR.9r3w3x3w3rrR.10r3w6rrR.12RRr9R.12RRr9F.14Rr6RR.16RRr3R.18RRr3F.20R3.154","enc_closed":".51εεB16.6BBK15θ.6BBK15θ.6BBKb12KKθ.6BBKbεεw8bKKθ.6BBKbbw9bKKθ.6BBKbbwxxw3xwwbKKθ.6BBKbbw9bKKθ.6BBKbbw9bKKθ.6BBKbbwx6wwbKKθ.6BBKb12KKθ.6BBKb12KKθ.6BBK15θ.6BBK6yK8θ.6BBK6yK8θ.6BBK15θ.6B17θ.6B17θ.99","enc_statue":".57H6.17HN6ηH.15HN6Hκ.13ηHN3xN3xxH.12HHN9κ.12HHN9κ.12HHN4xxN3κ.14HN6HH.15HN6Hκ.12H4N6H5.7ηHN3ηηN10H.6HHN15κ.6HHN3HN6HHN3κ.8H3.HHN3H..H3.9HHκ.HHN3κ..HHκ.12E9.13eEe9E.12EEe9d.12E11d.78","enc_nosignal":".54d12.11dD12Ed.9dD12dE.9dDDu9DdE.9dDDuxxu3xuuDdE.9dDDuxxu3xuuDdE.9dDDu9DdE.9dDDu3x3u3DdE.9dDDu3x3u3DdE.9dDDu9DdE.9dD12dE.9dD12dE.9dD3wwD7dE.9dDDUw3D6dE.9dDDw4D6dE.9dD12dE.10d12.12d11E.102","enc_queue":".75ττp.3ιιy.3οοc.9ppρ.3yyY.3ccΞ.8τp5.y3ιιy..c3οcc.3pxxpxxpyyxyyxιycxxcxx.3pxxpxxpyyxyyxyycxxcxx.3p6.y6..c6.3r6.o6..u6.3r5R.o5α..u6.3r5R.o5α..u6.3r5R.o5α..u6.3r5R.o5α..u6.3rrR.LR.βoα..α..uuU.uu.3D3.DD.D3..D..D3.DD.3DDx.Dx.DDx..x..DDx.DD.169","enc_notouch":".57d6.17dw6Ed.15dw6dE.13Edw3D3w3d.12ddwDDw3DwwE.12ddwDDw3DwwE.12ddw3D3w3E.14dw6dd.15dw6dE.16d6.20r3.21rrR.19LLr4.17Lrrw3rLr.15r3w3rrR.15rrLLr4R.15E9.15E8d.13EEe9E.78","enc_wind":".52Λ.14Λ.8Λ3.10Λ3.9ΛΙΛ10ΙΛΛ.9ΛΙ12Λ.10ΛΙΚ9ΙΙΛ.10ΙΙΚΚΙ6ΚΚΙΛ.10ΙΚΚdΚΙ4ΚdΚΚΛ.10ΙΙΚ3Ι4Κ3ΙΛ.9ΛΙ4Κ6Ι4Λ.8ΛΙΙxW8xΙΙΛ.8ΛΙΙxΙx6ΙxΙΙΛ.9ΛΛxΙx6ΙxΛΛ.11ΛΛΙΚ6ΙΛΛ.10R6ΚWWΚr6.8RFR3ΙΙWWΙΙr5.7RRFR3Ι7r5.6RFR3Ι8Κr4.6RFR3Ι8Κr4.6RFRRΚΙ8ΚΚr3.6RRΛ4Κ6Λ4r3.5R.Λ4.6Λ4r3.26","enc_mosq":".75οοc.12οοc.6ccΞ.12ccΞ.5cw3cc.9cw3οc.3cw5c.6οcw4cc.3cw5Ξ.6ccw4cc.4ccwwοοccEEdcw5c.8cw3d6w3cc.9cw3d6w3cΞ.12dD6dd.13EdDxxD3xDDd.12ddDxxD3xDDE.12ddD9E.14dD6dd.15dD6dE.16d6.3LL.12d.6Ed.15E.6dE.103","enc_typhoon":".54E6..E4.11Ee7Ee5E.9Ee6EEe4Ed.7eEe4xxe4xxe3E.6EEe15d.6EEeeΙΙe11d.6EEe6x3e6d.8Ee12EE.9Ee12Ed.10E12.9cu.3u.3uu.3u.9uU.3U.3uU.3U.11u.3uu.3u.3uu.7cu.3u.3cu.3u.9uU.3U.3uU.3U.11u.3uu.3u.3uu.148","enc_photo":".56ε6h.15εεh7εh.13h10B.13s11.13ssxs5xsS.13ssxs5xsS.13s10S.15sS3ssS.3D5.9sS3ssS.3D5.6c3A7ccADDwDD.6A13D5.6A13D5.6AUUA9U.12A10U.13A10U.13a3.5a3.13aax.5aax.13aax.5aax.12x4.5x4.78","fish_s":".200c5u.15c3u6ccu.3u.8u11U.3U.6ccuxxu10ccucu.4u6οοu3U4u5.4u11U4u5.6U12a..u3.9U5a.4cu.12U5a.4uU.172","fish_gold":".200ι5y.15ι3y6ιιy.3o.8y11Y.3α.6ιιyxxy10ββoβo.4y6ιιy3Y4o5.4y11Y4o5.6Y12J..o3.9Y5J.4βo.12Y5J.4oα.172","puffer":".81ιj.ιj.19jy.jy.18j3yj5.13ιjy9j.12jjy10.11jy3xxy3xy3ιj.9jy12jy.9jy12jy.9jy5p3y4jy.9j3y9j..ιιj.6j3ιιy8..j3.7j3y6j8.9j8y.3y.11j8y.3y.171","boot":".77ε6b.17b6ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5ζ.17bB5b7.11bB11bεb.9bBBεB8bbζ.9bBBεB9bζ.9b14ζ.9b14ζ.172","bobber":".83ΙΙe.21eeE.21eeE.19LLr4.18r5R.17r9.15w9.15w8Ι.15w8Ι.16w5Ι.18wLLwwΙ.20wwΙ.226","youtiao":".66y3.18ιιyYYOιy.16y3YYOyy.15ιyyYOOyYY.13ιιyYYOyyYOO.13y3JYOyyYOO.12ιyyYOOyYYO.12ιιyYYOyyYOO.13y3YYOyyYOγ.12ιyyYOOyYYO.12ιιyYJOyyYOO.13y3γYOyyYOγ.12ιyyYOOyYYO.12ιιyYYOyyYOO.13y3YYOyyYOγ.12ιyyYOOyYYO.14yYYOyyYOO.15yYYOyyYOγ.16O3YYO.87","shavedice":".57wwεεbw.17wb6εbw.14wb8Ι.12wwb4BBb3c.11w3bwwbbλBwwbοc.9w3bwwb3BwwbcΞ.9w3bw3bbw3bcΞ.7w8bw5bc3.6w8bw5bccΞ.6w15ccΞ.5wB3wwτy3w3p3wwcοc.3wB3w3y3w3p3wwc3.3w16c5.3c19uu.3c19uu.4u3wwu6wu5U.8u13UU.9u13Ua.10u9U3.14U8a.15U9.31","douhua":".56w.6ww.13ww.6w.15wΙ.6Ι.15c12.9οοcw12οοc.6c3w12ccΞ.5cw3b5w6nw3οc.3cwwb3Bιbbw3ιnNw3cc.3cwwb3Bb3w3nnNw3cc.3cw3b3w3nnNw3nnNuu.3uWWw13W3uu.3uWWw13W3uu.3u19UU.4uuwu5wu5wuuU.6uuwu5wu5wuua.6u17a.8u13UU.9u13Ua.10U12.14U8a.15U9.31","shaobing":".80ι8y.15y8Y.12ιy3ιwy6Y3.7ιιywwy3Y3wY6.6y3wwy3Y3wYιY3J.5ιy3Y3wwY6wY3αO.3ywwY9wY6OO.3ywwY9wY6OO.3yY5xY6xxY3wOO.3yYYwppY3x3Y3pY3OO.3yYYwppY3x3Y3pY3OO.3Y19OO.3YwwY6wY5wYYO3.3YwwY6wY5wYYO3.4Y15OOγ.6O17γ.6O17γ.9O11γ.78","noodles":".68bBB.19εbB.21bbθ.20bBB.13ι5yεbB.15y6bbθ.15yyYyyY.18yyYyyJ.18yyιyyJ.12w6ιyYyYYw6.5wo3y5YyyYyyoggbww.3wo3y5YyyYyyoggbww.3w19WW.3r19RR.3r19RR.4r3wwr6wr5R.8r13RR.9r13RF.10R12.14R8F.15R9.31","meal":".51b18.5bn18εB.3bn18BB.3bw3WWw4bbyo6BB.3bw8Wbboyyo3OBB.3bw8Wbboyyo3OBB.3bw5r3wbbo3yooOBB.3bwwWwwrRRwbbOoJo3OBB.3bwwWλwrRRwbbOo5OBB.3bw3λw5b9BB.3bw6WWwbbgGGgwwyBB.3bw6WWwbbgGGgwwyBB.3bWWw7bbg4wwyBB.3bw6W3bbGggGw3BB.3bw6W3bbGggGw3BB.3bB20.3B21.3B21.97","drumstick":".53ιιyβ4oo.13ιιy3o4YYββo.10y5o4YYooα.9ιyyo4YYo6O.8yo6ββo4YYoαO.6yo12YYoOγ.6o4xxo4xxo4Oγ.6o3po3xxo3pooOOγ.6o3po3xxo3pooOOγ.7o6YYo4O4γ.9Oo8O3γ.11Oo8O3γ.14O3o3O3γ.20OwwW.20OwwΚ.23w6.18w4WW.18w4WW.16w5W.18wwW.21wwW.30","jipai":".54ββoβo.3oββo.9β3ooyooββoyo3βoO.6o5yo5yo5γ.5oy3o9YYo3OαO.3oyyo3Yo9YYoOO.3oyyo3Yo5ββooYYoOO.3o6xo6xxo4OO.3o6po6ppo3O3.3o6po6ppo3O3.4o9YYo4OOγ.6n17N.6n17μ.6n17μ.6n15NNμ.6n15NNμ.6nnr13RRμ.6n15NNμ.6n15NNμ.6n15NNμ.6N17μ.6N18.27","soda":".57r6.18R6.18R5F.18wwc3u.18ccwccU.18ccwccU.17οccwc4u.13οοc7u3.12c3λc5uuU.12ccwλc7U.12w11W.12w11Κ.12wwr9Κ.12w11Κ.12w11Κ.12ccwc8u.12c3wwc6U.12c3wwccΞc3U.12c11U.14u9.15u9.31","mochi":".81w6.18w5Ι.15w4λλw6.11w3nw6nnwWW.9w3nw6nnwWΚ.7w17W.6wwnw11nwwΚ.6wwnw11nwwΚ.5w6xw6xxw3W3.3w4ppw3x3w3pwwW3.3w4ppw3x3w3pwwW3.3wnnw13nnW3.3w16W5.3w16W5.4WWw12W3Κ.8W14Κ.9W14Κ.7g17G.9G12.12G12.30","tangyuan":".81w6.18w5Ι.17w7WW.10τ4pwxxw3xWWτ3p.6p5wxxw3xWWp3ρ.5pwwp3Pw5p3wp3PP.3p6Pw5Wp6PP.3p6Pw5Wp6PP.3p4P3W6p5P3.3rn5ττn11rr.3rn18rr.3r19RR.3rw18RR.3rw18RR.4r15R3.8r12RRF.9r12RRF.10R11F.14R8F.15R9.31","tofu":".81Φlwlgl.18llwggΧ.15llgllwgglggl.11lggwgglggwllgΦl.9lggwgglggwllglΧ.6ι3y3lwwgllgwwy4YY.3y19YY.3y7JJy10YY.3y4YYky5Ykky4YY.3oOOoOOko5Okko3O3.3oOOoOOko5Okko3O3.3o4OOkxxoxxOkkoOOoOO.3Oo3OOko5Okko4OO.3Oo3OOko5Okko4OO.3o3O3kooOooOkkOo3OO.3O6kO6kkO6.3O6kO6kkO6.3e19EE.4E18.6E18.27","watermelon":".74gΦlL14rllg.3gllr15lgg.3gllrxxr9xrrlGG.3gllr15lGG.3gllrττr12lGG.3gllr3xr6xxr3lGG.3gllrppr3x3r3prrlGG.3gllrppr3x3r3prrlGG.3gllr15lGG.4gglrrxr6xxrllG.6gglrrxr6xxrllZ.6g3llr9lGGZ.8g3lr6llGGZ.9g3lr6llGGZ.10g3l6GGZ.14G8Z.15G8Z.103","breakfast":".51b8.3b7.5bn8εεbn7εb.3bn8b3n7bb.3bn5ιιn11BB.3bn5w9n4BB.3bn5w9n4BB.3bn3w12n3BB.3bnnw4y6w5NBB.3bnnw4y6w5NBB.3bnnw3y9WwwNBB.3bnnw3yxxy3xyyWwwNBB.3bnnw3yxxy3xyyWwwNBB.3bnnw3yppy3pYYWwwNBB.3bnnw4Y6W3N3BB.3bnnw4Y6W3N3BB.3bn3w5W6N4BB.3bn5N13BB.3bn5N13BB.3bN18BB.4B18.6B18.27","duck":".81ι5y.18y5Y.15ι3yyιιyyιyY.11ιy12YY.9y13YJ.9y3xy6xxyYJ.9yppyo6yypYJ.9yppyo6yypYJ.9y6O3y4YJ.6ω3Ny11YNNωωN.3N4y11YN5.3w19WW.3wu18UU.3wu18UU.4w15W3.8w12WWΚ.9w12WWΚ.10W11Κ.14W8Κ.15W9.31","fish":".81uuU.21UUa.20U6.6uuU.6ο3cu6.3cuU3.6ccοοu5U.3uuU3.4c3u9cu.uuU3.3cuuxwwu9cuuU3.3cuuxwwu12U3.3cuux3u4UUu6U3.3u12Uu5U3.3u12Uu5U3.3pw11uU3uuU3.4w9WWUUa.uuU3.4w9WWUUa.uuU3.6W7UUa.5U3.9U3.21UUa.109","icecream":".56τppτ5p.12τ3pwwp7PP.9p4wwp7Pσ.7ττpwwppττp8P.6p5xp6xxp3σ.6p5xp6xxp3σ.6p3rrp3x3p3rppσ.5τp17P3.3p18P3.3PppP3pP5pP8.4yyYyyYyyYyyYyyYyyO.6yyYyyYyyYyyYyyYyyγ.8YyyYyyYyyYyyYOO.9yYYyYYyYYyYYyOγ.9yYYyYYyYYyYYyOγ.10YYyYYyYYyYYO.14yYYyYYyOO.15yYYyYYyOγ.16YYyYYO.20YOO.21YOO.34","taroice":".54v3I8v.11vw3v10V.9vw3v9Va.9vwIIvvVv6Va.9v9Vv3Va.9v9Vv3Va.9v3xv6xxvVa.9vppv3x3v3pVa.9vppv3x3v3pVa.9v3Vv9Va.9v9Vv3Va.9v9Vv3Va.9vVVv10Va.9V14a.9V14a.13n3NN.19n3Nμ.19n3Nμ.19n3Nμ.19N4μ.19N5.34","teaegg":".57bbε3b.15εbιnnb4εBb.12bbn3b4BBζ.11bnnb3Bb6εB.9nb5ηηBb4Bθ.9nb5B3b4Bθ.7εbnbbBb5B3b3B.6b3BBb9Bbbθ.6b3BBb9Bbbθ.6b3xxb9xbbθ.6bbpb5x3b4ppθ.6bbpb5x3b4ppθ.6b5B3b6Bbbθ.6bbB3b4B3b3BBθ.6bbB3b4B3b3BBθ.8b6Bb3B4θ.9Bb5Bb5BBθ.9Bb5Bb5BBθ.10B11θ.15B5θ.18B6.33","herbtea":".63Lrw.20wrR.21wrR.12e9rwwe4.6Ιec9wrrc4eE.4eec9wrrc4EE.6lq8rwwq3E.8lqqcq3wwrq5d.8lqqcq3wwrq5d.8lqqlq3rrwqqcqqd.8lqqlq11d.8lq14d.9llq3xq3xxqEE.10llqppqxxqppqEd.10llqppqxxqppqEd.10llq9QEd.10llq7Q3Ed.10llq7Q3Ed.12Q9Z.78","coffee":".57ww.4ww.15wwΙ.3wwΙ.15wwΙ.3wwΙ.15Ι.5Ι.132wwb12W.9w14WeeE.6w3λw10WEEd.6w3xxw4xxw3W3d.6wwpw3xxw3pwwW3d.6wwpw3xxw3pwwW3d.6w14WEEd.8w10WWΚ.11w10WWΚ.8ce17E.6E17.7E17.28","tealeaf":".59l.21ΦΦlgG.19l3GZ.19llgGZ.6l3.12G.5ΦΦlg3.12Z.5l3g3.12q..l3g3G3.12qΦlg4GGZ.14Φllg4GGZ.5Φll.6qg3G4Z.6lggllg.3qG4Z.9lg4G.3qG4Z.9lg8Q.15g3G5Q.15g3G5Q.17G3Z..Q.23Q.23Q.23Q.23Q.23Q.36","pork":".63w3.20w4WW.18w4WΚ.10b3ε4bw3W.9εεboonb5BbbΚ.9b3oonb5BbbΚ.8boonb11BεB.6bnnb13B3.5bnnb13BBθ.5b4xxbεεb3xb3BBθ.5b3pb5xb3ppbBBθ.5b3pb5xb3ppbBBθ.5b16BBθ.6b14BBθ.7b14BBθ.6Ιeege3B8e3E.5e15ge4E.3e15ge3EE.4E18.75","dumpling":".125wWWwWWw.15w9WW.13w9WΚ.12w12W.11w3xw5xwwWwwWww.6w3xw5xwwWwwWwΙ.6wppw3xw11W.5w6λλw11WW.3w19WW.4W6w3xxw4xxwWW.10wwpw3xxw3pWW.10wwpw3xxw3pWW.4ο5cw11W3.3οc8W10uu.3c9W10uu.4u15U3.75","crab":".51Lr.Lr.9r..r.6rrLrR.9rLLR.6r4R.9r3R.6rrR3.ww.3w..rR3.8rRF.xx.3x..rRF.9rRF.xD.3D..rRF.9r3LrrL3rLLr3.7LLr15R.6r17F.5Lr3xxr7xxr3RrR.3r3pr5x3r3prrR3.3r3pr5x3r3prrR3.3r16R5.4r14R3F.6r14R3F.5R..R14F.rR.3F..F.3RF.3F.3RF.RR.3F..F.3RF.3F.3RF.RR.4RR.3R.6RR.3R.75","bread":".128o3β5o.12ββoy3o7αO.9o3y3o7Oγ.7ooyββo4yyo4O3.5oyyo4yyo6yooOαO.3oyyo4yyo6yooO3.3o4yyo6yo5O3.3o4xxo6xo5O3.3o4xxo6xo5O3.3o3po5xo5pooO3.3o18O3.3o18O3.3Oo17O3.4O17γ.6O17γ.8B15.76","peanut":".56ιnnι3n.15ιιnNNn4ωN.13n3NNn4Nμ.12ιn5ιιNn3N.11nNNn9μ.11nNNn9μ.11n3xn5xnnμ.11nppn3xn3ppμ.11nppn3xn3ppμ.12n9NN.15nNNn3N.17nNNn3μ.15ιιn4NNnNN.12ιnnNn8N.11n3Nn8μ.11n7NNn3μ.11nNNn7NNμ.11nNNn7NNμ.12NNn6NNμ.15N6μ.17N7.33","hotpot":".77ΦΦl.7ττp.11llΧ.7ppρ.9ΦΦlggl.5pPPpPP.6Φllg3GΦl.w3ppP3o.5l3g3GlΧ.w3ppP3α.5lg3G3llyw3WWPooOoo.3lggG3y3YW3r3o3OO.3lggG3y3YW3r3o3OO.3e19EE.3deeE15d3.3deeE15d3.3de3xxE9xEEd3.4e3E12ppE.6eepE12ppE.6eeE13ddE.8E12ddE.9E12ddE.10d11E.78","ricebag":".80w9.15w8Ι.12w4WWw3Ww5.7ιnwWWw9WwwN.6nnwWWw9Wwwμ.6n17μ.6n17μ.6n17μ.5ιn17NωN.3n4ιr10n3N3.3n4ιr10n3N3.3n4rrwrrwrrwrrn3N3.3n4r3w5r3n3N3.3n4r3w5r3n3N3.3n4rrwrrwrrwrrn3N3.3n4r11n3N3.3n4r11n3N3.3nNNn13N5.4N17μ.6N18.27","shop":".75ε16bB.6b17θ.6bby15θ.6B17θ.6B17θ.5Lrrw3r3w3r3w3rLr.3r3w3r3w3r3w3r3.3r3w3r3w3r3w3r3.3R3W3R3W3R3W3R3.4N3ιιN13.6N17μ.6nnc9nb5μ.6nny3r3g3nb5μ.6nny3r3g3nb5μ.6nnB9nb3yyμ.6nnoOOp3uUUnb5μ.6nnoOOp3uUUnb5μ.6nnN9nb5μ.5Ιe17EeE.3e18E3.25","convenience":".74w19WW.3w19WW.3u19UU.3y19YY.3y19YY.3g19GG.3w19WW.3w5οw13WW.3wc4οcddc3dc6WW.3wccyrrcddc3dccgoocWW.3wccyrrcddc3dccgoocWW.3wc6ddc3dc6WW.3wccrggcddc3dccuyycWW.3wccrggcddc3dccuyycWW.3wc6ddceedc6WW.3wE6ddc3dE6WW.3wE6ddc3dE6WW.3W7ddc3dW8.3e19EE.3e19EE.25","herb":".59gΦlg..Lrr.13lgGllggGR.15ggGllgGGR.18G3.18ιnxnnxωN.16nnxnnxNμ.15nNNn4N3.12w11W.12w11Κ.11u13UU.7w17W.6w3λw13Κ.6w3λwr7w3WWΚ.6w5rn5rw3WWΚ.6w5rn5rw3WWΚ.6w5rn5rw3WWΚ.6w5r7w3WWΚ.6w5r7w3WWΚ.8u13UU.10W12.12W12.30","lingjiao":".131vvV.18IIvV3vvV.15v3V5a.13IIvIIV7.8I4vvV10vvVkk.3v6V13kk.3vVV.VVxV6xxa..Vkk.3V.3VVpV6ppk.3kk.3a.3VVpV6ppx.3kk.7V5x3V3x.12V9kkx.12V9kkx.14V6kkx.16k5x.18k5x.105","lettuce":".54Φl.ΦΦl..l..l.9Φl.llΦl3ΦΦlΦΦΧ..l.6lΧ.l11Χ..Χ.5l3wlΦΦl9Φlgll.3gl18GG.3gl18GG.3gllGl12GGlGG.3g3lxxl9xllG3.3g3lxxl9xllG3.3g3lppl3x3l3pllG3.3lg3l14Gll.3lg3l14Gll.3gGGg3l9gG5.4ggGllgl6ggGllZ.6ggGllgl6ggGllZ.5lg3GGg7G6ll.4llgG3g5G6l.6llgG3g5G6Χ.8lG12ll.76","potato":".78ι4nω3N.15n5N3μ.14n3N7ωNb.9ιnN4ηηN7εb.7nnN13bζ.6nN3BBN12b.5nN5xN6xxN3ζ.5nN5xN6xxN3ζ.5nN3ppN3x3N3pNNbεb.3N15BNNb3.3N15BNNb3.3bN15b5.4bbN3BN8b3ζ.6bbN3BN8b3ζ.8b3N6b5ζ.10b11ζ.12b11ζ.102","garlic":".59Wnn.21wWW.21wWΚ.19w5W.17w6W3.15wwλλwwWWΚ.12w12W3.7Lrw13WWR.6rrw13WWF.5rw3xxw7xxw3WrR.3rw3ppw3x3w3pwwWRR.3rw3ppw3x3w3pwwWRR.3rw6WWw3Ww5WRR.3r3Ww3WWy3Ww3WWR3.3r3Ww3WWy3Ww3WWR3.3rrR.W3w5W4..R3.3r4..eWWeWWe.3rrR3.3r3R..eWWeWWE.3R5.3r6.9R6.73","loofah":".57G3.20lg3lgG.3τp.τp.9lg5Z.3pρ.pp.7Φlg9GppPpp.7llg7GGZ..p.9llg7GGZ..ρ.9llgxxg3xggZ.12llpg5pggZ.12llpg5pggZ.12llg3x3g3Z.12lΦgGGg3GggZ.12lΦgGGg3GggZ.12llgGGg3GggZ.11lg3GGg3Gg4G.9lg3GGg3Gg3GZ.9lg3GGg3Gg3GZ.9lg3GGg3GggGGZ.9lg3GGg3GggGGZ.10G11Z.78","meatball":".59yYY.18nωωN4εb.15nN6bζ.13nnNxxN3xNNb.12NNpNηηN3ppζ.12NNpN6ppζ.14b9.15nN6bζ.15nN6bζ.13nnNxxN3xNNb.12NNpNNx3Nppζ.12NNpNNx3Nppζ.14b9.15nN6bζ.15nN6bζ.13nnNxxN3xNNb.12NNpN6ppζ.12NNpN6ppζ.14b9.18yYY.21yYY.34","melon":".57GGg3G.20GGZ.21GGZ.18lggl3gΦl.12l3ΦΦlg4l4g.9lg3llg4llggG.7llgllg3lgglg3llG.5lg3xxgllg3lxxg3lgG.3lg3xxgllg3lxxg3lGG.3lgglg5lg6llgGG.3lggpg3llx3lg3ppgGG.3lggpg3llx3lg3ppgGG.3lgglg3llg3lg3llG3.4g5lg3llg3lGGZ.6g5lg3llg3lGGZ.6GGgllg3lg3llgGGZ.8G3g3lggG5Z.9G3g3lggG5Z.12G8Z.79","bee":".54xx.9x.14x.6xx.15D.6xD.15yι5yYY.12ι3yιιy7YY.9y13YJ.6w3y3xy6xxyYYw3.3wccy3py6ppyYYcww.3wccy3py6ppyYYcww.3wccy6x3y4YYcww.4wwx15w.6wwx15Ι.8y13YY.9x15.9x14D.10y9Y3.14Y8J.15Y8J.18x3.82","turtle":".57eeΙ3e.17exxe3xeE.15exxe3xEd.15eppe3pEd.9ΙΙe.3d9.3eeE.3eeE.3d8E.3eEE.3e4dde9EddE3.4dde3d7E5d.6dde3d7E6.6ddedde6EddE4.6ddedde4E3ddE4.6ddedde4E3ddE4.6ddEddΛΛE5ddE4.6ddE3d7E6.6ddE3d7E6.5ΙeedE12ddEeE.3eEE.3d9.3E3.3eEd.3d8E.3E3.12eEE.82","rabbit":".54w3.6w3.11wppΙ.6wwpWW.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.9wppΙ.6wwpWΚ.10w11W.11w13WW.9w13WΚ.7w3xxw7xxwW3.6wwpw5Pw5pWWΚ.6wwpw5Pw5pWWΚ.8w12WWΚ.9Ww3δw7WWΚ.9Ww3δw7WWΚ.7w15W3.5w6Ww6WWw3W3.3w6Ww6WWw3W3.3w6Ww6WWwW5.4W5Κ.6W5Κ.6W6.6W6.27","lion":".54EEeeE.3e3E.9eeEddE3e3E3deeE.6E3ddE9dEEd.5EddE3de6ddE3deE.3E3de12ddE3.3E3de12ddE3.3dEEewΙxe6wwxeeEdd.3E3e6E3e6E3.3E3e6E3e6E3.3Eddeppew6eepeedEE.3dEEe4r6e5Edd.3dEEe4r6e5Edd.4EEde12d3.6EEdE3ddE3dE3d3.6EEdE3ddE3dE3d3.8E3e9E3.7ΙΙe4EEe3Ee5E.6e6EEe3Ee5d.5E20d.3d21.3d21.25","mazu":".51y3ιιyιιy3ιyyιyyY.6rr.yyYyyr3yY3..r.6rR.yyYyyr3yY3..R.6rR.ιhyssy3syyh..R.6rR.hhsxxs3xssB..R.6rR.hhsxxs3xssB..R.9hhspps3pssB.14s8S.15s8S.12L3r3y3r5R.7LLr6y3r4R3.6r8y3r4RRF.6r5s3W3s3rRRF.6r8W3r4RRF.6r8W3r4RRF.6r3y12RRF.6r8yr6RRF.6r8yr6RRF.5r9y3r6R3.3y18Y3.3y18Y3.25","hand":".60ΙΙe.17ΙΙe.eeE..ΙΙe.12eeE.eed..eeE.12eEE.eed..eEE.7ΙΙe..eEd.eed..eEd.7eeE..eEd.eed..eEd.7eeE..eEd.eed..eEd.7eed..eEd.eed..eEd.7eed..eEd.eed..eEd.7eeEΙΙeΙEΙeeEΙΙeEEΙee.4e6Ιe8EEeEE.4e15EEeEE.4e15E5.4e15EEd.6e15EEd.8e12EEd.9e12EEd.9e12EEd.6ε3be11Eb3εB.3b19BB.3b19BB.25","statue":".59yYY.18ι3y3Y3.15y6YYJ.12y12Y3.12s9.15s8S.13nsxs6xxs.12sspssr3sppS.12sspssr3sppS.9sscu14s.8u13UU.9u13Ua.10ΞΞu9U.12U5.3U3a.12U4a.3U3a.9eeΙe14E.8eE12dd.9eE12dE.9e13EEd.6EEd15E.6d18.27","otter":".54ε11b.9εBεb12εbB.6BBb15θ.8b3xb6xxbBB.7εεbppn9pbbB.6b3ppn9pbbθ.6bbnBBn3x3n3Bnnθ.8bn12BB.9bn12Bθ.10bbn9B.12bbn9b.12bbn9ζ.11εbbηn8bεB.bb.6b3ηn6BBbBBbBB.6b3Bn6BBbBBbBB.6b3n9bBBbBB.6b4n6b3BBbBB.6b4n6b3BBbBB.7b11B4.9B5.3B3θ.12B5.3B4.30","goat":".53eEE.22eeE.21eed.18w6EEwpp.12w9W.14w9Κ.14w3xw3WWΚ.14w19.5w18Ι.6WWw16WW.4WWw15W3.4WWw7δδw6W3.6Ww14W3.7W14Κ.9W14Κ.9w3..w3.w3..w3.7wwΙ..wwΙ.wwΙ..w3.7wwΙ..wwΙ.wwΙ..w3.7d3..d3.d3..d3.73","cow":".51W3.12W3.8W3.9WWΚ.9WWΚ.9WWΚ.9w9x4WΚ.6ττpw9x4wwττp.3p3w9x4wwp3.3pPPw10x3wwP3.4w3xxδδw7xwwW.6w3xxw9xwwΚ.6w17Κ.6wwpw12ppΚ.6wwpw12ppΚ.5τp18PP.3p4xxp9xp3PP.3p4xxp9xp3PP.3p16P5.4p14P3σ.6p14P3σ.8P14σ.15yYY.21yYY.34","deer":".50B.3εB.18BεB.B3.17BBθ.BBθ.18B4θ.19o6εb.16o6bζ.15xooxo5.16o5α.18o5α.18o6β5oβ4ow3.6owwo3ββowo6OO.6owwo6wo6OO.6o6wo5wo3OO.6Oo14O3.6Oo14O3.7O14γ.9o3..o3.o3..oβo.7ooα..ooα.ooα..o3.7b3..b3.b3..b3.73","bird":".80L3rrR.18r4RF.16r8R.14w6x6.12w6x5D.9Eddwxxw4x5B.11w3pw3x8.9w3pw3x7D.10w6xxwxxwxD.10w5x3wxxwx3.9w5x3wxxwxxD.9w6x3wwx3D.11w3δxxwx8.9w4xxwx8.9w6x9.10w5xxD.3x3.10w5xxD.3x3.10y3..y.81","dino":".59l6g.15llg7lgG.12g11Z.8o.3g6wwxggGgG.6oβo.g11G3.6ooα.g11G3.4ββooα.g3ppg3x3G3.4oog3lg8G3Z.6oog12G3Z.5og4ΦΦl6ggZ.8g6l9ggG.6g6l9gGZ.6g6l7ggGGZ.6G.3ggl6gG4Z.6G.3ggl6gG4Z.12gG7Z.15g3.3gGZ.15ggG.3gGZ.15G3.3GGZ.79","whale":".53c..c..c.18οοcοc.19c4Ξ.21Ξ.11uUU.4c5uc5u.3cuU.6u11U.3uua.5cu12cu.uua.5u15cuua.5u18a.5uwwxuοοu9UUa.5u3pu11UUa.6u3pu11UUa.6uc11u3UUa.6c3Wc3WWc3WUUa.8c3Wc3WWc3WUUa.9c11UUa.12U9.15U8a.106","beetle":".50εhh.21hbb.21hbζ.21h4.21h3εh.3ε6h.9h4B.3h6B.9h8b6hεεh.5εh5bwwb3h7εh.3h6bwwb3h9.3hxxhb5hhεεh8.4h5b3h10kk.4h5b3h10kk.4h17k3.6hkkh10kkx.8hkkh10kkx.8x.3xx.4xx.10xx.3x.5x.12xD.3D.5D.11xxD.xxD.3xxD.81","starfish":".59ββo.19ββo3O.18o5γ.18o5γ.17βo5OαO.15ooββooOOγ.9oβ5o9ββoαOO.4o5xo6xxo3γ.6o5xo6xxo3γ.8oppo3x3o3pOO.10o11O.12o11γ.12o9OOγ.11βo5Oo5OαO.9o6Oo5OOγ.9o4OO.3o4Oγ.7ββo3O.6o3O3.6o5γ.6o3OOγ.6o3OO.9oOOγ.5oOO.15OαO.3oOO.15O3.25","station":".59rRR.19Lrw3R.18rrw3F.17rwwxw3rR.13LLrwwx3wR3.12r3wwx3wRRF.11Lr5w3R4rR.7LLr9R7.6r11R6F.5r12R9.4wwxwwx3wxxwx3wwW.6wwxwwx3wxxwx3wwΚ.6n17N.6nncΕΕn3b3n3c3μ.6nnc3n3b3n3c3μ.6nnuccn3bBBn3uccμ.6n8bBBn6μ.6n8bBBn6μ.6N8bBBN6μ.5Ιe19E.3e19EE.25","steamtrain":".51w3WW.18w7WW.15w7WΚ.16x6WΚ.4rrLr4R.6d3.3yYY.3rc3RR.6ddE.3yYJ.3rc3RR.4E14rc3RR.3yd14rc3RR.3yd14rc3RR.3d5eed8r4RR.4d14r4RR.4d14r4RR.3r19RR.4rrR.5rRR.4rrR.6rrF.5rRF.4rrF.5re3rRdLre3Rddre3rR.3re3RF.rre3F..re3RR.3re3RF.rre3F..re3RR.4R3.5R3.4R3.5Ιe3Ι5e3Ι4e4E.3e19EE.25","bridge":".74L18rrR.3r19RR.3rc3LLc4r3c6RR.3r3c6rc3rrc4RR.3r3c6rc3rrc4RR.3rccrc3rrc6rc3RR.3rc3r3c9r3RR.3rc3r3c9r3RR.3R21.3d21.3d21.3ueeEu11eEEu3.3ueeEuucu6ccueeEuu.3ueeEuucu6ccueeEuu.3ueeEu5cu6eeEUU.3UeeEU3u6U3eeEUU.3UeeEU3u6U3eeEUU.3UeeEU12eeEUU.3U21.3U21.25","tunnel":".51l16gG.5lg17GgG.3lg17G3.3R21.3r3Rr11Rr3RR.3r3Rrγr9Rr3RR.3rRRrrγe9rRRrRR.3r4eex9Er3RR.3r4eex9Er3RR.3rRRex12EErRR.3r3ex12EErRR.3r3ex12EErRR.3rRRex12EErRR.3r3ex12EErRR.3r3ex12EErRR.3rRRex3eex3ex3EErRR.3EeeE3wb6wwEeeE3.3EeeE3wb6wwEeeE3.3eE3wwE9wEEeEE.3E3wb12wwE3.3E3wb12wwE3.25","gas":".53L9rRR.10LLr12R.9r14F.9rrw10rrF.9rrwc8wrrRx3.6rrwc8wrrRxxD.6rrwccxccxccwrrF..xEd.4rrwc8wrrF..xdd.4rrwc8wrrF..xdd.4rrw10rrF..D.6r4λr9F..D.6r4λr9F..D.6r3w8r3F..D.6r3wwy3Ywwr3F..D.6r3wwy3Ywwr3F..D.6r3w8r3RxxD.6r14F.9r14F.8d18.6E19.5E19.27","temple":".50r.18rR.3rLr.6ιιy.6rRR.3rrR.6yyY.6R3.4r3y12rrF.6r15RRF.6r15RRF.5r18RrR.3R21.3R21.4y17Y.6rrRn12rrR.6rrRn12rrF.6rrRnnb9nrrF.6rrRnnιιyb3ybbnrrF.6rrRnnbyyb3ybbnrrF.6rrRnnb9nrrF.6rrRnnbyyb3ybbnrrF.6rrRnnbyyb3ybbnrrF.5e20E.3E21.3E21.25","tudigong":".51Lr.15R.6r3.3ι5y.3rrF.6rrR.3y5Y.3RRF.8rL3r6LrRRF.7LLr13R3.6r15RRF.5R21.6rB12RF.9rB12RF.9rB5y3B4RF.9rB5s3B4RF.9rLB4s3B4RF.9rLB4w3B4RF.9rB3y6B3RF.9rB3y6B3RF.9r6xrrxr3RF.7ΙΙe4YYy3Ye5E.6e6YYy3Ye5d.6e6Y6e5d.5eE18eE.3E21.25","shelltemple":".50p.18PP.3pτp.6w3.6P3.3ppρ.6wwΙ.6P3.4p3w12PPσ.6p15PPσ.6p15PPσ.5p18P3.3P21.3P21.4c3wwpPPpPPpPPc3u.6ccwppPpτPppPppPccU.6ccwppPpτPppPppPccU.6ccwppPppPppPppPccU.6c3wwPppPppPppc3U.6c3wwPppPppPppc3U.6rrc3PppPppPccoccU.6rrcP3ppPppP3o3U.6rrcP3ppPppP3o3U.5e20E.3E21.3E21.25","stonetemple":".50e.18eE.3eΙe.6ΙΙe.6eEE.3eeE.6eeE.6E3.4e3EEeE5eE3eed.6e5Ee5Ee3EEd.6e5Ee5Ee3EEd.5e3Ee5Ee5EeeE3.3d21.3d21.4e3EEe7EEe3E.6eeEeΙx9eEEd.6eeEeΙx9eEEd.6e5x3y3x3e3d.6EEe3x3Y3x3eEEd.6EEe3x3Y3x3eEEd.6e3EExr6xxEeed.6eeEe5Ee6EEd.6eeEe5Ee6EEd.5E21.3d21.3d21.25","torii":".50r.14R.8rL13rF.8r15F.9R14.12rRF.6rRF.12rRF.6rRF.10r14R.11rRR.6rRR.ΙeE.8rRF.6rRF.eed.8rLF.6rRRe3E3.6rLF.6rRF.yyd.8rRF.6rRF.yyd.8rRF.6rRRe3E3.6rRF.6rEE.eed.8rRF.6rEd.eed.8rRF.6EEd.eed.8rRF.6EEd.eed.8rRF.6EEd.eed.6e3E3.3e3EEe3E3.3lg6l3g9GG.3g19GG.25","lighthouse":".59rrR.12y.6LLrR3.6ιy.3Y.6r3RRF.6yy.4y3..xyywy3xx.y3.9ιyxy6xxy.12yyxy6xxY.12d12.14w7WW.15w7WΚ.15δδw5WΚ.15r7RR.15r7RF.13r5xr3R3.12w11W.12w11Κ.12w11Κ.12r11R.12r11F.11r6br5R3.7ΙΙe13E3.6e15E3.27","fort":".59xL3rr.18xrrR.20xrrR.11ΙΙe.ΙΙe..e3.ΙΙe..eeE.3e3Ιe3ΙΙe3Ιe3ΙΙeEE.3e19EE.3eEEe6Ee6EEeEE.3e4EEe7EEe4EE.3e4EEe7EEe4EE.3exxeΙΙe12xEE.3e4EEe3x3e3Ee3EE.3e4EEe3x3e3Ee3EE.3eEEe4x6e3EEeEE.3e7BBb3Be6EE.3e7BBb3Be6EE.3e3Ee3BBb3BeeEe3EE.3Ee6BBb3Be5E3.3Ee6BBb3Be5E3.3E7BBb3BE8.3d21.3d21.25","castle":".59rrR.19LLrR3.18r3RRF.12Lr.4r3RRF.5R.5LrrR..Lr3R3rR.LrRrR.3r3F..r4R4F.rrR3.3y3Y..y7YY.y3YY.3yxxJ..y3cy3YJ.yyxYY.3yxxJ..y3cy3YJ.yyxYY.3y3Yιιy13YY.3y3Yy11Yy3YY.3y3Yy11Yy3YY.3yxxYyyιy8YyyxYY.3y3Yyyιyyb3y3Yy3YY.3y3Yy5b3y3Yy3YY.3y3Yy3b6yyYy3YY.3y3Yy3b6yyYy3YY.3y3Yy3b6yyYy3YY.3Y7b6Y8.3e19EE.3e19EE.25","cannon":".89ΙΙeEEd.18e3Edd.15e3E4dd.12ΙΙeE4d5.12e3E4d5.9e3E3Ιd5E.8ΙΙeE4dΙd3E.11e3E4d5E.9ddE4d5E.14r6b4.14r6b3ζ.12LLr4bbBbbBbb.9Lr5bBB.bζ.BBb.8r6bBθ.bζ.BBζ.8RrrR..b4yyb3ζ.8R3.3bBB.bb.BBζ..d.5RRF.3bBθ.bζ.BBζ..E.12bbBbbBbb.EdEEd.12B3θ..Ed5.12B4..d6.25","pagoda":".59yYY.19ggqQ3.18q3QQZ.14q..gq5QqQ.qQ.9qggq7QQqQZ.9q10Q4Z.12rRRy3rRR.15rRRy3rRF.15rRRy3rRF.9q.5q6Q3.4qQ.3qg5q7QQq4QQ.3q5Lq7Q8.6rRL.y5Y.3rrR.8rRF.9rRR.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.9rRF.7e17E.5eE18eE.3E21.25","minnan":".50r.18rR.3rLrR.12r3RR.3r3F.12R5.4r3R14F.6r17F.6r17F.5r18RrR.3R21.3R21.3o3Oo11Oo3OO.3o4ΕΕo13OO.3o19OO.3oddWddrb5BrrdWWdOO.3oddWddrb5BrrdWWdOO.3oddWddrb5BrrdWWdOO.3o4OOrb5BrrOo3OO.3oOOo3rb5Brro3O3.3oOOo3rb5Brro3O3.3W21.3e19EE.3e19EE.25","stonehouse":".77E14d.9d14E.7EEdeed6ed5EEd.3Ed20.3d21.4e3EEe4EEe6E.6e3xxΙe6xxreed.6e3xxre6xxreed.6e3xxre6xxrEEd.6EEe6Ee8d.6EEe6Ee8d.6e3EEe3u4EEe3d.6e8uUUue3EEd.6e8uUUue3EEd.6eeEe5uUUue5d.6e5EeeuUUuEEe3d.6e5EeeuUUuEEe3d.6E17d.5lg19G.3g19GG.25","house":".63εεb.15LrR.3bbB.15rrF.3bbθ.14Lr3R3bbθ.12LLr6R4.12r8R3F.11Lr9R3rR.7LLr12R4.6r14R3F.5r5ΕΕr8R6.4n17N.6n17μ.6nny4n5b4nnμ.6nnywwyn5b3Bnnμ.6nnywwyn5b3Bnnμ.6nny4n5byybnnμ.6nngppgn5b3Bnnμ.6nngppgn5b3Bnnμ.6N11b3BNNμ.5lg19G.3g19GG.25","hut":".59yYY.19ιιyY3.18y3YYJ.17yNNyNNY3.13ιιy3Ny3Y3.12y5Ny3YYJ.11yNNyyιιyyNyyY3.7ιιy4NNy6NY3.6y6NNy6NYYJ.5y3Ny6NNy6Y3.3Y21.3Y21.4bbBb3BBb3Bb3BBb.6bbBbbx6b3BbbB.6bbBbbx6b3Bbbθ.6bbBbbx6bBBb3θ.6bbBbbx6b3Bbbθ.6bbBbbx6b3Bbbθ.5B21.4Bθ.Bθ.9θ..θ.6BB.BB.9B..B.27","totem":".51ww.ιy.Lr.3r..y..w.6w3y3rrL3rιιywwΙ.6w3y3r6y3wwΙ.9b11B.12bbxb5xbbθ.12bbxb5xbbθ.12b3rrbrrb3θ.12bbw7bbθ.12bbw7bbθ.12B11θ.12εbbr3b5θ.12εbbr3b5θ.12bbrb3rrb3θ.12b3xxbxxb3θ.12b3xxbxxb3θ.12b11θ.12b3w5b3θ.12b3w5b3θ.12bbBb6BBθ.9Ι3e13E.7e15EE.28","museum":".59wWW.18w6W3.15w6WWΚ.12w6y3W6.6w13W8.3w13W8.3E21.4wwWddwWWdb3ddwWWd.6wwWddwWWdb3ddwWWE.6wwWddwWWdb3ddwWWE.6wwWλdwWWdb3ddwWWE.6wwWλdwWWdb3ddwWWE.6wwWddwWWdbbBddwWWE.6wwWddwWWdbbBddwWWE.6wwWddwWWdbbBddwWWE.5e19EE.3W21.3W21.3e19EE.3E21.3E21.25","school":".50eLLr.20er3LLr.17er5R.17er4R.18E.6L11rrR.3E.6r12RR.3E.5r12R3.3E.3ιιn13NN.3E.3n15NN.3E.3nncnncn5cnncNN.3E.3nnu4y3u6NN.3E.3nnu3ΕΕyyu6NN.3E.3r15RR.3E.3nncnncnnb3nccnNN.3E.3nncnncnnb3nccnNN.3E.3nnu3n3bBBnu3NN.3E.3n8bBBn4NN.3E.3n8bBBn4NN.3d.3N8bBBN6.3gl3g15GG.3g19GG.25","treehouse":".54l8g.12Φllg9l4gG.6llg15Z.5lg6rrRg10G.3g4r3ΦΦrR3g6GG.3g4r6R3g6GG.3g3r9R3g4GG.3gGGgb9BBgGGgGG.3gGGgb9BBgGGgGG.4GGgbbcb6BBgG3.8Gb9BBGGZ.9Gb9BBGGZ.10B12.14b..bBθ.18ζ..bBθ.18beebBθ.18ζ..bBθ.18ζ..bBθ.18beebB3.15εεb6BεB.13b8B3.31","buddha":".59YαO.18YαOYOOYαO.15YOOYOOYOγ.13YYOYYOYYOYYO.12YYy9Y.12YYy9J.11YyyO3y3O3yYY.9Yy12YJ.9Yy12YJ.10YYy3O3y3Y.14Yy6YY.15Yy6YJ.10yyY4ιιY9O.5yY6OOY3OY6αO.3yY6OOY3OY6OO.3yY5Oy6OOY4OO.3Y19OO.3Y19OO.3pPPpPPpPPpPPpPPpPPpPP.4P18.6P18.27","monument":".59eeE.19ΙΙeE3.18e3EEd.18e3EEd.18eedEEd.18eedEEd.18eeΙEEd.18eeΙEEd.18eedEEd.18e3EEd.18eedEEd.18eedEEd.18e3EEd.15Ι3e3E3eeE.12e6E5d.11e9E4eE.7eeE16.6E17d.5gppge8E6gpp.3G21.3G21.25","info":".50c9u3c6uuU.3u9w3u7UU.3u9w3u7UU.3u9w3u7UU.3u19UU.3u19UU.3u3οu3w5u7UU.3u3οu5w3u7UU.3u9w3u7UU.3u9w3u7UU.3u7w6u6UU.3u7w6u6UU.3U21.6bBB.9bBB.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.9bBθ.6l3g3l9g5G.3g19GG.25","nightmarket":".51x18.5rwwrwwrwwrwwrwwrwwrrR.3rwwrwwrwwrwwrwwrwwrRR.3rwwrwwrwwrwwrwwrwwrRR.3RWWRWWRWWRWWRWWRWWR3.3RWWRWWRWWRWWRWWRWWR3.4rr.3r.6rr.3r.5rYYr..b.5rYYr..b.5rYYR..ζ.5rYYR..ζ.5r3ι..ζ.5r3R..ζ.6yy.3ζ.6yy.3ζ.6yY.3ζ.6yY.3ζ.6bb.3oyyOoo.6ζ.6bbw15ζ.6bbw15ζ.6yyYyyYyyYyyYyyYyyY.6b17B.6b17θ.6bbB15θ.6BB.15θ.6BB.15B.27","island":".54g3.6llg.9llgllglg.3lg5G.6g3llggG.3g4GGZ.5gllG4ggbggG7gg.3G.6b3BBb.6GG.3G.6b3BBζ.6GG.9b3B.3BB.16ΦΦθ.21bbθ.23bεB.21bBθ.21bBθ.21bBθ.16ι4nbBBιιn.13n5bBBnnκ.10ι3n12ωN.6un15N3cu.3un15N3uu.3cu3N14u3.4uuU16.6uuU16.27","beach":".57LLrw3Lr.13L3rrw4r3ww.10r5w4r3wΙ.9Lr3w6r5w.6LLr3w7r6ww.4r5w7r6ww.3R6W7R6WW.12bBB.21bBθ.21bBθ.21bBθ.21bBθ.12cu8bBBu4ccu3.3U9bBBU9.3U6ιιUbBBU9.3n9bBBn7NN.3n4w3n8oOON3.3n4w3n8oOON3.3n3wW3n9N5.4N17μ.6N18.27","rockarch":".56e4Ι4e.12ΙΙew4e7E.9e3w4e5EEd.7ΙΙewwe7E6.6e12E5dEd.4e5Ιe6E5d3.3Ιe4ΙE.6eeE3d3.3e4EE.9eEEd3.3e4Ed.9eEEd3.3e3E.12EEd3.3e3d.12EEd3.3e3d.12EEd3.3e3d.12EEd3.3eEEd.12EEd3.3eEEd.12EEd3.3eEEd.12d5.3d4ο7cwο3ccd3.3d4c8wc5d3.3cu6wwu10cc.4U18.6U18.27","mountain":".57wwe.20w4eE.18w4Ed.16w5eE3.15wwgwwgEEd.3Ιe.10wwgwwgEEd.3eE.9lg8GgGw3E.8lg4ΦΦg3GGwggEeE.6lg9GGwggE3.4Φlg10G3g3GG.4llg4llg6G3gGG.4llg4llg6G3gGG.3lg5lg8G6.3lg3llg10G5.3lg3llg10G5.3lg15G5.3g16G5.3g16G5.3G21.4G17Z.6G18.27","park":".53g3l5g.13lgl3g8G.10ggl3g7GZ.9gl3g9G3.8gllg9G3Z.8gllg9G3Z.8g8ΦΦG5Z.8g9G6Z.8g9G6Z.9ggG11Z.16bbB.21bbθ.21bbθ..b9.10bbθ..B9.10bbθ..B9.10bbBb11.10bbB4.6BB.10bbB3θ.6BB.3l7bbB4l6BB.3G21.3G21.25","paint":".66r3.11ι6n..rRR.12n6κ..rRF.9ιn9εbB.9ιιnr3n3y3bbBιn.7n3r3n3y3bbBnκ.7nnr3Rnny3Yn5N.5ιn9YYn6NωN.3n7ιιnYYn6N3.3nu3n14N3.3nuuUn4κ.3n6N3.3nuuUn4κ.3n6N3.3n8κ.3n4NNμ.5ng3n5ι3n4NNμ.5ng3n12NNμ.5nggGn6v3nnNNμ.7n9vvVNNμ.9n9vvVNNμ.11N3n4N4μ.15N5μ.18N6.34","lantern":".59B3.18Yιιy3Y3.15Yy5YYJ.12r12RrR.7Lrw3r10R3.6rrw3r10RRF.6R17F.5rwwr6y3r6RrR.3rwwrrLLrry3r6R3.3r7yyY3yr5R3.3R7yyY4R8.3R7yyY4R8.3r9yYYr6R3.4r15RRF.6r15RRF.8R14F.12Yy5Y3.15Yy5YYJ.18rRR.19LLrR3.18r3R3.33","posttruck":".74g14q.9q14Q.9ql14q.8qllq13οοc.5qllq13ccΞ.5q3w9q4c5.3q3Ww6WWq4ccq3.3q3Ww6WWq4ccq3.3q3wWWw3Wwwq9.3q3w3W3w3q9.3q3wgwW3w3q9.3q3wgw7q7yy.3Q21.3Q21.3Qd6Q6d6QQ.4dde3E.6dde3E.6dde3E.6dde3E.6dde3E.6dde3E.8d3.9d3.9d3.9d3.28","road":".54c5w3cοοc.9οοcw9c3wwc.6c3w9c3wwΞ.5οc14w4οc.3c21.3c21.3g9E3g7GG.3l7E6l6GG.3l7E6l6GG.3g7EEy3Eg6GG.3l6EΛΛE6l6.3l6E9l6.3g6E3y3E3g4GG.3l4E12l5.3l4E12l5.3g4E5y3E4g3GG.3l3E15l3.3l3E15l3.3gE8y3E7GG.4E17d.6E18.27","bike":".150x5.4x5.10x4D.4x4D.12r.8r.14rL8R.14r9R.14rrR.4rrR.11dLrdrR.3rddrEd.9drrdrR.3rddrdE.7dd.rR.rR.Lr.3R..d.5d.3rR.3LrR.3R.3Ed.3E.3rR.3rrR.3R.3dd.3E.3eeR3x3.3e.3dd.3E.8d3.7dd.3E.8ddE.7dd.4dd.4dd.3d.5d.8E3d.6E4d.9d4.6d5.28","airplane":".56dx6dd.18rRR.21rRF.19w5W.18wwc3Κ.18wwc3Κ.12w8cuuW7.5Lr6w5Wr7R.3r7wwλλwWr6RR.3R7w5WR8.10w5Κ.18w5Κ.18w5Κ.20wWW.21wWΚ.21wWΚ.16L4rwWWL3r.12r5wWWr3R.12R5wWWR4.17rRR.21rRR.34","pinball":".54v11V.9IIvc12vvV.6v3c12VVa.5Ivvc4r3ccy3c4vV.3vc5rRRrccyYYc4VV.3vc5rRRrccyYYc4VV.3vc6rrc4yycu3VV.3vccu3c10uuUVV.3vccu3c10uuUVV.3vccuUUc12dVV.3vc8ec6EEdVV.3vc3οc4ec6EEdVV.3vc3οc13dVV.3vc3w3c6W3c3VV.3vc3w3c6W3c3VV.3vc5w3c3W3c4VV.3vc8.3c7VV.3vc7Ξ.3c7VV.3V21.4d3.12d3.6d3.12d3.27","fountain":".57ccw3c.15οοc..u3.οοc.12ccΞ..uuU.ccΞ.11c.5uUU.4cc.7οc.3Ι3e5E.3c.6cΞ.3e6EEd.3Ξ.6uu.w11E..u.6uU.E11d..U.6uU.E3οοE7..U.14eEd.13οc.6eEd.6c.6cΞ.6eEd.6Ξ.5Ιe11E8d.3ec6u11Udd.3ec6u11Udd.3eccu13U3dd.3e13E6dd.3e13E6dd.4E15d3.8d14E.9d15.28","toothpaste":".51wwcw3ccw.14w6cw5.12w6cw4Ι.13eeweeweewee.13e10E.13e10E.12u19UU.4U18.6U17a.29Ew15WW.6Ew15WΚ.6eWWw13WWccu.3Ew3xxw6xw3u5.3Ew3xxw6xw3u5.3eWWwppwx3wwpw3uuU3.3Ew15u5.3Ew15u5.3eW17u3.73","rocket":".59rRR.19LLr3R.18r5F.17r6R3.15w7WW.15w7WΚ.15wccu3wWΚ.15wu3UUwWΚ.15wu3UUwWΚ.15w7WΚ.13Lrλxxw3xWWR.12rrλxxw3xWWF.11Lrrwppw3pWWRrR.9r3w7WWRRF.9r3w7WWRRF.9rRR.E6..RRF.13ooy3o.18ooy3α.20yoo.21o.23o.36","toilet":".53p.8y..r.9τpyτp.4ιyoιyrwwr.6ppypρ.4yyoyyrwwR.8pgg.6ygg.rr.6w3W..g.3lg.gG.gg.6w3Κ..G.3gG.gG.gG.6w3Κ.3gg.g4G.gG.6w3Κ..ΙeeΙe5ΙeeE.5w3Κ..e12d.5w3Ww14W.5w3Ww3xxw4xxwWWΚ.5w3Ww3xxw4xxwWWΚ.6W3wwλλpwxxwppwWWΚ.9w11WWΚ.10w11WWΚ.12w7WWΚ.14w6WWΚ.15w6WWΚ.13w9W3.12W11Κ.12W12.30","flower":".53pτp.6yιy.10τpwp3.3ιyoy3.9ppwppρ.3yyoyyY.9p3PPρ.3y5Y..rLr.6pPσ.lg.3Ygg.Lrwrr.6pPσ.gG.3YgG.rrwrr.10gG.r3..g..rRR.6IIv.ggrwwrrRG.11vvV.ggrwwrRRG.9vvwv3ggr3RggG.11vVVnGGgRRnGGn.11vVVnGGgRRnGGκ.12n11N.12r4ββrrR4.12r8R3F.14n3r3nN3.14n6NNμ.15n6NNμ.16n3NNμ.20NNμ.21N3.34","farm":".57Φl.3G.14llg.llGΦlZ..o.11ggG.llGllZ..α.9ggl3gllG3gβoO.8gl3g3GGgr3o3.8gl3g3GGgr3ooα.8g3lg5r3RooO.8g6Grrwr3RRo.8g6Grrwr3RRα.9ggG4r5RRF.9ιnnN12ω5N.3n3N18.3bnnbnnbnnbnnbnnbnnbBB.3b18B3.3b4εεb12B3.3bBBbBBbBBbBBbBBbB5.4b15BBθ.6b15BBθ.6bbBbbBbbBbbBbbB3θ.8B14θ.9B15.28","book":".75w6.6w6.6w5Ι.6w5Ι.5w10kkw7WW.3we6w3kkwy5wWW.3we6w3kkwy5wWW.3w10kkwy5wWW.3we8wkkw7WW.3we4ΙΙeewkkw7WW.3w10kkwg5wWW.3we5w4kkg3G3gWW.3we5w4kkg3G3gWW.3w10kkw7WW.3we6w3kkw7WW.3we6w3kkw7WW.3w10kkw7WW.3W10kkW9.3W10kkW9.3r10R11.4R8.4R5F.6R8.4R6.27","hearttree":".53g4.6l4g.7lgl3glg.3lg5G.6ggl3ggG.3g6Z.5gl3g5lg8GgG.3gllg7ppPg3G5.3gllg7ppPg3G5.3g5ΦΦggp6gG5.4g8p4PPgGGZ.6g8p4PPgGGZ.8g7ppPggGGZ.10g11Z.12g11Z.14g3b3G3.16ggbBBZ.18ggbBBZ.20bBθ.21bBθ.21bBθ.18b4B5.12ΦΦlg11G.9l3g10GG.28","sakura":".65p3.9ττp.7τpyPPp.8ppρ.7ppyPPρ.6ppyPPp.5bBBp3.9p3.4εbBpp.12ppρ.4bbBpρ.16εεbBB.3p3.9ττp.bbB.3τpyPPp.8ppρ.bbθ.3ppyPPρ.6ppyPPεbbθ.5p3.9p3bBτ.ττp.14p3bBθ.ppρ.15bbB..pyyPpp.12εbbθ.3p3.14b3θ.3ppρ.12εεbBB.p3.15bbB..pyyPτp.13bbθ..pyyPpρ.12bBB.4p3.14B.23B.45","circus":".60L3rr.18BrrR.20BrrR.20B3.19Lrw3r.18rrw3R.17r3w3rRR.13Lrwrrw3rwwR.12rrwrrw3rwwF.11LrLwrrw3rwwRrR.7LLrwLwrrw3rw3R3.6r3w3rrw3rw3RRF.5yYYyYYyYYyYYyYYyYYyYY.4wwr3w3r3w3rRRW.6wwr3w3r3w3rRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6wwr3wk6wwrRRΚ.6W6k6W5Κ.6W6k6W6.27","tree":".54g6..l3g.9llgl5gllg5Gg.6g3l5g7G3.5lggl3g12GgG.3gllg15G3.3gllg15G3.3g4ΦΦg9G6.3GggG3gG14.3GggG3gG14.4bb.b3B3b3..b..B.6bζ.bζ.bbBbζ.3ζ..θ.6bζ.bζ.bbBbζ.3ζ..θ.6bζ.4bbBb3..ζ..θ.6bζ.3εbbB3ζ.5θ.6bζ.3b3B3ζ.5θ.11b3B3ζ.15εεb3B4εb.13b5B4bζ.10g3b5B6bg3.5gG18gG.3G21.25","gourd":".59Ggg.19lgZ..llg.16ggZ..lgG.16y3YYlGGg.14ιy5Y3.15y6YYJ.15y6YYJ.16r3R3.18r3RRF.15yyιy6Y3.11ywιιy8Y3.9ywwy9YYJ.7ιιy3xy6xxyY3.6y3ppy3x3y3pYYJ.6y3ppy3x3y3pYYJ.6y15YYJ.6y14Y3J.6y14Y3J.8Yy9Y4J.12Y8J.15Y9.31","billiard":".50BεB.21bB3.20bBBθ.21bbBεB.21bB3.20bBBθ.21nnNBB.L5r.14uUU.r7R.12uUa.r6RF.12rw3r10R.9rwwr3w3r3R3.9rwwr3LLwr3R3.9r4w6rrR3.9r4w6R5.9r4w6R5.9r6W3R6.9r7R8.9r7R8.10R11F.15R5F.18R6.30","pipes":".50r12Lrr.cuU.5R12rRR.uua.5R12rRF.uua.17rRF.uua.5ι8y.3rRF.uua.5y8Y.3rRF.uua.5Y5LLYY.3rRF.uua.11yYJ.ΙeE3euua.11yYJ.eeE3euua.9eeE3e..rRR.uua.11yYY.3rRF.uua.11yYJ.3rRF.uua.8lg11.uua.8gG11.uua.8gG10Z.uua.8gGZ.yyY.5eE3ee.6gGZ.yyJ.6uuU.8gGZ.yyJ.6uua.6eeE3eyyJ.6uua.8gGG.yyJ.6uua.8gGG.yyY.6uuU.27","telescope":".54c8uU3.9c3u14U.6u15UUa.5cuud4u6d5UuU.3uddcwwdUUu3dccwddU3.3uddcwwdUUu3dccwddU3.3ud8Uuud6U3.4U17a.6U4οοU11a.12u3UUa.17cuuy3UuU.15u3y3UUa.15u4U4a.16uuUUa.19uuUUa.19uuUUa.19uuUUa.19uuUUa.16u6UUuuU.12uU12.11U13.30","speaker":".51wwe.11d4.5wd3ΙΙe.9bbB.5wd3eeE.9bbθ.5ed5Ee3.3Ed.bbθ.5ed5E4eeEd3bbθ.5ed5ΙE6d3bbθ.5ed5ΙEEd.3dE.bbθ.5ed3EEd.9bbθ.5ed3EEd.9bbθ.6e3.12bbθ.6wwE.12bbθ.6wwE.12bbθ.5wd3e3.9bbθ.5ed5EΙΙe.3Ed.bbθ.5ed5EeeE.3dE.bbθ.5ed5E7d3bbθ.5ed3E4d.4dE.bbθ.5ed3E4d.4dE.bbθ.6e3.12bbθ.18ε3bbBεB.16b5B3.25","sports":".57w5W.15w9W3.12w9WWΚ.11xw3x3w5xWW.9xwwx6w3xWΚ.9xwwx6w3xWΚ.7w5x6w3W4.6w6x3w5W3Κ.6w4δδx3w5W3Κ.6wwxw9xxW3Κ.8x3w6x3WWΚ.9x3w6x3WWΚ.9w4x3w3W4Κ.10W3x3W4Κ.13W3x3W4Κ.9lg5G7g6GG.3r19RR.3r19RR.3w21.3R21.3R21.25","firstaid":".51bbo.12oob.6oopβo.9oppo.6oopoα.9oppα.6oop3o.6βop3O.6o6w6o3OOγ.6o6w6o3OOγ.5βo5w3rw5oO3αO.3oBBo3wr5w3BooO3.3oBBo3wr5w3BooO3.3o3Boow3rw3BBo3O3.3o3w3o7w3ooO3.3o3wwββo6w3ooO3.3o3xwwo9xwwO3.3oBBon12ooOBB.3oBBon12ooOBB.4ppon5x3n4ppγ.6o3n12ooγ.6o3n12ooγ.8o3n3xnnxn3OO.10O12.12O12.30","lake":".51BB.13BB.7bb.13bb.7bζ.13bζ.7bbB.11bBB.7gg.εB.9g..B.6gG.Bθ.9G..θ.6ggGbb.9gGGb.6gG.gg.9G..g.6gG.gG.9G..G.8οc5ο6cοοc.6οοc3w3c10οc.4c5w3c12.3c4u12UUc3.3gccuοοu3g3Gu5Ucc.3gccu6g3Gu5Ucc.3g3cu5GggGu3UUc3.4GGc3u9U3Ξ.6GGc3u9U3Ξ.8Gc6U3c5.10G12.12G12.30","surf":".55h3.20hh..h5.18hhs4.18hhssDs.19s5.19s5.14s.3s3r3.14s5L4rr.15ss.r6s.17r5s3..s.13a5r.s4.12sa6..s.12as3a5.12s5a..aasaa.11s4.5as5.22ss.10W12ss.7W3λ15W3.5W16.6c20.5u18.27","fishingrod":".59bεBw.20bBθ.ww.18bBθ.wΙ.16εbB.5w.15bbθ.5Ι.15bbθ.5Ι.14bBB.6Ι.14bBθ.4βoO.14bBθ.4ooγ.12εbB.5oyyoOO.10bbθ.3βoxooxooO.9bbθ.3ooxooxooγ.8bBB.4oopo3ppγ.6εbBddE.5o4OOγ.6bbBd3.5o4OOγ.6bbθ..d.5o3OOγ.6bBB.10ooγ.8bBθ.10ooγ.8B.11oOOoOO.6θ.9βoO.3ooO.5B.9ooO.3ooO.27","plant":".57llg.17llg.ggllg.llg.11ggG.gglgG.ggG.9gglg5GgG.gglgg.6gllg3GggGg3llgGGg.5gllg3GggGg3llgG3.5gllg4G3g6G3.6g3G3..Z..g3GGZ.7g3GGZ..Z..g3GGZ.10GGZ..G4.20Z.23Z.17o12ααO.9O14γ.9O5ββO7γ.10o9OOγ.12o9OOγ.12o9OOγ.14o6OOγ.15O8γ.15O9.31","sunset":".74Ν20.4Ν7Oy4OΝ7.4Ν5Oyj6yOΝ5.4Ν4Oy10OΝ4.4Ν3Oy12OΝ3.4Ν3Oy12OΝ3.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOy14OΝΝ.4ΝΝOOy12OOΝΝ.4Ν3Oy12OΝ3.4Ν3OOy10OOΝ3.4Ξ20.4u6y9u5.4u20.4u8j5u7.4uc4u15.4u15U4u.50","boat":".59LLr.21r4.20r3R.20Br5.18θ.23θ.17w6θ.17wccwccwWW.15wccwccwWΚ.15w7WΚ.12L3r9L8r.3r21.3u18U3.4uuwu12UUa.6uuwuοοu9UUa.8U14a.7οc.3c3.4cc.3c.6cΞ.3ccΞ.4cΞ.3Ξ.5c6.c7Ξ.ccΞ.75","star":".59yYY.21yYJ.21yYJ.19ιιy3Y.18y5J.18yιιyyJ.11yι6y6ι4yY3.4y17J.6y17J.8y3xy6xxyYY.10ppy3x3y3pYJ.10ppy3x3y3pYJ.10y11Y.12y11Y3.10y11YYJ.9ιy3YY.3y3YYJ.9y3Y.6yyYYJ.9y3J.6yyYYJ.7ιιyYY.9YYJ.7yyY.12YJ.7yyY.12YY.28","girl_a":".55h9.14hhb7h3.11b5h10.8h6shhs3hhsh.7h6sshhs3hhssh.6h6sshhs3hhs3.6h5s5xs4xss.6h5s5xs4xss.6h5ssps8ps.7h6s10.9h6sS6sh.9rrRyj8yh.10rrRy9ss.10rry9Yss.11Ry9YY.14y8YY.14yJ7yy.14b8B.14S3.6s3.11W4.6w4.52","girl_b":".55h9.14hhb7h3.11b5h10.8h6shhs3hhsh.7h6sshhs3hhssh.6h6sshhs3hhs3.6h5s5xs4xss.6h5s5xs4xss.6h5ssps8ps.7h6s10.9h6sS6sh.9rrRyj8yh.10rrRssy9.10rryssy6YYy.11Ry9YY.14y8YY.14yJ7yy.14b8B.17ss..SS.17w3..W3.55","girl_wave":".54h9.14hhb7h3.12b4h10.9h3sshhs3h5.ss.5h3s3hhs3h6ss.5h3s3hhs3h6ss.5hhssxs4xs4h3ss.5hhssxs4xs4hh.ss.5hhsps3Rs3psshh.ss.6hhs11hhs3.6h3s8h3.ss.8rryj7ys5.8rry9s4.9ssy10.12ssy7YYy.14y7YY.15y9.15b7B.16ss.4SS.16w3.3W3.56","veh_plane":".74uuU.21uUa.21u3U.20u5U.4w6.8u4Ua.4w5Ι.8u4UUw4cch3cww.6u4w5ch6ccw3.3u4w5ch6ccw3.3w9chhsxxsccwrr.3Wu18rr.3Wu18rr.4W4δδW12.9wwe6E.15wwe6d.14we6EE.13wwe4EE.16wwe4Ed.109","veh_train":".75Ι17e.6e17E.5w21.3wc3wwch6ccwc3ww.3wc3wwch6ccwc3ww.3wc3wwchhsxxsccwc3ww.3w21.3w21.3u21.3U21.3U4οοU15.3w19yy.3W21.3W21.4ddxdd.7ddxdd.7d4E.7d4E.7d4E.7d4E.6E21.73","veh_boat":".84LrR.21rrF.21rrF.14Ι7e3Ι4e.9e14E.9wc3h6c3ww.9wc3hhsxxsc3wΙ.9wc3hhsxxsc3wΙ.9w14Ι.6w21.3w21.3r5LLr14.4R18.6R17F.8R14F.6c3uc3u3c3u3c4u.3cu3c3u3c3u3c3uu.3u3Uu3UUu3Uu3UUu3.4UUa.3U3.3U3.3UU.4U3.3U3.3U3.3UU.25","veh_bus":".125l14g.7llg16.6g17G.5gc3ggch6ccgc3οc.3gc3ggchhsxxsccgc5.3gc3ggchhsxxsccgc5.3gc3ggcs6ccgc5.3g21.3g21.3w19yy.3G4ΦΦG15.3G21.3G3d4G6d5G3.4ddx3E.6ddx3d.6ddx3E.6ddx3E.8d3.9d3.76","veh_scooter":".54rrL5r.15rwwr7.14rwwr6R.14r12.12h4s5xss.12h4s5xsS.12h4ssps4S.13y9ssEEd.10y9ssddE.9ry8Y..u3.7ccub8s..u3y.6u3b8S..u3Y.5u12S..u3U.5U4οοU6w3U3a.5U12w3U3a.6d3.11d3.6dE4d.7EdE3d.5dE3dE.7ddE4.5dE3dE.7ddE4.6d3.11d3.7d3.11d3.28","veh_bike":".56B6h.15h10.13h13.11h5s3hhshh.10h6s3hhsh3.9h6s7hh.10hhs3Ds3Dsshh.10hhs10h.11h3sps5psh.13hhs6h3.14j6h..ksk.12y5s.3s.14y5s5.14uU4ccsuu.10kk.uuU3uuc3uuk.7kWWuus.u4cc.uuWk.5kWu3k3uucsc.kWuuWk.4ku9k3.kWuuWk.4kWuWWk.4u.3kW4k.5kWWk.10kWWk.7kk.12kk.28","veh_balloon":".56LLrιιyLLr.12ywwr3y3r3yYY.9ywwr3y3r3yYJ.7Lrywwr3y3r3yYYR.6rry3r3y3r3yYYF.6rry3ιrry3r3yYYF.6rry3ιrry3r3yYYF.6rry3r3y3r3yYYF.6rry3r3y3r3yYYF.8y3r3y3r3YYJ.12R3Y3R3.15R3Y3RRF.13εbh9b.12bbhxxs3xhhζ.12bbhxxs3xhhζ.11b15.10bbBbbBbbBbbB.12bbBbbBbbBbbθ.12BBbBBbBBbBBb.14B8θ.15B9.31","veh_ufo":".81ο5c.18c5Ξ.17ch6cc.13οch9c.12cch9Ξ.12cchxxs3xhhΞ.12ccps6ppΞ.12ccps6ppΞ.9e15ΙΙe.5ew3e14EeE.3ew3e14E3.3e3re3yye3ge3uuE3.3E4ΙΙE15.3E21.4EEd16.8y.3yy.3y.3yy.9Y.3yY.3Y.3yY.100","chest_shut":".77ω14N.9N14μ.7εbyb12yyb.5εbbybbηηb8yyBεB.3b3yb12yyB3.3b3yb12yyB3.3y19YY.3y19YY.3b3yb3y6b3yyB3.3b3yb3yyx3Yb3yyB3.3b3yb3yyx3Yb3yyB3.3b3yb3Y6b3yyB3.3b3yb12yyB3.3b3yb12yyB3.3B3YB12YYB3.3y18Y3.3y18Y3.97","chest_open":".51ιιy16.6yyB15Y.6yyB15Y.6yyB15Y.6yyByyιιyBy3YYwyyY.6yyByywyyBy3YYwyyJ.5y3wy5Yy5wy3YY.3Y21.3Y21.3b3yb5y3b4yyB3.3b3yb5Y3b4yyB3.3b3yb5Y3b4yyB3.3b3yb12yyB3.3b3yb12yyB3.3b3yb12yyB3.3B3YB12YYB3.3y18Y3.3y18Y3.97","trophy":".51ι3yyι10y3.5ιy3wwy10Y5.3y4wwy10Y5.3Y..wy11YYJ.YY.3Y..wy11YYJ.YY.3Y..wy11YYJ.YY.4y3wwy9Y4.8y3ιy8YYJ.9y3ιy8YYJ.10y9YYJ.14y6YYJ.15y6YYJ.18yYY.21yYJ.21yYJ.18y6Y3.13εεb7B3.12b9BBθ.11b12BεB.9B14θ.9B15.28","scroll":".51nnι15n.5rwwn15NLr.3rwwn15Nrr.4N4ιιN11μ.8wW14.9wW13Κ.9wW13Κ.9wb9W4Κ.9wb9W4Κ.9wW13Κ.9wb8W5Κ.9wb8W5Κ.9wW13Κ.9wb11rWΚ.9wb11rWΚ.9wW13Κ.7ιιn16.6n17κ.5rwwn15Nrr.4N17μ.6N18.27","dexbook":".50RL16r.6Rr17w.5Rr17Ι.5Rr8yr8Ι.5Rr6y5r6Ι.5Rr6y5r6Ι.5Rr3y11r3Ι.5Rr5y7r5Ι.5Rr3Lry7r5Ι.5Rr3Lry7r5Ι.5Rr3y3r5y3r3Ι.5Rr3y3r5y3r3Ι.5Rr15RRΙ.5Rr3w9r3RRΙ.5Rr3w9r3RRΙ.5Rr15RRΙ.5R18Ι.5R18Ι.6W18.6R17.7R17.28","sparkle":".51ιy.6ιιy.12ιy3.5yyY.12y3Y.5yyY.13yY.6yyY.19ιιy4.18y5Y.18yywyyY.17ιyyw3yYY.15y3w3yYJ.9ι6yw6y6YY.3y7w6yyY6.3y7wwιιwwyyY6.9y3w3Y3.16y3YYJ.18y3YYJ.18yyY3J.5y.14yYJ.4ιιyιy.12yYJ.4y5.12yYJ.6Y.14YYJ.21Y3.34","ic_drop":".84rR.22RF.21rR3.20R3F.20R3F.18r2R4rR.16R7F.16R7F.15rR2LR6.14RL2R6F.14RL2R6F.14RL2R6F.14R9F.14R9F.15R7F.18R3F.20R3F.105","ic_water":".84uU.22Ua.21uU3.20U3a.20U3a.18u2U4uU.16U7a.16U7a.15uU2cU6.14Uc2U6a.14Uc2U6a.14Uc2U6a.14U9a.14U9a.15U7a.18U3a.20U3a.105","ic_gift":".128ι4y2ι2y.15y4J2y2Y.15y4J2y2Y.10L5r3y3r3L3r.6r8y3r6R.6r8y3r6R.6r8y3r6R.8R6y3R6.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.9R6y3R5F.76","ic_cloak":".125c2AUcAu2UAuUc2A.9A3UA2U3AU2A2U.9A3UA2U3AU2A2U.6c3A3UA2U3AU2A3c2A.3A9yU2A9.3A9yU2A9.3A9U3A9.3A9U3A9.3A9U3A9.3A9yU2A9.3A9U3A9.3A9U3A9.3A9U3A9.6A6U3A5U.9A6U3A5U.9A6U3A5U.76","ic_hands":".60y2.21j.2j.20y.2y.12n7s.3sn5s.6s7S.ιys6S.6s7S.y2s6S.6s7S.3s6S.6s7S.3s6S.6s7S.3s6S.5ns7S.3s7ns.3s8S.3s9.3s8S.3s9.3s8S.3s9.6S4.6S5.9S3κ.6S4κ.9S3κ.6S4κ.9S3κ.6S4κ.9S3κ.6S4κ.100","ic_shoe":".219L4rwrRwr4R.10r5wR2wR4F.10r5w6R2F.10R14r5R.4R20.4R20.4R20.4R20.3w21.3w21.3w21.97","ic_lantern":".80ι8y.15y8Y.15y8Y.12r3R3F3R3r2R.9R6F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9Rr2R3F3R5F.9R6F3R5F.9R6F3R5F.9R6F3R5F.12y9.15y8Y.15y8Y.19yY.22y2.34","ic_tripod":".78E11d.12d11E.12d2yd2u4d2E.12d5u4d2E.12d5u4d2E.12d5u4d2E.12d11E.12d11E.18x2.21x4.20x3D.20x3D.18x2.xD.x2.16xD.xD.xD.15x.3xD.3x.12x2.4xD.4x2.10xD.4xD.4xD.10xD.4xD.4xD.9x.6xD.6x.8x.6x2.6x.27","ic_bolt":".60ι2yι2y.18y2jy2Y.18y2jy2Y.17ιy2jyY.18y3jyY.18y3jyY.15ι3y5Y.15y8Y.15y8Y.18y7.17y6Y.17y6Y.15ι2y3Y.18y5Y.18y5Y.17ιy2Y.20y3Y.20y3Y.18y2.88","ic_stick":".53k9.15ku6kx.15ku6kx.15ku2cu3kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15ku6kx.15k7e3.21e3Ιe.19e4E.21e4.21e3E4d.16e3d5.18ed5.19d5.19d5.25","ic_alert":".81Lr4R.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.18r2R3F.66r5R.18R5F.18R5F.18R5F.81","ic_peace":".80n2s.3n2s.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s2S.3s2S.15s3n3s2S.15s8S.12n3s3S3s2S.12s6S3s2S.12s6S3s2S.12s11S.15s8S.15s8S.15s8S.79","ic_thumb":".81n4s.19s4S.19s4S.19s4S.19s4S.19s4S.19s4S.19s4S.16s12.9u3U2S10.9U5S10.9U5s9S.9U5S10.9U5S10.9U5s9S.9U5s9S.9U5s9S.9U5s9S.78","ic_shy":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9sS5y3S6y.8S6y3S6Y.8S6y3S6Y.6ιyS6y3S6yιy.4y20.4y20.4y20.6y15Y.8y15Y.8y4k6y5Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_cool":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9y16.6D2U4D6U5D.6D2U4D6U5x.6D18ιy.4D18y2.4D18y2.4y20.6y15Y.8y15Y.8y3k9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_dizzy":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8yk2yk2y4k2yk2Y.8yk2yk2y4k2yk2Y.6ι2y3ky8ky3ιy.4y3k2yk2y4k2yk2y3.4y3k2yk2y4k2yk2y3.4y20.6y15Y.8y15Y.8y4k6y5Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_eyes":".146w9.3w9.3w8Ι.3w9.3w8Ι.3w9.3w4D5.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w4D4x.3w4D5.3w9.3w9.3w8Ι.3w9.3w8Ι.3w9.145","ic_zzz":".77I8v.15v8V.22vV.21v.23V.20v3.19Iv.22vV.21v.23vI7v6V.9v9V5a.22Va.21V.23a.21V2.21V.23a.23V6.76","ic_meh":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8y15Y.8y15Y.6ι2yk5y3k4y3ιy.4y20.4y20.4y20.6y15Y.8y15Y.8y3k9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_cop":".77U14a.9a14x.9a7y2a5x.9a14x.9a14x.7D18.6D17x.6D17x.9s14.9ns15.8s15S.8s4k2s4k2s3S.8s15S.8s15S.9s13S.10s3R6s4S.10s3R6s4S.12s9S.17s3S.20s4.33","ic_walker":".59s3S.18s2S4sS.16S7κ.16S7κ.16S7κ.16S7κ.18U4.17s2SU4s2S.14S3U4S2κ.14S3U4S2κ.14S3U4S2κ.14S3U4S2κ.17U3a.18U2a.2aUa.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.16a2x.2a2x.79","ic_takeout":".81k8.16k7x.15k.6kx.15x.6kx.15x.6kx.12r3Rr6R2r2R.9R14F.9R14F.9R14F.9w15.9w14Ι.9w14Ι.9R15.9R14F.9R14F.9R14F.9R14F.9R14F.76","ic_siren":".129L5r.18r5R.18r5R.15r2R7r2R.12R2LR8F.12R2LR8F.12R2LR8F.12R2LR8F.12R2LR8F.12R11F.12R11F.12R11F.11Ed12Ed.9d14E.9d14E.9d14E.76","ic_wind":".135u3cu.7ο11c.3uU.7c11Ξ.3uU.7c11Ξ.3uU.22uU.22uU.34ο14c.9c14Ξ.9c14Ξ.65u4.9ο10c.13c10Ξ.13c10Ξ.82","ic_rain":".126Ι7e.16e8Ι5e.10e13E.7Ι3e15.6e17E.6e17E.6e17E.6e17E.6e17E.6e17E.57uU.4uU.4uU.10Ua.4Ua.4Ua.10Ua.4Ua.4Ua.10Ua.4Ua.4Ua.76","ic_nosig":".80k9.15k8x.12r2Rku6kx.12R4u6kx.12R4u6kx.13R5u4kx.15R4u3kx.15R4u3kx.15kR5ukx.15ku2R4kx.15ku2R4kx.15ku3R5.15ku5R4.14ku5R3F.14ku6R3rR.12k9R4.11k9R3F.11k8x.R3rR.21R3.21R3.25","ic_wheat":".60ι2y.18ι3y3ι2y.15y8Y.15y8Y.15y8Y.15y8Y.15y2Y.3y2Y.18z2.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.22zΩ.82","ic_door":".78ε11B.12B11θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K7y2θ.12B2K7y2θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B2K9θ.12B11θ.78","ic_camera":".128E5d.18d5E.18d5E.13E5d7E3d3.6d8D4d3y2E.6d8D4d3y2E.6d6D8d3E.6d5D4u2D4d2E.6d5D4u2D4d2E.6d5D3u4D3d2E.6d5D4u2D4d2E.6d5D4u2D4d2E.6d6D8d3E.6d8D4d5E.6d8D4d5E.99","ic_fire":".60o2.22R2o.21R2α.20o3α.20Ro2α.20Ro2α.18β2o4βo.15βo7α.15o8α.15o8α.13r2Ro9.12R3o8α.12R3o2y4o2α.12R3y8α.12R3y8α.14Ry6o2.16o2y3o.18o2y3α.20o3.82","ic_warn":".84ιy.22yY.22y3.20ιy3ιy.18y5Y.18y5Y.16ιyk3y4.15y2k3y3Y.15y2k3y3Y.14ιy2k3y4ιy.12y3k3y5Y.12y3k3y5Y.10ι2y13.9y14Y.9y5k3y6Y.8ιy15ιy.6y18.6y18.73","ic_sign":".77ω14N.9N14μ.9N14μ.9Nk12Nμ.9Nk12Nμ.9N14μ.9Nk9N4μ.9Nk9N4μ.9N14μ.9N14μ.9N14μ.15B3.21B2θ.21B2θ.21B2θ.21B2θ.21B2θ.21B2θ.82","ic_bars":".65g2G.21G2Z.21G2Z.21G2Z.16g2G.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.16G2Z.2G2Z.12g2G.G2Z.2G2Z.12G2Z.G2Z.2G2Z.12G2Z.G2Z.2G2Z.12G2Z.G2Z.2G2Z.7g2G.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.7G2Z.2G2Z.G2Z.2G2Z.76","ic_umb":".81r5R.18R5F.15rRwR6w2R.11rR2wR6w2RrR.9R3wR6w2R2F.7r2R3wR6w2R4.6R5wR6w2R3F.6R5wR6w2R3F.6R5wR6w2R3F.15k2.22kx.22kx.22kx.22kx.22kx.22kx.22kx.21k2x.82","ic_tea":".60Lr.22rR.22rR.22rR.22rR.22rR.16w6r2w4.12w11Ι.12w11Ι.14n9.15b9.15b8ζ.15b8ζ.15b8ζ.15b8ζ.15n9.15nk6nκ.15nk6nκ.15nk6nκ.79","ic_think":".78w12.12w11Ι.11w15.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.9w14Ι.10w11Ι.59w3.21w2Ι.21w2Ι.42w.23w.45","ic_shield":".77u14U.9U14a.9U6c3U5a.9U6c3U5a.9U6c3U5a.9Uc12Ua.9Uc12Ua.9Uc12Ua.9U6c3U5a.9U6c3U5a.9U6c3U5a.10U5c3U3a.12U5c3U3a.12U5c3U3a.15U5a.18U5a.18U5a.105","ic_boom":".60ι2y.21y2Y.21y2Y.14ι2y.4y2Y.5ι2y.6y4.2βo3.3ι2y3.6y3Y.2o3α.3y5.7y2oβ2o4β2oy2Y.11o3R4o3yY.12o3R4o3yY.10β2oR8o3.6ι3yo3R8o3ι2y.3y4o3R8o3y3.3y4o3R8o3y3.9o3R4o2α.14o3R4o2α.14o10ιy.10ι2y3o3α.2y4.9y5o3α.2y3Y.8ιy2Y.3y3.3y3ιy.6y2Y.4y2Y.5y3.6y3.4y3.5y3.25","ic_clock":".59E2d.21d2E.21d2E.21w4.17w10.14w9Ι.12w6k2w6.9w7k2w7.8w7k2w6Ι.8w7k2w6Ι.6w9k2w9.4w9k2w9.4w9k5w6.4w20.4w20.6w15Ι.8w15Ι.8w15Ι.9w13Ι.12w9Ι.14w10.30","ic_magnet":".77w4.6w5.9w3Ι.6w4Ι.9w3Ι.6w4Ι.9R4.6R5.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R3F.6R4F.9R4r6R4F.9R14F.9R14F.76","ic_swirl":".83Uw2U.20Uw2a.17U3.4U3.12uU.3ο3c.3uU.10Ua.3c3Ξ.3Ua.9U.2οc2.4c3.2U.8a.2Ξ.2u3U.2Ξ.2a.8a.2Ξ.2U3a.2Ξ.2a.6uU.οc.u2a.2UuU.οc.uU.4Ua.cΞ.Ua.4Ua.cΞ.U2.4Ua.cΞ.Ua.4Ua.cΞ.U2.4Ua.cΞ.U3.2uUa.cΞ.U2.6U.2c.2Uu2a.2c.2U.8a.2Ξ.2U3a.2Ξ.2a.8a.2c3.4c2Ξ.2a.9uU.3ο3c.3uU.10Ua.3c3Ξ.3Ua.12U3.4U3.17u3U.20U4.33","ic_party":".81I2v.8u2U.10v2V.8U3.10v3r2R.5U3.13R2F.21R2F.26ι2y.21y2Y.21y2Y.33β2o.7l2g.11o2α.7g2G.11o4.6g2G.2r2R.4β2o3α.11R3.4o5α.11R3.4o6βo.15βo7α.15o8α.15o10.84","ic_medal":".56r8R.15R8F.15R8F.15R8F.15R8F.15R8F.15R8F.18y4.20y3Y.17ι3y4ι2y.14y3J3y3Y.14y3J3y3Y.12ι2y3J3y4ιy.10y5J3y5Y.10y5J3y5Y.10y5J3y5Y.12y3J3y3Y.14y3J3y3Y.14y9Y.17y3Y.20y4.33","ic_dash":".153Ι8e.15e8E.9Ι6e8E.9e14E.9e14E.9e8E.26Ι6e.17e6E.8Ι9e6E.8e15E.8e15E.8e11E.151","ic_bulb":".36j2.22jy.21ιy3.20y3Y.17ι3y4ι2y.14y9Y.14y9Y.12ι2yj2y7ιy.6ι2j.y14ι2j.3j2y.y14j3.7y13Y.12y9Y.14y9Y.14y9Y.15d6.18d5E.18d5E.18d5E.18d5E.20d2E.82","ic_bricks":".122F6WF14.3F6WF14.3F6WF14.3F6WF14.3W21.3W21.3F13W2F6.3F13W2F6.3F13W2F6.3W21.3F6WF14.3F6WF14.3F6WF14.3F6WF14.3R5FWR13F.97","ic_mag":".129ο4c.16ο3c5ο2c.13c10Ξ.13c2Ξ.5c2Ξ.12οcΞ.7c3.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.11c2Ξ.7c2Ξ.12c3.5οcΞ.13c3ο5cB3.12c9B2θ.15c4Ξ.B3εB.21B4.20B3θ.21B3εB.21B3.21B3.25","ic_target":".83r3R.20R3F.17r3R4r2R.12r2R3w4R3rR.10R5w4R4F.9rR2w10R3.8R3w3R4w3R2F.8R3w3R4w3R2F.6r2Rw3R8w3RrR.4R3w3R8w3R3.4R3w3R8w3R3.4R3w3R8w3R3.6R3w3R4w3R2F.8R3w3R4w3R2F.8R3w10R2F.9R5w4R4F.10R5w4R4F.12R9F.17R3F.20R4.33","ic_wrench":".87Ι5e.18e5E.18e2E.2E.18e3Ι2eΙe.16e8.18Ee5.16e2Ee5.16E3e5.15eE6.15e2E5d.16E7d.15eE5d.15e2E5d.16E7d.15eE5d.15e2E5d.16E7d.16E5d.18E4d.19E5.37","ic_check":".162l2g.21g2G.20lg2G.18l2g2G.19g4G.18lg2G.11l2g.6g2G.12g2G.6g2G.12g4.3l2g2G.13g3l3g2G.15g8G.17g5G.19g2G.21g2G.108","ic_cross":".125r2R.10r2R.8R4.8rR2F.8R3F.8R3F.9R3rR.4r2R2F.12R4.2rR2F.14R3F.2R3F.15R3r2R2F.18R3F.20R3F.18r2R4rR.15rR2F.2R4.14R3F.2R3F.12r2R2F.4R3rR.9rR2F.8R4.8R3F.8R3F.8R2F.10R2F.75","ic_sndon":".152E3d.6cu.12d3E.6uU.12d3E.6uU.7E5d3E.3cu.uU.7d8E.3uU.uU.7d8E.6uU.7d8E.6uU.7d8E.6uU.7d8E.3u2.uU.12d3E.6uU.12d3E.6uU.12d3E.6uU.148","ic_sndoff":".152E3d.20d3E.20d3E.3R2.4R2.4E5d3E.5R.2R.6d8E.5F.2F.6d8E.6rR.7d8E.6RF.7d8E.6RF.7d8E.5R.2R.11d3E.3rR.4rR.9d3E.3RF.4R2.9d3E.156","ic_devil":".77r2R.9r2R.9R2F.9R2F.9R2F.9R2F.9R2F.3I3v.2R2F.9R2F.3v3V.2R2F.9R3I3v4IvR2F.10v14.10v13V.10v13V.9Iv3y2v4y2v4.8v4y2v4y2v3V.8v15V.8v15V.8v15V.9v13V.10v3k6v4V.10v3k6v4V.12v9V.17v3V.20v4.33","ic_rocket2":".59R3.19w6.18w5Ι.18w5Ι.18w5Ι.18w5Ι.18w2Uw2Ι.18w5Ι.18w5Ι.18w5Ι.15r2Rw6r2R.12R3w6R2F.12R3w6R2F.12R2F.2o3.R2F.12R2F.2o2α.R2F.12R2F.2o2α.R2F.17o2α.21o2α.106","ic_flash":".78E11d.12d11E.12d2y9E.8ι2j.d2y9E.2ι2j.3j2y.d2y9E.2j3.7d11E.14E9.15E8d.15E8d.15E8d.15E8d.16k6.18k5x.18k5x.18k5x.18k5x.18k5x.18k5x.81","ic_bucket":".60d2.19E2d.2E2d.16d2E.2d2E.13d3.8d3.7eEdE3e8E3d.6E2dE15.6E18.8e15.9e14E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9ew2e11E.9e14E.9e14E.9ed12eE.76","ic_hand":".59n2s.16n2s.2s2S.n2s.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s3n2s3ns2S.9n3s11S.9s14S.9s14S.9s14S.9s14S.12s11S.12s11S.12s11S.14S9.15S8κ.15S9.31","ic_crown":".83ι2y.21y2Y.13y3.12y3.78ι17y.6y17Y.6y17Y.6y3R2y4U2y3Ry2Y.6y3R2y4U2y3Ry2Y.6y17Y.6y17Y.6y17Y.6J18.6J17γ.6J17γ.99","ic_money":".129N6.17k9.15k8x.16N6.15ω3N6ω2N.12N11μ.12N11μ.12N5J3N3μ.12N5J3N3μ.12N3J6N2μ.12N5J3N3μ.12N5J3N3μ.12N5J3N3μ.12N11μ.12N11μ.12N11μ.78","ic_bill":".146l20g.3g21.3gl18g2.3gl2Gl5G4l6g2.3gl2Gl5G4l6g2.3gl6G8l4g2.3gl6G8l4g2.3gl6G8l4g2.3gl6G8lG2lg2.3gl8G4l6g2.3gl8G4l6g2.3g21.145","ic_coin":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y3J4y3ιy.10y5J4y4Y.9ιy2J6yJ3y3.8y3Jy2J3y3Jy2Y.8y3Jy2J3y3Jy2Y.6ι2yJ2y3J3y4J2yιy.4y3J2y3J3y4J2y3.4y3J2y3J3y4J2y3.4y3J2y3J3y4J2y3.6y3Jy2J3y3Jy2Y.8y3Jy2J3y3Jy2Y.8y3J3y4J3y2Y.9y5J4y4Y.10y5J4y4Y.12y9Y.17y3Y.20y4.33","ic_love":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8y3ky6k2y3Y.8y3ky6k2y3Y.6ι2yk2y9ky3ιy.4y20.4y20.4y2i3y9i3y3.6y15Y.8y15Y.8y3R9y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_paw":".129ε2h.2ε2h.16h2B.2h2B.16h2B.2h2B.12ε2h.h2B.2h2B.ε2h.8h2B.10h2B.8h2B.10h2B.8h2B.10h2B.11ε8h.15h8B.15h8B.15h8B.15h8B.15h8B.15h8B.15h8B.103","ic_skull":".83w4.20w3Ι.17w10.12w14.10w13Ι.10w13Ι.9wD5w3D4w3.8wD5w3D4w2Ι.8wD5w3D4w2Ι.8wD5w3D4w2Ι.8wD5w3D4w2Ι.9w6D2w5Ι.10w13Ι.10w13Ι.12w9Ι.14wD2w3DwΙ.15wD2w3DwΙ.15wD2w3DwΙ.79","ic_cry":".83ι3y.20y3Y.17ι3y4ι2y.12ι2y10ιy.10y13Y.9ιy15.8yk5y3k4y2Y.8yk5y3k4y2Y.6ι2y3Uy6U2y4ιy.4y5Uy6U2y6.4y5Uy6U2y6.4y5Uy6U2y6.6y3Uy6U2y3Y.8y3Uy6U2y3Y.8y3Uk6U2y3Y.9y13Y.10y13Y.12y9Y.17y3Y.20y4.33","ic_tomb":".128e8E.15E8d.15E8d.13e2E10.12E5d3E3d.12E5d3E3d.12E11d.12E3d6E2d.12E3d6E2d.12E11d.12E11d.12E11d.12E11d.12E11d.12E11d.9g3G12g2G.6G17Z.6G18.27","ic_cloud":".150Ι8e.15e8E.15e9Ι2e.12e11E.12e11E.9Ι3e12Ι2e.6e17E.6e17E.6e17E.6e17E.6e17E.6e17E.147","ic_wilt":".80r6R.17R6F.17R6F.17R6F4.14R6F3R.20F3R.12f2.4z2F3R.12fx.4z2F3R.18zΩ.22zΩ.22zΩ.22zΩ.19z4Ω.19z4Ω.18z.3zΩ.22zΩ.22zΩ.22zΩ.82","ic_lock":".83Ι3e.20e3E.18e2.4e2.15e.8e.14E.8E.14E.8E.14E.8E.14E.8E.11ι3ye2y4e2yιy.9y6e4y4Y.9y6e4y4Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y14Y.9y14Y.9y14Y.76","ic_unlock":".87Ι4e.19e4E.19eE.eE.19eE.eE.19eE.eE.22eE.22eE.22eE.9ι13y2.9y14Y.9y14Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y6k3y5Y.9y14Y.9y14Y.9y14Y.76","ic_van":".194w21.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3wu8w3u7w2.3w21.3w21.3w21.3R21.6k4.6k5.9k3x.6k4x.9k3x.6k4x.9k3x.6k4x.9k4.6k5.28","ic_rice":".128w9.15w8Ι.15w8Ι.12w15.9w14Ι.9w14Ι.9w14Ι.7k2w15k.6k2w15x.6k3d12k2x.6k3d12k2x.6k3d12k2x.6k3d12k2x.6k17x.6k17x.99","ic_broom":".90ε2B.21B2θ.20εB2θ.18ε2B2θ.19B4θ.18εB2θ.20B2θ.21B2θ.19ε2B2θ.18εB2θ.20B3θ.12ι2yι3y6.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.12y2Jy3J2y3Y.81","ic_point":".59n2s.21s2S.21s2S.21s2S.21s2S.21s2S.21s2S.19n2s3n3s.15s8S.15s8S.15s8S.15s8S.14ns8S.14s9S.14s9S.14s9S.15s8S.15s8S.15s8S.78","ic_pin":".83r3R.20R3F.17r3R4r2R.14R9F.14R9F.12r2R4w2R4rR.10R5w4R4F.10R5w4R4F.10R6w2R5F.12R9F.14R9F.14R9F.15R7F.16R7F.42r3R.20R3F.45rR.22R2.34","ic_case":".81k6.18k5x.18kx.3x.18k5x.18k5x.12ε6B6ε5B.6B17θ.6B17θ.6B17θ.6k8y3k7.6k8y3k6x.6B8y3B7.6B17θ.6B17θ.6B17θ.6B17θ.6B17θ.6B17θ.75","ic_starO":".59E3.69E3.61E18.81e11E.12E11d.83E15.148","gi_hand":".30w12.12w11Ι.11ns12ns.9s14S.9s14S.5sn3s14S.5s18S.5s18S.5sSs16S.5sSs16S.5s4S15.9S14κ.9S14κ.9s3.s3.2s3.s3.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.s2S.8s2S.s2S.2s2S.16s2S.2s2S.16s3.2s3.31","gi_scratch":".30w12.12w11Ι.12s12.12s11S.12s11S.12S12.12S11κ.12s3.2s3.s3.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12s2S.2s2S.s2S.12p3.2s2S.p3.12p2ρ.2s2S.p2ρ.17p3.82","gi_swatter":".27d18.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cu2cu2cu2E.6d2cu2cu2cu2cu2cu2E.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cy2cu2cu2E.6d2cu2cu2cy2cu2cu2E.6d2uc2uc2yc2yc2uc2E.6d2cu2cu2cy2cu2cu2E.6d2cu2cu2cy2cu2cu2E.6d2uc2uc2uc2uc2uc2E.6d2cu2cu2cu2cu2cu2E.6d2cu2cu2cu2cu2cu2E.6d17E.14R3.21R2F.21R2F.21R2F.21R2F.21R2F.19f6.18f6.33","gi_staff":".54U6a2U3a.12a6y2a3x.12a6y2a3x.11D15.12s9.15s8S.15sk2s3ksS.15s8S.15s8S.15s3S3s2S.12U3a4R2a3U2a.9a7R2a5x.9a7R2a5x.9a4y2aR2ay2a2x.9a4y2aR2ay2a2x.9a7R2a5x.9sD12s2.9sD12sS.12a3.3a3.15a2x.3a2x.15a3.3a3.31","gi_pax":".56ε8h.15h8B.15h8B.15S9.15Sk2S3kSκ.15Sk2S3kSκ.15S8κ.15S8κ.15S8κ.10α3O2R9.10O3R12.9O3R11F.9O3R11F.9O3R11F.9O3R11F.9O3R11F.9O3S2R9S.9O3S2R9κ.14U3.3U3.15U2a.3U2a.15U3.3U3.31","gi_kid":".201ε5B.18B5θ.18B5θ.18S6.18S2kS2k.18S2kS2x.18S6.17ιy6ιy.15y8Y.15y8Y.16y5Y.18y5Y.18U6.18U5a.18U6.33","gi_luggage":".129k6.18k5x.18k5x.14Kε3B6ε3B2.9KB12y2.9KB12yY.9KB14.9K15.9K14b.9KB14.9KB13θ.9KB13θ.9KB12y2.9KB14.9KB13θ.9KB13θ.10k3.6k3.12k3.6k3.30","gi_trolley":".123E2d3.19dE.b2ε9b.9dE.b11ζ.9dE.b11y.9dE.b12.9dE.b11ζ.9dE.K12.9dE.b12.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.9dE.b11ζ.8Ed2Ed12E4d.3d21.3d21.6k4.6k5.9k4.6k5.28","gi_puddle":".342u8U4.9u3U8c3Uu2U.6U11c3U3a.5U4c5U12.4U17a.6U17a.9U11a.78","gi_boost":".75ι2y.6ι2y.12y2Y.6y2Y.12y3ιy.4y3ιy.12y4.5y4.11y3Y.5y3Y.12y2Y.6y2Y.12y3ιy.4y3ιy.10y4Y.4y4Y.12y4.5y4.12y2Y.6y2Y.12y2Y.6y2Y.11ιy2Y.5ιy2Y.9ι2y2Y.4ι2y2Y.10y4Y.4y4Y.10y2Y.6y2Y.11ιy2Y.5ιy2Y.11y3Y.5y3Y.9ι2y2Y.4ι2y2Y.10y2Y.6y2Y.12y3.6y3.33","gi_belt_f":".290l20g.3g21.3G21.3G3wG5wG5wG5.3G3wG5wG5wG5.3G4w2G4w2G4w2G3.3G3wG5wG5wG5.3G3wG5wG5wG5.3G21.73","gi_belt_b":".290L20r.3r21.3R21.3R6wR5wR5wR2.3R6wR5wR5wR2.3R4w2R4w2R4w2R3.3R6wR5wR5wR2.3R6wR5wR5wR2.3R21.73","corgi_sleep":".260O.10oO.19Oo.8o2O.19o3.6o3.19o2po2.4o2po2.18op3o2λ2o2p3o.18o6λ2o6.18o3Α3λ2Α3o3.18oΑ4λ4Α4o5.13oΑ5λ4Α5oΑ3o4.9oΑ5λ4Α5oΑ7o2.o.4o3Α4λ4Α4o3Α8oΑ2o.2o3x3λ6x3o3Α8o4.2o4xλ8xo4Α8o4.3op2λ3.x2.λ3p2oΑ3Β4Αo4.4o2λ4x4λ4o2Α2Β6o3.6o2λ4x2λ4o2Β10o.8oλ4p2λ4oΒ11o.9Βλ8Β13.9λ12Β2λ6Β2.10λδλδλ4δλδλΒ2λ6.14λ2.4λ2.114","paw_print":".79k2.6k2.13k4.4k4.12k4.4k4.12k4.4k4.13k3.4k3.14k2.6k2.9k3.14k3.4k3.14k3.4k4.12k4.4k4.12k4.5k3.12k3.11k8.15k10.13k12.12k12.12k12.12k12.12k12.13k3.k2.k3.55","corgi_nap":".409r2.r2.42r7.41r7.42r5.44r3.46r.375O.10oO.23h9.3Oo.8o2O.22h2b7h3.o3.6o3.22b5h10po2.4o2po2.20h6sh2s3h2shp2o2λ2o2p3o.19h6s2h2s3h2s2ho3λ2o6.19h6s2h2s3h2s3Α3λ2Α3o3.19h5s5xs4xs2Α2λ4Α4o5.15h5s5xs4xs2Α2λ4Α5oΑ3o4.11h5s2ps8psΑ2λ4Α5oΑ7o2.o.8h6s10Α3λ4Α4o3Α8oΑ2o.7h6sS6shx2λ6x3o3Α8o4.7r2Ryj8yhoxλ8xo4Α8o4.7r2Ry9s2pλ3.x2.λ3p2oΑ3Β4Αo4.8r2y9Ys2λ4x4λ4o2Α2Β6o3.10Ry9Y2o2λ4x2λ4o2Β10o.13y8Y2.oλ4p2λ4oΒ11o.13yJ7y2.2Βλ8Β13.14b8B.2λ12Β2λ6Β2.14S3.6s3λδλδλ4δλδλΒ2λ6.15W4.6w4.λ2.4λ2.307"};
   Object.assign(SPRITES, {"ic_arrow_l": ".59R2.21R3.20R4.19R5.18R6.17R7.16R17.6R18.5R19.4R20.5fR18.6fR17.7fR16.8fR6f9.9fR5.19fR4.20fR3.21fR2.22f2.83", "ic_arrow_r": ".59R2.22R3.21R4.20R5.19R6.18R7.8R17.7R18.6R19.5R20.4R18f.5R17f.6R16f.7f9R6f.17R5f.18R4f.19R3f.20R2f.21f2.83", "ic_arrow_d": ".56R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.10R18f.5R18f.6R16f.8R14f.10R12f.12R10f.14R8f.16R6f.18R4f.20R2f.22R.60", "ic_arrow_u": ".59R.22R2f.20R4f.18R6f.16R8f.14R10f.12R12f.10R14f.8R16f.6R18f.5R18f.11R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.16R7f.56"});
   /* 遊戲裡所有箭頭統一用這組紅色像素箭頭（l/r/u/d），不再用 emoji 或文字箭頭 */
   const ARW = (d, sz = 28) => '<img src="' + sprite('ic_arrow_' + d) + '" alt="" style="position:static;display:inline-block;flex:none;width:' + sz + 'px;height:' + sz + 'px;image-rendering:pixelated;vertical-align:middle;margin:0 3px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))">';
@@ -1112,7 +1112,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     let h = '<section><h4>🛍️ 孫女小舖<small>你有 💰 ' + bal + '</small></h4><ul class="smv3-shop"><li><span class="ic">🎫</span><div><b>保釋券</b><small>被抓時可以直接免費保釋　目前持有 ' + tk + '／' + TICKET_MAX + '</small></div><button type="button" data-buy="ticket" aria-label="購買 保釋券，' + TICKET_PRICE + ' 幣' + (tk >= TICKET_MAX ? '，已經帶滿了' : bal < TICKET_PRICE ? '，零用錢不夠' : '') + '"' + (bal < TICKET_PRICE || tk >= TICKET_MAX ? ' class="dim"' : '') + '>' + (tk >= TICKET_MAX ? '已滿' : '💰 ' + TICKET_PRICE) + '</button></li></ul></section>';
     h += '<section><h4>🚌 專屬座駕<small class="sub">可多選，走遠路時從勾選的座駕隨機搭一個</small></h4><ul class="smv3-shop">' + SHOP_VEH.map(([k, n, p]) => row('<img src="' + sprite(k) + '" alt="">', n, '遠距離移動時會隨機搭乘（可多選）', p, sh.veh.includes(k), vehSel().includes(k), 'veh:' + k)).join('') + '</ul></section>';
     if (extras.skin.length) h += '<section><h4>🎭 孫女造型<small class="sub">可多選，每次出門從勾選的造型隨機變一個</small></h4><ul class="smv3-shop">' + extras.skin.map(s => row('<img src="' + sprite(s.a) + '" alt="">', s.n, s.n === CEO_SKIN && !sh.skin.includes(s.n) ? '變身造型　打贏夾褲 CEO ' + CEO_NEED + ' 次免費解鎖（' + Math.min(CEO_NEED, ceoWinCnt()) + '/' + CEO_NEED + '），或花錢買' : '變身造型', skinPrice(s.n), sh.skin.includes(s.n), skinSel().includes(s.n), 'skin:' + s.n)).join('') + '</ul></section>';
-    h += '<section><h4>🚆 列車庫<small class="sub">路線專屬車自動換；高級列車用零用錢買，按「使用」出車。時速為真實營運速度。</small></h4><ul class="smv3-shop">' + [['emu', 'EMU500 電聯車', '宜蘭、海線、縱貫線'], ['diesel', '柴聯車 DR1000', '深入內灣、平溪與集集線的經典支線鐵道。'], ['alishan', '阿里山號', '穿梭高山森林的紅色傳奇，阿里山林鐵專用。']].map(([k, n, d]) => '<li><span class="ic wide">' + trainIco(k) + '</span><div><b>' + n + '</b><small>' + d + '</small></div><em class="own">路線專屬</em></li>').join('') + TRAIN_SHOP.map(([k, n, p, d]) => row(trainIco(k), n, d, p, trainHas(k), sh.trainPick === k, 'train:' + k)).join('') + row(trainIco('funny'), '孫女夾褲列車', '開局免費！孫女拖著整排夾褲用時速 35 賣力狂奔。', 0, true, sh.trainPick === 'funny', 'train:funny') + (trainHas('gold') ? row(trainIco('gold'), '賽博列車', '時速飆破 400 的科幻磁浮，制霸全場的終極神車。', 0, true, sh.trainPick === 'gold', 'train:gold') : (() => { const gN = trainStarN(), gT = Math.max(1, TRAIN_FULLS().length); let gu = ''; try { gu = TrainGame.icon('gold'); } catch (e) {} const cells = Array.from({ length: gT }, (_, i) => '<i' + (i < gN ? ' class="on"' : '') + '></i>').join(''); const f = Math.min(1, gN / gT); return '<li class="lock gold-lock"><span class="ic wide">' + (gu ? '<span class="gl" style="--m:url(' + gu + ')"><img class="trainico lock" src="' + gu + '" alt=""><img class="trainico gcol" src="' + gu + '" alt="" style="clip-path:inset(0 0 0 ' + Math.round((1 - f) * 100) + '%)"></span>' : trainIco('gold', 'lock')) + '</span><div><b>賽博列車（未解鎖）</b><small>在每個車站用普通以上難度停出 3 星，拿到越多車越完整</small><span class="gbar" style="grid-template-columns:repeat(' + gT + ',1fr)">' + cells + '</span><small class="gn">' + gN + '／' + gT + ' 站</small></div></li>'; })()) + '</ul></section>';
+    h += '<section><h4>🚆 列車庫<small class="sub">路線專屬車自動換；高級列車用零用錢買，按「使用」出車。時速為真實營運速度。</small></h4><ul class="smv3-shop">' + [['emu', 'EMU500 電聯車', '宜蘭、海線、縱貫線'], ['diesel', '柴聯車 DR1000', '深入內灣、平溪與集集線的經典支線鐵道。'], ['alishan', '阿里山小火車', '穿梭高山森林的紅色傳奇，阿里山林鐵專用。']].map(([k, n, d]) => '<li><span class="ic wide">' + trainIco(k) + '</span><div><b>' + n + '</b><small>' + d + '</small></div><em class="own">路線專屬</em></li>').join('') + TRAIN_SHOP.map(([k, n, p, d]) => row(trainIco(k), n, d, p, trainHas(k), sh.trainPick === k, 'train:' + k)).join('') + (trainHas('funny') ? row(trainIco('funny'), '孫女夾褲列車', '孫女拖著整排夾褲用時速 35 賣力狂奔。', 0, true, sh.trainPick === 'funny', 'train:funny') : '<li><span class="ic wide">' + trainIco('funny') + '</span><div><b>孫女夾褲列車</b><small>孫女拖著整排夾褲用時速 35 賣力狂奔。停車失敗滿 10 次解鎖。</small></div><button type="button" class="dim" disabled>停車失敗 ' + Math.min(10, ST().trainFailAll || 0) + '／10</button></li>') + (trainHas('gold') ? row(trainIco('gold'), '賽博列車', '時速飆破 400 的科幻磁浮，制霸全場的終極神車。', 0, true, sh.trainPick === 'gold', 'train:gold') : (() => { const gN = trainStarN(), gT = Math.max(1, TRAIN_FULLS().length); let gu = ''; try { gu = TrainGame.icon('gold'); } catch (e) {} const cells = Array.from({ length: gT }, (_, i) => '<i' + (i < gN ? ' class="on"' : '') + '></i>').join(''); const f = Math.min(1, gN / gT); return '<li class="lock gold-lock"><span class="ic wide">' + (gu ? '<span class="gl" style="--m:url(' + gu + ')"><img class="trainico lock" src="' + gu + '" alt=""><img class="trainico gcol" src="' + gu + '" alt="" style="clip-path:inset(0 0 0 ' + Math.round((1 - f) * 100) + '%)"></span>' : trainIco('gold', 'lock')) + '</span><div><b>賽博列車（未解鎖）</b><small>在每個車站用普通以上難度停出 3 星，拿到越多車越完整</small><span class="gbar" style="grid-template-columns:repeat(' + gT + ',1fr)">' + cells + '</span><small class="gn">' + gN + '／' + gT + ' 站</small></div></li>'; })()) + '</ul></section>';
     return h;
   }
   function shopBuy(key) {
@@ -2134,7 +2134,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     saveGameState();
     let g = e.t === 'npc' ? '釣魚-共用魚池' : e.g; if (g === '隨機釣魚') g = pick(FISHG); if (!GAMES[g]) g = e.t === 'npc' ? '釣魚-共用魚池' : '連點';
     const fish = FISHG.includes(g), box = $('smv3-arena'); box.hidden = false;
-    box.innerHTML = '<div class="smv3-arena' + (e.boss ? ' boss' : '') + '" role="dialog" aria-label="' + esc(encName(e)) + '"><header><img src="' + sprite(e.s) + '" alt=""><b>' + esc(encName(e)) + '</b><button type="button" data-x>逃跑</button></header>' + (e.boss ? '<div class="stg"><b>第 ' + (e.si + 1) + '／' + e.boss.st.length + ' 關</b><img class="bmood" src="' + sprite(['ic_cool', 'ic_meh', 'ic_devil'][Math.min(2, e.si)]) + '" alt="" style="position:static;width:20px;height:20px;image-rendering:pixelated"><span class="bhp"><i style="width:' + Math.max(0, 100 - e.si * 33.34) + '%"></i><s style="left:33.3%"></s><s style="left:66.6%"></s></span><u>面子 ' + '■'.repeat(e.faces || 0) + '□'.repeat(Math.max(0, 2 - (e.faces || 0))) + '</u></div>' : '') + '<div class="say"></div><div class="hud" hidden><div class="sc"></div><div class="row"><span class="l"></span><span class="r"></span></div><div class="bar"><em></em></div></div><div class="stage ' + e.t + (fish ? ' fish' : '') + (e.boss && !fish ? ' bz' : '') + '"></div><div class="acts"></div></div>';
+    box.innerHTML = '<div class="smv3-arena' + (e.boss ? ' boss' : '') + '" role="dialog" aria-label="' + esc(encName(e)) + '"><header><img src="' + sprite(e.ic || e.s) + '" alt=""><b>' + esc(encName(e)) + '</b><button type="button" data-x>逃跑</button></header>' + (e.boss ? '<div class="stg"><b>第 ' + (e.si + 1) + '／' + e.boss.st.length + ' 關</b><img class="bmood" src="' + sprite(['ic_cool', 'ic_meh', 'ic_devil'][Math.min(2, e.si)]) + '" alt="" style="position:static;width:20px;height:20px;image-rendering:pixelated"><span class="bhp"><i style="width:' + Math.max(0, 100 - e.si * 33.34) + '%"></i><s style="left:33.3%"></s><s style="left:66.6%"></s></span><u>面子 ' + '■'.repeat(e.faces || 0) + '□'.repeat(Math.max(0, 2 - (e.faces || 0))) + '</u></div>' : '') + '<div class="say"></div><div class="hud" hidden><div class="sc"></div><div class="row"><span class="l"></span><span class="r"></span></div><div class="bar"><em></em></div></div><div class="stage ' + e.t + (fish ? ' fish' : '') + (e.boss && !fish ? ' bz' : '') + '"></div><div class="acts"></div></div>';
     const q = s => box.querySelector(s);
     const c = A = { e, g, fish, rec, dead: false, t: 0, pen: 0, timers: [], ivs: [], raf: 0, st: q('.stage'), say: q('.say'), hud: q('.hud'), acts: q('.acts'), mod: fish && g !== '釣魚-沉默' && g !== '釣魚-共用魚池' && Math.random() < .7 ? pick(Object.keys(MODS)) : '' };
     c.df = dfOf(e.n, e.dm || lastDm(e)); c.dmKey = c.df.k;
@@ -2267,7 +2267,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     c.say.textContent = pick(e.i.length ? e.i : [e.n + ' 出現了！']);
     c.acts.innerHTML = e.t === 'npc' ? '<button type="button" data-go class="main">來啊</button><button type="button" data-x>不要，我只是路過</button>' : '<button type="button" data-go class="main">看懂了，開始！</button><button type="button" data-x>算了</button>';
     const h = c.how = V2_GAMES[g] || g === '釣魚-共用魚池' ? HOW[g] : howOf(g, GAMES[g].tip);
-    c.st.appendChild(mk('<div class="how"><div class="hd"><img src="' + sprite(e.s) + '" alt=""><b>' + esc(g === '記憶' ? '一二三木頭人' : g === '群怪' ? '閃巴掌' : g === '頂風' ? '空中大戰' : g.replace('釣魚-', '釣魚・')) + '</b><small>怎麼玩？</small></div><ul><li><i>🎯</i><span><u>目標</u>' + esc(h.goal) + '</span></li><li><i>👆</i><span><u>操作</u>' + esc(h.how) + '</span></li><li><i>⚠️</i><span><u>注意</u>' + esc(h.tip) + '</span></li></ul><div class="demo ' + h.gest + '"><em>' + esc(h.demo) + '</em><span>' + (h.gest === 'swipe' ? '👆' : '👆') + '</span></div></div>', 'intro'));
+    c.st.appendChild(mk('<div class="how"><div class="hd"><img src="' + sprite(e.ic || e.s) + '" alt=""><b>' + esc(g === '記憶' ? '一二三木頭人' : g === '群怪' ? '閃巴掌' : g === '頂風' ? '空中大戰' : g.replace('釣魚-', '釣魚・')) + '</b><small>怎麼玩？</small></div><ul><li><i>🎯</i><span><u>目標</u>' + esc(h.goal) + '</span></li><li><i>👆</i><span><u>操作</u>' + esc(h.how) + '</span></li><li><i>⚠️</i><span><u>注意</u>' + esc(h.tip) + '</span></li></ul><div class="demo ' + h.gest + '"><em>' + esc(h.demo) + '</em><span>' + (h.gest === 'swipe' ? '👆' : '👆') + '</span></div></div>', 'intro'));
     { const how = c.st.querySelector('.how'); if (how && e.t !== 'npc' && !(e.boss && e.si > 0 && e.dm)) { c.dmSel = e.dm || lastDm(e); how.insertAdjacentHTML('beforeend', dfSelHtml(e, c.dmSel)); how.addEventListener('click', ev => { const b = ev.target.closest('[data-dm]'); if (!b) return; c.dmSel = b.dataset.dm; how.querySelectorAll('[data-dm]').forEach(x => x.setAttribute('aria-pressed', x === b)); }); } else { c.dmSel = e.dm || 'normal'; if (how && e.boss && e.si > 0) how.insertAdjacentHTML('beforeend', '<div class="dfnote">難度：' + DIFFS[c.dmSel].ico + ' ' + DIFFS[c.dmSel].n + '</div>'); } }
   }
   const GAMES = {
@@ -2379,6 +2379,9 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     enc_wind: { name: '風大飛走怪', loot: '被風吹爛的傘', challenge: '全程沒被打中', failure: '✈️ 飛機墜毀了！' },
     enc_typhoon: { name: '颱風假沒放怪', loot: '正常上班通知', challenge: '無傷完成', failure: '🌧️ 本縣市正常上班上課。' },
     steamtrain: { name: '冷門列車駕駛', loot: '頂埔站務紀念票', challenge: '停車誤差 3 公尺內（三星）', failure: '🚆 沒停準！站長搖搖頭。' },
+    gymfish: { name: '體操午仔魚', loot: '古厝阿姨的金牌吊環', challenge: '沒昏倒、沒落水', failure: '🐟 午仔魚還沒闖到終點……阿姨：再來一次！' },
+    ringfish: { name: '吊環五仔魚乾', loot: '古厝阿姨的魚乾吊環', challenge: '沒被海鷗叼、沒手滑', failure: '🐟 魚還沒曬乾……阿姨：明天太陽更大。' },
+    tofu: { name: '連吃五碗豆花', loot: '福春豆花伯的空碗', challenge: '五碗一口都沒嗆到', failure: '🍮 吃不下了……豆花伯：先喝口水。' },
     my_17: { name: '吉普車翹翹板', loot: '吉普阿諾特技證', challenge: '零撞擊、板子沒失控', failure: '🚙 翻車了！吉普阿諾說：再來一次。' },
     enc_statue: { name: '抽象雕像怪', loot: '看不懂的藝術品', challenge: '一滴血都沒掉', failure: '🗿 你看不懂藝術。' },
     enc_nosignal: { name: '冷門到沒訊號怪', loot: '一格訊號', challenge: '三次一次命中', failure: '📵 無法連線，請稍後再試。' },
@@ -5221,7 +5224,7 @@ var TrainGame = (function () {
         if (sim.done) { if (st.resT > st.board.end + 1.2) finishRoute(); }
         else if (st.inp.lever > 0 && st.resT > st.board.end - 0.3) routeResume();
       }
-      if (RT && sim.phase !== 'result') { var ri = RT.infos.length - 1; for (var qi = 0; qi < RT.bounds.length; qi++) if (sim.x < RT.bounds[qi]) { ri = qi; break; } if (ri !== st.region) { var pv = st.region; st.region = ri; var inf = RT.infos[ri]; var setTrainChanged = setTrain(inf.full); if (setTrainChanged || (pv != null && RT.infos[pv].line !== inf.line)) { var tn = KIND === 'alishan' ? '阿里山號' : KIND === 'diesel' ? '柴聯車' : '電聯車', ln = inf.line || ''; st.msg = { text: (setTrainChanged ? '換乘 ' + tn : '進入 ' + ln) + (setTrainChanged && ln && (tn + ln).length <= 7 ? '・' + ln : ''), t: 2.6 }; } } }
+      if (RT && sim.phase !== 'result') { var ri = RT.infos.length - 1; for (var qi = 0; qi < RT.bounds.length; qi++) if (sim.x < RT.bounds[qi]) { ri = qi; break; } if (ri !== st.region) { var pv = st.region; st.region = ri; var inf = RT.infos[ri]; var setTrainChanged = setTrain(inf.full); if (setTrainChanged || (pv != null && RT.infos[pv].line !== inf.line)) { var tn = KIND === 'alishan' ? '阿里山小火車' : KIND === 'diesel' ? '柴聯車' : '電聯車', ln = inf.line || ''; st.msg = { text: (setTrainChanged ? '換乘 ' + tn : '進入 ' + ln) + (setTrainChanged && ln && (tn + ln).length <= 7 ? '・' + ln : ''), t: 2.6 }; } } }
       if (st.msg) { st.msg.t -= dt; if (st.msg.t <= 0) st.msg = null; }
       if (sim.phase === 'result') {
         st.resT += dt;
@@ -5254,11 +5257,2147 @@ var TrainGame = (function () {
   return { create: create, icon: icon, kindOf: kindOf };
 })();
 
-  /* 列車庫：路線專屬列車（EMU500、柴聯車、阿里山號）一開始就依路線自動換；高級列車用金幣買；賽博列車＝全部車站在普通以上拿過 3 星 */
+  /* ---- dofu_assets.js ---- */
+var DofuAssets = {"w": 72, "h": 56, "pal": {"k": "#3b2a1e", "s": "#d9a171", "S": "#ecc08f", "d": "#b97c52", "D": "#8f5a38", "h": "#241f1c", "H": "#4b413a", "g": "#8d8782", "b": "#241f1c", "e": "#1c1714", "w": "#f6f0e4", "m": "#7a2a2c", "t": "#fbf6ea", "l": "#b7674e", "r": "#e9907a", "c": "#2c2e35", "C": "#434650", "x": "#1d1e24", "p": "#cfd1d8", "y": "#c8ccd2", "Y": "#f1f3f6", "q": "#8fdcf2", "o": "#a8703a"}, "boss": {"idle": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds2b4s7b4s2dh3k.43khgd2sb6s5b6sd2ghk.43kh2d2sbs4bs5bs4bsd2h2k.43khgds21dghk.42kdhs3e4s10e4s4hdk.40kd2s4we2ws10we2ws5d2k.39kd2s4we2ws10we2ws5d2k.39kd3s3ds2ds4d2s4ds2ds4d3k.39kd3s11d2s12d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kdr2s3dsDd4Ds2ds3r2dk.47kdr2s6Ds2Ds7r2dk.48kd2s2ds11ds2d2k.49kd2s2ds11ds2d2k.50kd3sDs9Dsd3k.52kd2s2Ds7Ds2d2k.54kd2s2D2s3D2s2d2k.56kd2s3D3s3d2k.58kd3l4sd2k2.59kdD8dk.60kdD8dk.58k3d10k4.50k5xd15xk4.43k3c4x2d15x2c3k3.37k3c8xd15xc7k3.32k2c4Cc6x2d2s9d2x2c10k2.27k3c3C4c7x2d11x2c13k3.21k3c4C6c8x3d7x3c17k3.17kc4C9c10x9c22k.16kcC12c14xc14xc11k.15kc2C12c29x13k.14kc2C12c29x13k.14kcC13c23p3c2x15k.13kcC13c23pxpc2x15k.12kc2C13c23p3c2x15k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4", "blink": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds2b4s7b4s2dh3k.43khgd2sb6s5b6sd2ghk.43kh2d2sbs4bs5bs4bsd2h2k.43khgds21dghk.42kdhs25hdk.40kd2s27d2k.39kd2s4e4s10e4s5d2k.39kd3s11d2s12d3k.39kd3s11d2s12d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kdr2s3dsDd4Ds2ds3r2dk.47kdr2s6Ds2Ds7r2dk.48kd2s2ds11ds2d2k.49kd2s2ds11ds2d2k.50kd3sDs9Dsd3k.52kd2s2Ds7Ds2d2k.54kd2s2D2s3D2s2d2k.56kd2s3D3s3d2k.58kd3l4sd2k2.59kdD8dk.60kdD8dk.58k3d10k4.50k5xd15xk4.43k3c4x2d15x2c3k3.37k3c8xd15xc7k3.32k2c4Cc6x2d2s9d2x2c10k2.27k3c3C4c7x2d11x2c13k3.21k3c4C6c8x3d7x3c17k3.17kc4C9c10x9c22k.16kcC12c14xc14xc11k.15kc2C12c29x13k.14kc2C12c29x13k.14kcC13c23p3c2x15k.13kcC13c23pxpc2x15k.12kc2C13c23p3c2x15k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4", "talk": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds3b3s7b3s3dh3k.43khgd2s2b4s7b4s2d2ghk.43kh2d2sb6s5b6sd2h2k.43khgds2bs4bs5bs4bs2dghk.42kdhs3e4s10e4s4hdk.40kd2s4we2ws10we2ws5d2k.39kd2s4we2ws10we2ws5d2k.39kd3s3ds2ds4d2s4ds2ds4d3k.39kd3s11d2s12d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kdr2s3dsDd4Ds2ds3r2dk.47kdr2s6Ds2Ds7r2dk.48kd2s2ds11ds2d2k.49kd2s17d2k.50kd3sds8ds2d3k.52kd2s2lt6ls3d2k.54kd2s2m6s3d2k.56kd2sm6s2d2k.58kd2m2l2m2d2k2.59kdD8dk.60kdD8dk.58k3d10k4.50k5xd15xk4.43k3c4x2d15x2c3k3.37k3c8xd15xc7k3.32k2c4Cc6x2d2s9d2x2c10k2.27k3c3C4c7x2d11x2c13k3.21k3c4C6c8x3d7x3c17k3.17kc4C9c10x9c22k.16kcC12c14xc14xc11k.15kc2C12c29x13k.14kc2C12c29x13k.14kcC13c23p3c2x15k.13kcC13c23pxpc2x15k.12kc2C13c23p3c2x15k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4", "surprise": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2Sb2S6sb2s2h5k.44kh4s2b5s5b5s2h4k.43kh3dsb3s2bs5bs2b3sdh3k.43khgd2sbs15bsd2ghk.43kh2d2s19d2h2k.43khgdse4s10e4s2dghk.42kdhs3w4s10w4s4hdk.24k2.14kd2s4we2ws10we2ws5d2k.13k2.6k2s2k2.12kd2s4we2ws10we2ws5d2k.11k2s2k2.3ks6k.11kd3s3we2ws4d2s4we2ws4d3k.10ks6k.2ks2dsdsk.11kd3s3w4s4d2s4w4s4d3k.10ks2dsdsk.2ks6k.11kd2s12Sds13d2k.10ks6k.2ks6k.12kd2s2S3s5Sd2s7S3s2d2k.11ks6k.3ks5k.13k3dS3s4d6s5S3dk3.13ks5k.2ks7k.14kd2s4dsDd4Ds2ds4d2k.14ks7k.ks7k.14kd2s7Ds2Ds8d2k.14ks7k.ks7k.15kd2s2ds11ds2d2k.15ks7k.kd7k.15kd2s17d2k.15kd7k.kd7k.16kd3s5l2s6d3k.16kd7k.2ks5k.18kd2s3lm4ls4d2k.17ks5k2.3ks5k.19kd2s2lm4ls3d2k.18ks5k.5ks4k.20kd2slm4ls2d2k.19ks4k.6ks4k.21kd2lm4ld2k2.20ks4k.6ks5k.20kdDlm4lDdk.20ks5k.6ks5k.20kdD3l2D3dk.20ks5k.6ks6k.17k3d10k4.17ks5k.7ks6k.11k5xd15xk4.12ks6k.7ks7k6.2k3c4x2d15x2c3k3.3k6s7k.7ks8c5k2c8xd15xc7k3c5s8k.7ks6c4Cc5Cc6x2d2s9d2x2c17s6k.8ks4c2C7c2Cc7x2d11x2c19s4k.10ks3cC9cCc8x3d7x3c20s3k.12ksc2C9c12x9c23sk.14kc2C9c16xc27k.14kc2C10c44k.14kc3C9c44k.14kc3C9c25p3c2xc13xk.13kcCc11Cc23pxpc2x2c11x2k.12kc2Cc11Cc23p3c2x2c11x2k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4", "laugh": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds2b4s7b4s2dh3k.43khgd2sb6s5b6sd2ghk.43kh2d2sbs4bs5bs4bsd2h2k.43khgds21dghk.42kdhs25hdk.40kd2s5e2s12e2s6d2k.39kd2s4es2es10es2es5d2k.39kd3s4d2s5d2s5d2s5d3k.39kd3s11d2s12d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kdr2s3dsDd4Ds2ds3r2dk.47kdr2s6Ds2Ds7r2dk.48kd2s2ds11ds2d2k.49kd2sds12ds2d2k.50kd3t12sd3k.52kd2t12sd2k.54kdm12d2k.56km3l6m3dk.58kdml6mdk2.59kdD8dk.60kdD8dk.58k3d10k4.50k5xd15xk4.43k3c4x2d15x2c3k3.37k3c8xd15xc7k3.32k2c4Cc6x2d2s9d2x2c10k2.27k3c3C4c7x2d11x2c13k3.21k3c4C6c8x3d7x3c17k3.17kc4C9c10x9c22k.16kcC12c14xc14xc11k.15kc2C12c29x13k.14kc2C12c29x13k.14kcC13c23p3c2x15k.13kcC13c23pxpc2x15k.12kc2C13c23p3c2x15k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4", "point": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds3b3s7b3s3dh3k.43khgd2s2b4s7b4s2d2ghk.43kh2d2sb6s5b6sd2h2k.43khgds2bs4bs5bs4bs2dghk.42kdhs3e4s10e4s4hdk.40kd2s4we2ws10we2ws5d2k.39kd2s4we2ws10we2ws5d2k.39kd3s3ds2ds4d2s4ds2ds4d3k.39kd3s11d2s12d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kdr2s3dsDd4Ds2ds3r2dk.27k3.17kdr2s6Ds2Ds7r2dk.23k4s3k.17kd2s2ds11ds2d2k.24s8k.16kd2s17d2k.24s9k.16kd3sds8ds2d3k.25k2s7k.17kd2s2lt6ls3d2k.27kd6sk.18kd2s2m6s3d2k.28kd6k.20kd2sm6s2d2k.30ks5k.21kd2m2l2m2d2k2.31ks5k.21kdD8dk.32ks5k.21kdD8dk.32ks5k.19k3d10k4.30ks5k.13k5xd15xk4.26ks5k.3k5.2k3c4x2d15x2c3k3.23ks6k3c5k2c8xd15xc7k3.20ks7c4Cc5Cc6x2d2s9d2x2c10k2.19ks5c2C7c2Cc7x2d11x2c13k3.16ks5cC9cCc8x3d7x3c17k3.13ks4c2C9c12x9c22k.13ks3c2C9c16xc14xc11k.14k2scC10c31x13k.14kc3C9c31x13k.14kc3C9c25p3c2x15k.13kcCc11Cc23pxpc2x15k.12kc2Cc11Cc23p3c2x9s5xk.12kc2C13c28x9s5x2k.11kcC14c27x10s5x2k.10kc2C14c27x10s5x3k.4", "ladle": ".180k.33k.32k5hk5.26k2yk.29k2h11k2.23ky4.28kh15k.21kyY3y.27khH11h5k.19ky6.26kh2H11h6k.19ky5.25kh13H7hk.19ky4.25kh21k.19ko2yk.24khH4h18k.17ko3k.25kh23k.17ko2k.25kh4dsS7h12k.16ko2k.25kh4s2S9sh9k.16ko2k.25kh3ds2S9s5h5k.16ko2k.24kh4s19h4k.14ko3k.24kh3ds2b4s7b4s2dh3k.14ko3k.24khgd2sb6s5b6sd2ghk.14ko2k.25kh2d2sbs4bs5bs4bsd2h2k.14ko2k.25khgds21dghk.14ko2k.24kdhs3e4s10e4s4hdk.13ko2k.23kd2s4we2ws10we2ws5d2k.11ko3k.23kd2s4we2ws10we2ws5d2k.11ko3k.23kd3s3ds2ds4d2s4ds2ds4d3k.11ko2k.24kd3s11d2s12d3k.11ko2k.24kd2s12Sds13d2k.11ko2k.25kd2s2S3s5Sd2s7S3s2d2k.12ko2k.26k3dS3s4d6s5S3dk3.12ko3k.28kdr2s3dsDd4Ds2ds3r2dk.14ko2sk.28kdr2s6Ds2Ds7r2dk.13kso2s2k.28kd2s2ds11ds2d2k.13kd2o2d3k.27kd2s2ds11ds2d2k.13kd7k.28kd3sDs9Dsd3k.14ks7k.29kd2s2Ds7Ds2d2k.16ks5k.31kd2s2D2s3D2s2d2k.17ks4k.33kd2s3D3s3d2k.18ks4k.34kd3l4sd2k2.19ks4k.34kdD8dk.20ks4k.34kdD8dk.20ks4k.32k3d10k4.17ks5k.26k5xd15xk4.12ks6k.23k3c4x2d15x2c3k3.3k6s7k.20k3c8xd15xc7k3c5s8k.18k2c4Cc6x2d2s9d2x2c17s6k.15k3c3C4c7x2d11x2c19s4k.13k3c4C6c8x3d7x3c20s3k.13kc4C9c10x9c23sk.14kcC12c14xc27k.14kc2C12c42k.14kc2C12c42k.14kcC13c23p3c2xc13xk.13kcC13c23pxpc2x2c11x2k.12kc2s5C8c23p3c2x2c11x2k.12kc2s5C8c28x16k.11kcCs5C8c27x17k.10kc2Cs5C8c27x18k.4", "thumb": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s19h4k.43kh3ds2b4s7b4s2dh3k.43khgd2sb6s5b6sd2ghk.43kh2d2sbs4bs5bs4bsd2h2k.43khgds21dghk.42kdhs25hdk.40kd2s5e2s12e2s6d2k.39kd2s4es2es10es2es5d2k.39kd3s4d2s5d2s5d2s5d3k.39kd3s11d2s12d3k.12k2.25kd2s12Sds13d2k.11kSsk.25kd2s2S3s5Sd2s7S3s2d2k.12ks2k.26k3dS3s4d6s5S3dk3.13ks2k.28kdr2s3dsDd4Ds2ds3r2dk.15ks3k.27kdr2s6Ds2Ds7r2dk.14ks5k.27kd2s2ds11ds2d2k.14ks7k.26kd2sds12ds2d2k.14kd7k.27kd3t12sd3k.15ks7k.28kd2t12sd2k.17ks5k.30kdm12d2k.18ks4k.32km3l6m3dk.18ks5k.33kdml6mdk2.19ks5k.33kdD8dk.20ks5k.33kdD8dk.20ks5k.31k3d10k4.17ks5k.26k5xd15xk4.12ks6k.23k3c4x2d15x2c3k3.3k6s7k.20k3c8xd15xc7k3c5s8k.18k2c4Cc6x2d2s9d2x2c17s6k.15k3c3C4c7x2d11x2c19s4k.13k3c4C6c8x3d7x3c20s3k.13kc4C9c10x9c23sk.14kcC12c14xc27k.14kc2C12c42k.14kc2C12c42k.14kcC13c23p3c2xc13xk.13kcC13c23pxpc2x2c11x2k.12kc2s5C8c23p3c2x2c11x2k.12kc2s5C8c28x16k.11kcCs5C8c27x17k.10kc2Cs5C8c27x18k.4", "worry": ".180k.66k5hk5.59k2h11k2.56kh15k.54khH11h5k.52kh2H11h6k.50kh13H7hk.49kh21k.48khH4h18k.47kh23k.46kh4dsS7h12k.45kh4s2S9sh9k.45kh3ds2S9s5h5k.44kh4s5b2s5b2s5h4k.43kh3ds3b4s5b4s3dh3k.2k.40khgd2sb4s9b4sd2ghk.kqk.39kh2d2sb2s13b2sd2h2k.kq2k.38khgdse4s10e4s2dghk.kq2k.37kdhs3w4s10w4s4hdk2q2k.36kd2s4we2ws10we2ws5d2kq2k.36kd2s4we2ws10we2ws5d2k2qk.36kd3s3we2ws4d2s4we2ws4d3k.k.37kd3s3w4s4d2s4w4s4d3k.39kd2s12Sds13d2k.40kd2s2S3s5Sd2s7S3s2d2k.42k3dS3s4d6s5S3dk3.45kd2s4dsDd4Ds2ds4d2k.47kd2s7Ds2Ds8d2k.48kd2s2ds11ds2d2k.49kd2s17d2k.50kd3s13d3k.52kd2s5l2s6d2k.54kd2s2l2s2l2s3d2k.56kd2ls6lsd2k.58kd3s5d2k2.59kdD8dk.60kdD8dk.58k3d10k4.50k5xd15xk4.43k3c4x2d15x2c3k3.37k3c8xd15xc7k3.32k2c4Cc6x2d2s9d2x2c10k2.27k3c3C4c7x2d11x2c13k3.21k3c4C6c8x3d7x3c17k3.17kc4C9c10x9c22k.16kcC12c14xc14xc11k.15kc2C12c29x13k.14kc2C12c29x13k.14kcC13c23p3c2x15k.13kcC13c23pxpc2x15k.12kc2C13c23p3c2x15k.12kc2C13c28x16k.11kcC14c27x17k.10kc2C14c27x18k.4"}};
+
+/* ---- dofu_girl.js ---- */
+var DofuGirl = {"w": 72, "h": 80, "pal": {"k": "#3b2a1e", "h": "#7a4e3a", "H": "#a06c52", "J": "#5a382a", "s": "#ffe3cf", "S": "#fff1e4", "d": "#f2c3a2", "r": "#ff9aa6", "e": "#3b2a1e", "w": "#ffffff", "m": "#8a2f3a", "l": "#ff8a96", "t": "#fffaf0", "T": "#f8d84e", "U": "#e4b02c", "R": "#e0554a", "W": "#fffaf0", "q": "#8fdcf2", "c": "#e6f4fa", "v": "#6cc3ee", "y": "#fff7b0", "G": "#4a3128"}, "f": {"idle": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws2e3s3G2s7G2ws2e3s3G2s8h4k.13kh4s7G2wsew2e4s2G2s5G2wsew2e4s2G2s7h4k.13kh3s5G4s3ew2e4s3G2s3G2s3ew2e4s3G4s5h3k.12kh5s2G2s2G2s2e9s2G7s2e9s2G2s2G2s2h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6G2s2e5we3s2G2s3G2s2e5we3s2G2s6h5k.11kh5s6G2s3e7s3G2s3G2s3e7s3G2s6h5k.11kh5s7G2s2e7s2G2s5G2s2e7s2G2s7h5k.11kh6s2r5G2s3e3s3G2s7G2s3e3s3G2r5s2h6k.11kh6sr7G2s7G2s9G2s7G2r7sh6k.12kh5r9G9s11G9r9h5k.13kh6r7s4G3s3e2s7e2s3G3s4r7h6k.14kh5sr5s13es5es13r5sh5k.16kh5s19e5s19h5k.16k3h5s41h5k3.14kh9s39h9k.12kh11s37h11k.10kh13s35h13k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "blink": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s13G2s3G2s13G4s5h3k.12kh5s2G2s2G2s13G7s13G2s2G2s2h5k.11kh5s6Gs15Gs3Gs15Gs6h5k.11kh5s6Gs5e5s5Gs3Gs5e5s5Gs6h5k.11kh5s6Gs4e7s4Gs3Gs4e7s4Gs6h5k.11kh5s6G2s2e2s5e2s2G2s3G2s2e2s5e2s2G2s6h5k.11kh5s6G2s2es7es2G2s3G2s2es7es2G2s6h5k.11kh5s7G2s11G2s5G2s11G2s7h5k.11kh6s2r5G2s9G2s7G2s9G2r5s2h6k.11kh6sr7G2s7G2s9G2s7G2r7sh6k.12kh5r9G9s11G9r9h5k.13kh6r7s4G3s3e2s7e2s3G3s4r7h6k.14kh5sr5s13es5es13r5sh5k.16kh5s19e5s19h5k.16k3h5s41h5k3.14kh9s39h9k.12kh11s37h11k.10kh13s35h13k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "wow": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s12J4s16J4s9h7k.11kh5s11J4s16J4s14h5k.11kh5s49h5k.11kh5s13G3s17G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws4ysG2s9G2ws4ysG2s9h5k.12kh4s8G2ws2e3sysG2s7G2ws2e3sysG2s8h4k.13kh4s7G2wsew2e4s2G2s5G2wsew2e4s2G2s7h4k.13kh3s5G4s3ew2ew2es3G2s3G2s3ew2ew2es3G4s5h3k.12kh5s2G2s2G2s2e5w2e2s2G7s2e5w2e2s2G2s2G2s2h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3eye7s3Gs3Gs3eye7s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6G2s2e5we3s2G2s3G2s2e5we3s2G2s6h5k.11kh5s6G2s3e7s3G2s3G2s3e7s3G2s6h5k.10k2h5s7G2s2e7s2G2s5G2s2e7s2G2s7h5k2.8kS5h3s2r5G2s3e3s3G2s7G2s3e3s3G2r5s2h3S5k.6kSdS3dSh2sr7G2s7G2s4ks4G2s7G2r7sh2SdS3dSk.4kS2dS3dS2hr9G9s3k2mk2s3G9r9hS2dS3dS2k.2kS3dS3dS3hr7s4G3s6km3ks6G3s4r7hS3dS3dS3k.kS11hsr5s13km5ks13r5shS11k.kS11h2s18km5ks18h2S11k.kS11h3s17kml3mks17h3S11k.kS11h4s17kl3ks17h4S11k.2kS9h6s16k2lk2s16h6S9k.3kTS7h8s17ks17h8S7k.4kT2S5h10s6d21s6h10S5Tk.3kT7h9kh3s5d19s5h3kh8T7k.2kT7h8k.k3h2s4d17s4h2k3.kh7T7k.2kT7h8k.4k4hs3d13s3hk4.4kh7T7k.2kT7h7k.9k5d11k5.9kh6T7k.2kT7h6k.14kd11k.14kh5T7k.2kT6k7.14k2d11k2.14k6T6k.2kT6k.14k6W15k6.13kT6k.kT7k.13kR5T2W13T2R5k.12kT7k2T7k.5k.5k2TR5T3W11T3R5Tk2.5k.4kT7k2T7k.2k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.kT7k2T7k.kT7kT3R5T5W9T5R5T3kT7k2T7k2T7k2T12R5T6W7T6R5T12kT7k2T6k2T12R6T7W5T7R5T13kT6k2T6k2T12R6T8W3T8R5T13kT6k2T6kT13R5T10WT9R6T19k2T6k2T11R6T20R6T12kT6k.k6.kT11R6T21R5T12k7.10kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "open": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s12J4s16J4s9h7k.11kh5s11J4s16J4s14h5k.11kh5s49h5k.11kh5s13G3s17G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws2e3s3G2s7G2ws2e3s3G2s8h4k.13kh4s7G2wsew2e4s2G2s5G2wsew2e4s2G2s7h4k.13kh3s5G4s3ew2e4s3G2s3G2s3ew2e4s3G4s5h3k.12kh5s2G2s2G2s2e9s2G7s2e9s2G2s2G2s2h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6G2s2e5we3s2G2s3G2s2e5we3s2G2s6h5k.11kh5s6G2s3e7s3G2s3G2s3e7s3G2s6h5k.11kh5s7G2s2e7s2G2s5G2s2e7s2G2s7h5k.11kh6s2r5G2s3e3s3G2s7G2s3e3s3G2r5s2h6k.11kh6sr7G2s7Gk2t7k2Gs7G2r7sh6k.12kh5r9G8k2t9k2G8r9h5k.13kh6r7s4G3s2km11ks2G3s4r7h6k.14kh5sr5s10km11ks10r5sh5k.16kh5s14k2m11k2s14h5k.16k3h5s14km11ks14h5k3.14kh9s13km5lm5ks13h9k.12kh11s12k2ml7mk2s12h11k.10kh13s12k2l7k2s12h13k.9kh14s6d6k2l5k2d6s6h14k.9kh12kh3s5d7k5d7s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "hurry": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s9J2s23J2s9h7k.11kh5s11J4s19J4s11h5k.11kh5s12J5s15J5s12h5k.11kh5s13G3J2s13J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws2e3s3G2s7G2ws2e3s3G2s8h4k.13kh4s7G2wsew2e4s2G2s5G2wsew2e4s2G2s7h4k.13kh3s5G4s3ew2e4s3G2s3G2s3ew2e4s3G4s5h3k.12kh5s2G2s2G2s2e9s2G7s2e9s2G2s2G2s2h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6G2s2e5we3s2G2s3G2s2e5we3s2G2s6h5k.11kh5s6G2s3e7s3G2s3G2s3e7s3G2s6h5k.11kh5s7G2s2e7s2G2s5G2s2e7s2G2s7h5k.11kh6s2r5G2s3e3s3G2s7G2s3e3s3G2r5s2h6k.11kh6sr7G2s7Gk2t7k2Gs7G2r7sh6k.12kh5r9G8k2t9k2G8r9h5k.13kh6r7s4G3s2km11ks2G3s4r7h6k.14kh5sr5s10km11ks10r5sh5k.16kh5s14k2m11k2s14h5k.16k3h5s14km11kt3s11h5k3.14kh9s13km5lm5t5s9h9k.12kh11s12k2ml7mk2t3s9h11k.10kh13s12k2l7k2s3ts8h13k.9kh14s6d6k2l5k2d6s6h14k.9kh12kh3s5d7k5d7s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "chewA": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s5e3s5G2s3G2s5e3s5G4s5h3k.12kh3shs2G2s2G2s4e5s4G7s4e5s4G2s2G2s2hsh3k.11ks11Gs4e2s3e2s4Gs3Gs4e2s3e2s4Gs11k.10ks12Gs3e2s5e2s3Gs3Gs3e2s5e2s3Gs12k.8ks13Gs3es7es3Gs3Gs3es7es3Gs13k.6ks14G2s13G2s3G2s13G2s14k.5ks14G2s13G2s3G2s13G2s14k.5ks15G2s11G2s5G2s11G2s15k.5ks11r5G2s9G2s7G2s9G2r5s11k.4ks11r7G2s7G2s9G2s7G2r7s11k.4ks9r9G9s11G9r9s9k.5ks10r7s4G3s4es7es4G3s4r7s10k.5ks11r5s13e7s13r5s11k.5ks65k.6ks63k.8ks9h2s39h2s9k.10ks7h4s37h4s7k.10kh4sh8s35h8sh4k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "chewB": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s5e3s5G2s3G2s5e3s5G4s5h3k.12kh2sh2s2G2s2G2s4e5s4G7s4e5s4G2s2G2s2h2sh2k.9k2s12Gs4e2s3e2s4Gs3Gs4e2s3e2s4Gs12k2.6ks14Gs3e2s5e2s3Gs3Gs3e2s5e2s3Gs14k.4ks15Gs3es7es3Gs3Gs3es7es3Gs15k.3ks15G2s13G2s3G2s13G2s15k.2ks16G2s13G2s3G2s13G2s16k.ks17G2s11G2s5G2s11G2s17k.ks13r5G2s9G2s7G2s9G2r5s13k2s13r7G2s7G2s9G2s7G2r7s13.ks11r9G9s11G9r9s11k.ks12r7s4G3s17G3s4r7s12k.ks13r5s13es7es11r5s13k.2ks31e7s29k.3ks67k.4ks11h2s39h2s11k.6k2s7h5s37h5s7k2.8kh3sh9s35h9sh3k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "joy": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s12J4s16J4s9h7k.11kh5s11J4s16J4s14h5k.11kh5s49h5k.11kh5s13G3s17G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s5e3s5G2s3G2s5e3s5G4s5h3k.12kh5s2G2s2G2s4e5s4G7s4e5s4G2s2G2s2h5k.11kh5s6Gs4e2s3e2s4Gs3Gs4e2s3e2s4Gs6h5k.11kh5s6Gs3e2s5e2s3Gs3Gs3e2s5e2s3Gs6h5k.11kh5s6Gs3es7es3Gs3Gs3es7es3Gs6h5k.11kh5s6G2s13G2s3G2s13G2s6h5k.11kh5s6G2s13G2s3G2s13G2s6h5k.11kh5s7G2s11G2s5G2s11G2s7h5k.11kh6s2r5G2s9G2s7G2s9G2r5s2h6k.11kh6sr7G2s7G2s9G2s7G2r7sh6k.12kh5r9G6k2t13k2G6r9h5k.13kh6r7s4G3skt13ksG3s4r7h6k.14kh5sr5s9km13ks9r5sh5k.16kh5s14km13ks14h5k.16k3h5s14km11ks14h5k3.14kh9s13k2ml7mk2s13h9k.12kh11s13k2l7k2s13h11k.10kh13s14k7s14h13k.9kh14s6d10kd10s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "choke": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh8qh4k.12kh11H9h3Jh10Jh9Jh8qh5k.11kh13JhHh7Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh6q5h3k.11kh13Jh30Jh7q3h4k.11khqh17s21h12q3h4k.11kq3h9s35h6qh5k.11kq3h4s45h7k.11kq3h2s16J2s13J2s16h5k.11khqh3s14J3s15J3s14h5k.11kh5s12JG3s17G3Js12h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2wes9G2s5G2ws8esG2s7h4k.13kh3s5G4s2e2s9G2s3G2s9e2s2G4s5h3k.12kh3shs2G2s2G2s3e2s8G7s8e2s3G2s2G2s2hsh3k.11ks11Gs5e3s7Gs3Gs7e3s5Gs11k.10ks12Gs6e2s7Gs3Gs7e2s6Gs12k.8ks13Gs5e3s7Gs3Gs7e3s5Gs13k.6ks14G2s3e2s8G2s3G2s8e2s3G2s14k.5ks14G2s2e2s9G2s3G2s9e2s2G2s14k.5ks15G2ses9G2s5G2s9esG2s15k.5ks16G2s9G2s7G2s9G2s16k.4ks18G2s7Gk2t7k2Gs7G2s18k.4ks18G8k2t9k2G8s18k.5ks21G3s2km11ks2G3s21k.5ks26km11ks26k.5ks25k2m11k2s25k.6ks25km11ks25k.8ks9h2s13km5lm5ks13h2s9k.10ks7h4s12k2ml7mk2s12h4s7k.10kh4sh8s12k2l7k2s12h8sh4k.9kh14s6d6k2l5k2d6s6h14k.9kh12kh3s5d7k5d7s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W9T5R5T3kT7k.18kT12R5T6W7T6R5T12k.16kT12R6T7W5T7R5T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "drink": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s13G2s3G2s13G4s5h3k.12kh3shs2G2s2G2s13G7s13G2s2G2s2hsh3k.11ks11Gs15Gs3Gs15Gs11k.10ks12Gs5e5s5Gs3Gs5e5s5Gs12k.8ks13Gs4e7s4Gs3Gs4e7s4Gs13k.6ks14G2s2e2s5e2s2G2s3G2s2e2s5e2s2G2s14k.5ks14G2s2es7es2G2s3G2s2es7es2G2s14k.5ks15G2s11G2s5G2s11G2s15k.5ks11r5G2s9G2s7G2s9G2r5s11k.4ks11r7G2s4cw17cs4G2r7s11k.4ks9r9G5cw17cG5r9s9k.5ks10r7s4G2c19G2s4r7s10k.5ks11r5s7c4wc14s7r5s11k.5ks23c4wc14s23k.6ks23c3wc13s23k.8ks9h2s11c3wc13s11h2s9k.10ks7h4s10c3wc13s10h4s7k.10kh4sh8s9cv2wv12cs9h8sh4k.9kh14s3S5cv2wv12cS5s3h14k.9kh12kh3S7v2wv12S7h3kh12k.9kh11k.k2S9vwv11S9k2.kh11k.9kh11k.2kS9vwv11S9k.2kh11k.10kh9k.3kS9vwv11S9k.3kh9k.12kh7k.4kS9vwv11S9k.4kh7k.14k7.5kS9vwv11S9k.5k7.28kS7cv13cS7k.42kS5Tcv13cTS5k.35k.5k2TR3T5v11T5R3Tk2.5k.24k3Tk3.kT2R3T7v9T7R3T2k.k3Tk3.20kT7kT3R2T9W7T9R2T3kT7k.18kT12R3T8W7T8R3T12k.16kT12R5T8W5T8R4T13k.15kT12R6T8W3T8R5T13k.14kT13R5T10WT9R6T13k.14kT11R6T20R6T12k.15kT11R6T21R5T12k.16kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "full": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh13k.12kh11H9h3Jh10Jh9Jh14k.11kh13JhHh7Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh9Jh10Jh9Jh14k.11kh13Jh30Jh14k.11kh19s21h19k.11kh12s35h12k.11kh7s45h7k.11kh5s49h5k.11kh5s14J4s16J4s11h5k.11kh5s11J2G3s15J2G3s13h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2ws10G2s5G2ws10G2s7h4k.13kh3s5G4s13G2s3G2s13G4s5h3k.12kh5s2G2s2G2s13G7s13G2s2G2s2h5k.11kh5s6Gs15Gs3Gs15Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6Gs3e9s3Gs3Gs3e9s3Gs6h5k.11kh5s6G2s2e9s2G2s3G2s2e9s2G2s6h5k.11kh5s6G2s3ewe5s3G2s3G2s3ewe5s3G2s6h5k.11kh5s7G2s2e7s2G2s5G2s2e7s2G2s7h5k.11kh6s2r5G2s3e3s3G2s7G2s3e3s3G2r5s2h6k.11kh6sr7G2s7G2s9G2s7G2r7sh6k.12kh5r9G9s11G9r9h5k.13kh6r7s4G3s2e2s9e2s2G3s4r7h6k.14kh5sr5s12e2s5e2s12r5sh5k.16kh5s19e5s19h5k.16k3h5s41h5k3.14kh9s39h9k.12kh11s37h11k.10kh13s35h13k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W13T2R5k.35k.5k2TR5T3W11T3R5Tk2.5k.24k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.20kT7kT3R5T5W4TW4T5R5T3kT7k.18kT12R5T19R5T12k.16kT12RS5T23RT13k.15kT11S9T35k.14kT12SdS7T36k.14kT10S2dS8T34k.15kT10S2dS8T34k.16kT9S11T33k.18kTUT7S9T31UTk.20kT8S9T32k.20kT11S5T35k.18kT53k.17kT53k.8", "brain": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh8qh4k.12kh11H9h3Jh10Jh9Jh8qh5k.11kh13JhHh7Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh6q5h3k.11kh13Jh30Jh7q3h4k.11khqh17s21h12q3h4k.11kq3h9s35h6qh5k.11kq3h4s45h7k.11kq3h2s16J2s13J2s16h5k.11khqh3s14J3s15J3s14h5k.11kh5s12JG3s17G3Js12h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2wes9G2s5G2ws8esG2s7h4k.13kh3s5G4s2e2s9G2s3G2s9e2s2G4s5h3k.12kh5s2G2s2G2s3e2s8G7s8e2s3G2s2G2s2h5k.11kh5s6Gs5e3s7Gs3Gs7e3s5Gs6h5k.11kh5s6Gs6e2s7Gs3Gs7e2s6Gs6h5k.11kh5s6Gs5e3s7Gs3Gs7e3s5Gs6h5k.11kh5s6G2s3e2s8G2s3G2s8e2s3G2s6h5k.11kh5s6G2s2e2s9G2s3G2s9e2s2G2s6h5k.10k2h5s7G2ses9G2s5G2s9esG2s7h5k2.8kS5h3s2q5G2s9G2s7G2s9G2q5s2h3S5k.6kSdS3dSh2sq7G2s7G2s4ks4G2s7G2q7sh2SdS3dSk.4kS2dS3dS2hq9G9s3k2mk2s3G9q9hS2dS3dS2k.2kS3dS3dS3hq7s4G3s6km3ks6G3s4q7hS3dS3dS3k.kS11hsq5s13km5ks13q5shS11k.kS11h2s18km5ks18h2S11k.kS11h3s17kml3mks17h3S11k.kS11h4s17kl3ks17h4S11k.2kS9h6s16k2lk2s16h6S9k.3kTS7h8s17ks17h8S7k.4kT2S5h10s6d21s6h10S5Tk.3kT7h9kh3s5d19s5h3kh8T7k.2kT7h8k.k3h2s4d17s4h2k3.kh7T7k.2kT7h8k.4k4hs3d13s3hk4.4kh7T7k.2kT7h7k.9k5d11k5.9kh6T7k.2kT7h6k.14kd11k.14kh5T7k.2kT6k7.14k2d11k2.14k6T6k.2kT6k.14k6W15k6.13kT6k.kT7k.13kR5T2W13T2R5k.12kT7k2T7k.5k.5k2TR5T3W11T3R5Tk2.5k.4kT7k2T7k.2k3Tk3.kT2R5T5W9T4R6T2k.k3Tk3.kT7k2T7k.kT7kT3R5T5W9T5R5T3kT7k2T7k2T7k2T12R5T6W7T6R5T12kT7k2T6k2T12R6T7W5T7R5T13kT6k2T6k2T12R6T8W3T8R5T13kT6k2T6kT13R5T10WT9R6T19k2T6k2T11R6T20R6T12kT6k.k6.kT11R6T21R5T12k7.10kT10R5T22R6T10k.18kTU7TR5T22R6TU7Tk.20kU7R6T22R6TU7k.21kU7R6T22R6TU7k.21kU49k.20kT7R6T24R6T8k.9", "stuffed": ".316k17.52k3h17k3.46k3h23k3.41k2h29k2.37k2h33k2.34kh37k.32kh39k.30kh41k.27k2h43k2.24kh23Hh23k.22kh13H23h13k.21kh9H31h9k.20kh9H33h9k.18kh11H31h11k.17kh15H23h15k.16kh21Jh5Hh4Jh22k.15kh11JhHh7Jh10Jh9Jh12k.14kh10H9h3Jh10Jh9Jh13k.13kh9H11h2Jh10Jh9Jh8qh4k.12kh11H9h3Jh10Jh9Jh8qh5k.11kh13JhHh7Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh7q3h4k.11kh13Jh9Jh10Jh9Jh6q5h3k.11kh13Jh30Jh7q3h4k.11khqh17s21h12q3h4k.11kq3h9s35h6qh5k.11kq3h4s45h7k.11kq3h2s16J2s13J2s16h5k.11khqh3s14J3s15J3s14h5k.11kh5s12JG3s17G3Js12h5k.11kh5s10G9s11G9s10h5k.11kh5s9G2ws6G2s9G2ws6G2s9h5k.12kh4s8G2ws8G2s7G2ws8G2s8h4k.13kh4s7G2wes9G2s5G2ws8esG2s7h4k.13kh3s5G4s2e2s9G2s3G2s9e2s2G4s5h3k.12kh5s2G2s2G2s3e2s8G7s8e2s3G2s2G2s2h5k.11kh5s6Gs5e3s7Gs3Gs7e3s5Gs6h5k.11kh5s6Gs6e2s7Gs3Gs7e2s6Gs6h5k.11kh5s6Gs5e3s7Gs3Gs7e3s5Gs6h5k.11kh5s6G2s3e2s8G2s3G2s8e2s3G2s6h5k.11kh5s6G2s2e2s9G2s3G2s9e2s2G2s6h5k.11kh5s7G2ses9G2s5G2s9esG2s7h5k.11kh6s7G2s9G2s7G2s9G2s7h6k.11kh6s8G2s7G2s4ks4G2s7G2s8h6k.12kh5s9G9s3k2mk2s3G9s9h5k.13kh6s11G3s6km3ks6G3s11h6k.14kh5s19km5ks19h5k.16kh5s18km5ks18h5k.16k3h5s17kml3mks17h5k3.14kh9s17kl3ks17h9k.12kh11s16k2lk2s16h11k.10kh13s17ks17h13k.9kh14s6d21s6h14k.9kh12kh3s5d19s5h3kh12k.9kh11k.k3h2s4d17s4h2k3.kh11k.9kh11k.4k4hs3d13s3hk4.4kh11k.10kh9k.9k5d11k5.9kh9k.12kh7k.14kd11k.14kh7k.14k7.14k2d11k2.14k7.30k6W15k6.44kR5T2W6TW6T2R5k.35k.5k2TR5T17R5Tk2.5k.24k3Tk3.kT2R2T25R2T2k.k3Tk3.20kT7kT35kT7k.18kT53k.16kT55k.15kT55k.14kT57k.14kT55k.15kT55k.16kT53k.18kT51k.19kT51k.19kT51k.18kT53k.17kT53k.8"}};
+
+/* ---- dofu_bowl.js ---- */
+var DofuBowl = {"w": 76, "h": 50, "cy": 18, "styles": [{"pal": {"k": "#a9d3dd", "a": "#c4e5eb", "b": "#bde1e8", "c": "#bde1e8", "y": "#e3ecd0", "w": "#ffffff", "f": "#ffffff", "g": "#ffffff", "n": "#eaf4f6", "p": "#ffffff", "q": "#e45a9a", "Q": "#f59ac0", "Z": "#c75a8f", "o": "#26262c", "O": "#9a9aa8", "i": "#a9d3dd", "r": "#bfe3ea"}, "f": [".20o5.o2w2o5.9ow2o4.44ow2o5Oo7.8o2w2o5.42o2w2o13.2o5.oOo7.42oOo12Oo2.ow2o13.36o5.o19w2o10Oo2.3o5.27ow2o10Oo9goOo15.2ow2o4.25o2w2o13fo5g2o16k.o2w2o5.24oOo14fg8o6Oo2go5f2koOo7.24o9fo5fg9o9g3o5fo9k2.22o6Oo2g4rf2g10o7p3ow2o10Oo2f2k2.20o9g4f3g10po5p3o2w2o13f4k.18kfo7g4r2f3g9p9oOo14f6k.16kf2go5g6nf5g7p9o9go5g2f6k.14krf2g12rnf7g6p7o6Oo2p8f6rk.13kf3g10pr3nf19o9p10f5k.12kr2f3g9p4r5f12r3fo7p11f4r2k.11k2nf5g7p5n4r4f12no5p12f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb3Qqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb3Qqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".27ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.8o9.42o17.2w2o3.oOo7.42oOo12Oo2.ow2o13.36w2o3.o31Oo2.3w2o3.27ow2o10Oo9foOo15.2ow2o4.25o17k2o3g3o16.2o9.24oOo14kf2g6o6Oo2f2o3fk.2oOo7.24o9k2o3k2fg8o9g2f5k2o9.24o6Oo2f8g9o7p2gf7o6Oo2k.23o9g5rf2g10po3p7f4ro9fk2.22o7g6rf4g7p13f3rgo7f4k.20kfgo3g8rnf5g6p11f2r3g3o3g2f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb3Qqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b3Qqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".28w2o3.14o.50o.4ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.4o.3o9.42o17.2w2o3.oOo7.38o.3oOo12Oo2.ow2o13.36w2o3.o16.o14Oo2.35ow2o10Oo9koOo14.35o16.3o3kf2o16.35oOo14.2k2fg4o6Oo2f2o3.37o9.2o3k4fg7o7gf5k5.32o6Oo2k8fg8o7g2f5k10.27o7f8rf2g9o3p6f3rf8k5.22ko7g8rf4g6p11f2r2g5f5k5.17k4io3g6r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b3Qqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b3Qqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".29o3.71ow2o4.63o3.3ow2o4.61ow2o5Oo7.60ow2o13.59oOo12Oo2.54o3.2o17.52ow2o10Oo9.53ow2o13.o5.53oOo14.4o.3k9.43o9.o5k9g5f4k11.32o6Oo2k3ok7g13f4k13.26o9k3i7g15f4i7k9.22ko7i10f2g13f6i12k6.17k4o5i2g5f3r2f5g5f9r2g4f4i7k4.14k3i4og13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b21Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".249o3.71ow2o4.68o2w2o5.67oOo7.62o3.2o9.60ow2o10Oo2.59o2w2o13.11k.47oOo14k28.32o9ko5k13ik21.26o6Oo2k3i10g9f3i11k9.22o9i11g13f3i15k6.17k3o7i11rf2g9f6ri17k4.14k3i2o5i7b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb5k18Q2qk10b4c2b2cbc5bck.9kb10q3b20Qq4b9cbc5b2cbcb2c3k.10kb10q2b21Qqb11cbc7bc2b2c4k.11kb32q3b10cbc5b2c3bc4k.12kb32q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"], "n": [".190k.68k7fk7.58k3f15k3.53k2f4g9f8k2.48k.kf3g15f7k.k.38k7fkf2g19f6kfk7.28k3f10g21f14k3.23k2f4g6rf2g12p9f6rg2f8k2.20kf3g9f3g10p13f5g5f7k.18kf2g10r2f3g9p13f4r2g6f6k.16kf2g12nf5g7p13f4ng8f6k.14krf2g12rnf7g6p9f3r2nrp8f6rk.13kf3g10pr3nf19r5fn2p11f5k.12kr2f3g9p4r5f12r3f4n3p12f4r2k.11k2nf5g7p5n4r4f12n5p13f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb3Qqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb3Qqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".412k13.60k3f13k3.55k2f2g11f6k2.52kf2g15f6k.42k9fg19f5k9.30k3f10g13p5gf14k3.25k2f2g8rf2g10p11f4rg4f6k2.22kf2g10rf4g7p13f3rg6f6k.20kfg12rnf5g6p11f2r3g8f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb3Qqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b3Qqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".565k11.62k3f11k3.57k2fg11f5k2.50k5fg15f5k5.39k10fg17f5k10.29k5f8rf2g9p9f3rf8k5.22k5fg10rf4g6p11f2r2g5f5k5.17k4ifg8r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b3Qqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b3Qqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".718k9.56k11g5f4k11.39k13g13f4k13.29k9i7g15f4i7k9.22k6i12f2g13f6i12k6.17k4i7g5f3r2f5g5f9r2g4f4i7k4.14k3i5g13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b21Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i10g9f3i11k9.22k6i14g13f3i15k6.17k4i17rf2g9f6ri17k4.14k3i14b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb5k18Q2qk10b4c2b2cbc5bck.9kb10q3b20Qq4b9cbc5b2cbcb2c3k.10kb10q2b21Qqb11cbc7bc2b2c4k.11kb32q3b10cbc5b2c3bc4k.12kb32q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"]}, {"pal": {"k": "#8fc3d3", "a": "#cde9ef", "b": "#bde1e8", "c": "#a9d3dd", "y": "#e3ecd0", "w": "#ffffff", "f": "#ffffff", "g": "#ffffff", "n": "#f3e1e6", "p": "#fbe6ee", "q": "#e45a9a", "Q": "#f59ac0", "Z": "#b83a78", "o": "#26262c", "O": "#9a9aa8", "i": "#a9d3dd", "r": "#e7a3bb"}, "f": [".20o5.o2w2o5.9ow2o4.44ow2o5Oo7.8o2w2o5.42o2w2o13.2o5.oOo7.42oOo12Oo2.ow2o13.36o5.o19w2o10Oo2.3o5.27ow2o10Oo9goOo15.2ow2o4.25o2w2o13fo5g2o16k.o2w2o5.24oOo14fg8o6Oo2go5f2koOo7.24o9fo5fg9o9g3o5fo9k2.22o6Oo2g4rf2g10o7p3ow2o10Oo2f2k2.20o9g4f3g10po5p3o2w2o13f4k.18kfo7g4r2f3g9p9oOo14f6k.16kf2go5g6nf5g7p9o9go5g2f6k.14krf2g12rnf7g6p7o6Oo2p8f6rk.13kf3g10pr3nf19o9p10f5k.12kr2f3g9p4r5f12r3fo7p11f4r2k.11k2nf5g7p5n4r4f12no5p12f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb2wQqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb2wQqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2wc3bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c3w2c6bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c4w2c10bc3bQqc12bc2bc5bc2k.21k2bc8wcwc5bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".27ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.8o9.42o17.2w2o3.oOo7.42oOo12Oo2.ow2o13.36w2o3.o31Oo2.3w2o3.27ow2o10Oo9foOo15.2ow2o4.25o17k2o3g3o16.2o9.24oOo14kf2g6o6Oo2f2o3fk.2oOo7.24o9k2o3k2fg8o9g2f5k2o9.24o6Oo2f8g9o7p2gf7o6Oo2k.23o9g5rf2g10po3p7f4ro9fk2.22o7g6rf4g7p13f3rgo7f4k.20kfgo3g8rnf5g6p11f2r3g3o3g2f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb2wQqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b2wQqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc3w2c3bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3q4c11bc2bc5bc2k.21k2bc8wcwc5bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".28w2o3.14o.50o.4ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.4o.3o9.42o17.2w2o3.oOo7.38o.3oOo12Oo2.ow2o13.36w2o3.o16.o14Oo2.35ow2o10Oo9koOo14.35o16.3o3kf2o16.35oOo14.2k2fg4o6Oo2f2o3.37o9.2o3k4fg7o7gf5k5.32o6Oo2k8fg8o7g2f5k10.27o7f8rf2g9o3p6f3rf8k5.22ko7g8rf4g6p11f2r2g5f5k5.17k4io3g6r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b2wQqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b2wQqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb13wb15qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".29o3.71ow2o4.63o3.3ow2o4.61ow2o5Oo7.60ow2o13.59oOo12Oo2.54o3.2o17.52ow2o10Oo9.53ow2o13.o5.53oOo14.4o.3k9.43o9.o5k9g5f4k11.32o6Oo2k3ok7g13f4k13.26o9k3i7g15f4i7k9.22ko7i10f2g13f6i12k6.17k4o5i2g5f3r2f5g5f9r2g4f4i7k4.14k3i4og13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b3w2b16Qqb3q2b8c4b2c4bcbcbk.13kb13w2b16q3b10cbc4bcbc2bc2bck.15kb13wb16q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".249o3.71ow2o4.68o2w2o5.67oOo7.62o3.2o9.60ow2o10Oo2.59o2w2o13.11k.47oOo14k28.32o9ko5k13ik21.26o6Oo2k3i10g9f3i11k9.22o9i11g13f3i15k6.17k3o7i11rf2g9f6ri17k4.14k3i2o5i7b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb2w2bk18Q2qk10b4c2b2cbc5bck.9kb10q3bw2b17Qq4b9cbc5b2cbcb2c3k.10kb10q2b2wbwb16Qqb11cbc7bc2b2c4k.11kb14w2b16q3b10cbc5b2c3bc4k.12kb14w2b16q2b13c4b2c4bcbcbk.13kb13w2b29cbc4bcbc2bc2bck.15kb13wb28cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb15w2bk31b4c2b2cbc5bck.9kb14w2b31cbc5b2cbcb2c3k.10kb14wbwb29cbc7bc2b2c4k.11kb14w2b29cbc5b2c3bc4k.12kb14w2b31c4b2c4bcbcbk.13kb13w2b29cbc4bcbc2bc2bck.15kb13wb28cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"], "n": [".190k.68k7fk7.58k3f15k3.53k2f4g9f8k2.48k.kf3g15f7k.k.38k7fkf2g19f6kfk7.28k3f10g21f14k3.23k2f4g6rf2g12p9f6rg2f8k2.20kf3g9f3g10p13f5g5f7k.18kf2g10r2f3g9p13f4r2g6f6k.16kf2g12nf5g7p13f4ng8f6k.14krf2g12rnf7g6p9f3r2nrp8f6rk.13kf3g10pr3nf19r5fn2p11f5k.12kr2f3g9p4r5f12r3f4n3p12f4r2k.11k2nf5g7p5n4r4f12n5p13f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb2wQqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb2wQqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2wc3bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c3w2c6bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c4w2c10bc3bQqc12bc2bc5bc2k.21k2bc8wcwc5bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".412k13.60k3f13k3.55k2f2g11f6k2.52kf2g15f6k.42k9fg19f5k9.30k3f10g13p5gf14k3.25k2f2g8rf2g10p11f4rg4f6k2.22kf2g10rf4g7p13f3rg6f6k.20kfg12rnf5g6p11f2r3g8f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb2wQqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b2wQqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc3w2c3bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3q4c11bc2bc5bc2k.21k2bc8wcwc5bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".565k11.62k3f11k3.57k2fg11f5k2.50k5fg15f5k5.39k10fg17f5k10.29k5f8rf2g9p9f3rf8k5.22k5fg10rf4g6p11f2r2g5f5k5.17k4ifg8r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b2wQqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b2wQqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb13wb15qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".718k9.56k11g5f4k11.39k13g13f4k13.29k9i7g15f4i7k9.22k6i12f2g13f6i12k6.17k4i7g5f3r2f5g5f9r2g4f4i7k4.14k3i5g13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b3w2b16Qqb3q2b8c4b2c4bcbcbk.13kb13w2b16q3b10cbc4bcbc2bc2bck.15kb13wb16q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i10g9f3i11k9.22k6i14g13f3i15k6.17k4i17rf2g9f6ri17k4.14k3i14b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb2w2bk18Q2qk10b4c2b2cbc5bck.9kb10q3bw2b17Qq4b9cbc5b2cbcb2c3k.10kb10q2b2wbwb16Qqb11cbc7bc2b2c4k.11kb14w2b16q3b10cbc5b2c3bc4k.12kb14w2b16q2b13c4b2c4bcbcbk.13kb13w2b29cbc4bcbc2bc2bck.15kb13wb28cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb15w2bk31b4c2b2cbc5bck.9kb14w2b31cbc5b2cbcb2c3k.10kb14wbwb29cbc7bc2b2c4k.11kb14w2b29cbc5b2c3bc4k.12kb14w2b31c4b2c4bcbcbk.13kb13w2b29cbc4bcbc2bc2bck.15kb13wb28cbc2bcb2cbc2bc3k.17kcb2cbc3bc3w2c3bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc3w2c6bc4b2c15bc2b2c4bcbc2k.19kbc2b2c6w2c10bc3bc14bc2bc5bc2k.21k2bc8wcwc5bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcw2bc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"]}, {"pal": {"k": "#1d1612", "a": "#fbe98a", "b": "#fbe785", "c": "#f2d96a", "y": "#e3ecd0", "w": "#ffffff", "f": "#f6e3ea", "g": "#fbeef2", "n": "#ecd9e0", "p": "#f3d3de", "q": "#e45a9a", "Q": "#f59ac0", "Z": "#b83a78", "o": "#4a4a52", "O": "#8c8c98", "i": "#a9d3dd", "r": "#1d1612"}, "f": [".19k8ow2o4k2.7k2w2o3k2.42k2w2o3k2Oo6k2.k7ow2o4k2.40k2ow2o4ko7k10Oo6k2.35k7Oo6ko5Ook3w2o3k2o7k2.2k5.27k8o7ko7k2ow2o4ko5Ook2.k7.25k2w2o3k2o5Ook2o5kgkOo6ko7k4w2o3k2.23k2ow2o4ko7kfk5g2ko7k2o5k4ow2o4k2.22k2Oo6k2o5kfg8ko5Ookgk5f2k2Oo6k2.22k2o7kfk5fg9ko7kg3k5fko7k3.21k2o5Ookg4rf2g10ko5kp3kw2o3k2o5Ookf2k2.19k2o7kg4f3g10pk5p3kow2o4ko7kf4k.18kfko5kg4r2f3g9p9kOo6k2o5kf6k.16kf2gk5g6nf5g7p9ko7kgk5g2f6k.14krf2g12rnf7g6p7ko5Ookp8f6rk.13kf3g10pr3nf19ko7kp10f5k.12kr2f3g9p4r5f12r3fko5kp11f4r2k.11k2nf5g7p5n4r4f12nk5p12f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb3Qqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb3Qqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".20k5.k2w2o3k2.9kw2k4.44kw2k5o7k2.7k2w2o3k2.42k2w2o3k2Oo6k2.k7o7k2.40k2o7ko7k3w2k5Oo6k2.35k7Oo6ko5Ook3w2o3k2o7k2.2k5.27kw2k5o7k2o5k3o7ko5Ook2.kw2k4.25k2w2o3k2o5Ook3o3k2fkOo6k2o5k5w2o3k2.23k2o7k2o5k7g3ko7k3o3k5o7k2.22k2Oo6k3o3k3f2g6ko5Ookf2k3fk.k2Oo6k2.22k2o7k8fg8k2o5k2g2f5k3o7k2.22k2o5Ookf8g9k2o3k2p2gf7ko5Ook2.22k3o5k2g5rf2g10pk3p7f4rk2o5k2fk2.21k3o3k2g6rf4g7p13f3rgk2o3k2f4k.20kfgk3g8rnf5g6p11f2r3g3k3g2f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb3Qqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b3Qqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".22k.4kw2ok3.11k5.46k5.k2w2o3k2.9kw2ok3.44kw2ok4o7k2.3k.3k2w2o3k2.42k2w2o3k2Oo6k2.k7o7k2.37k.2k2o7ko7k3w2ok4Oo6k2.35k7Oo6ko5Ook3w2o3k2o7k2.34kw2ok4o7k2o5k3o7ko5Ook2.33k2w2o3k2o5Ook3o3k4Oo6k2o5k2.33k2o7k2o5k8f2ko7k3o3k3.33k2Oo6k3o3k3.k2fg4ko5Ookf2k5.34k2o7k10fg7ko5kgf5k5.31k2o5Ook9fg8k2o3k2g2f5k10.26k2o5kf8rf2g9k3p6f3rf8k5.22k3o3k2g8rf4g6p11f2r2g5f5k5.17k4ik3g6r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b3Qqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b3Qqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".27k7.63k3.2k2w2o2k3.60k9w2o3k2.59k2w2o2k3Oo6k2.58k2w2o3k2o7k2.53k3.k2Oo6ko5Ook2.51k8o7ko7k2.50k2w2o2k3o5Ook2o5k2.51k2w2o3k2o7k4ok3.51k2Oo6k2o5k2.k5.k9.42k2o7k4ok11g5f4k11.31k2o5Ook12g13f4k13.25k2o7k4i7g15f4i7k9.22k2o5ki10f2g13f6i12k6.17k6ok2i2g5f3r2f5g5f9r2g4f4i7k4.14k3i4kg13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b21Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".173k3.71k7.68k2w2o2k3.66k3w2o3k3.61k3.k2Oo6k2.59k8o7k2.58k2w2o2k3o5Ook2.57k3w2o3k2o7k2.10k.46k2Oo6k2o5k29.31k2o7k20ik21.25k2o5Ook4i10g9f3i11k9.21k2o7ki11g13f3i15k6.17k4o5ki11rf2g9f6ri17k4.14k3i2k5i7b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb5k18Q2qk10b4c2b2cbc5bck.9kb10q3b20Qq4b9cbc5b2cbcb2c3k.10kb10q2b21Qqb11cbc7bc2b2c4k.11kb32q3b10cbc5b2c3bc4k.12kb32q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"], "n": [".190k.68k7fk7.58k3f15k3.53k2f4g9f8k2.48k.kf3g15f7k.k.38k7fkf2g19f6kfk7.28k3f10g21f14k3.23k2f4g6rf2g12p9f6rg2f8k2.20kf3g9f3g10p13f5g5f7k.18kf2g10r2f3g9p13f4r2g6f6k.16kf2g12nf5g7p13f4ng8f6k.14krf2g12rnf7g6p9f3r2nrp8f6rk.13kf3g10pr3nf19r5fn2p11f5k.12kr2f3g9p4r5f12r3f4n3p12f4r2k.11k2nf5g7p5n4r4f12n5p13f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6kb8Qq2Q4q4i32k8Qq4Qq2ck.7kb7Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb8Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kb6Qq3Qqb3Qqb15qQq3Qq3b6cbc5b2cQq2bq4k.9kb6q4Qqb3Qqb16Qq4Qqb6cbc7bcq3cq4k.10kb5q3Qq2b3Qqb15qQq2b2Qqb6cbc5b2c3q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".412k13.60k3f13k3.55k2f2g11f6k2.52kf2g15f6k.42k9fg19f5k9.30k3f10g13p5gf14k3.25k2f2g8rf2g10p11f4rg4f6k2.22kf2g10rf4g7p13f3rg6f6k.20kfg12rnf5g6p11f2r3g8f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6kb8Qq2Q4q3i33k8Qq4Qq2ck.7kb8Qq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb7Qq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kb6q4Qqb3Qqb16Qq3Qq2b7cbc5b2cq3bq4k.9kb6q3Qq2b3Qqb15qQq4Qqb6cbc7bc2q2c2q2k.11kb6q2Qq2b3Qqb15Qq3b2Qqb6cbc5b2c3bc4k.12kb8qQqb2Qq2b15Qq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".565k11.62k3f11k3.57k2fg11f5k2.50k5fg15f5k5.39k10fg17f5k10.29k5f8rf2g9p9f3rf8k5.22k5fg10rf4g6p11f2r2g5f5k5.17k4ifg8r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6kb8Qq2Q3q3ki33k8Qq3Qq3ck.7kb7Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb7q4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kb6q3Qq2b3Qqb16Qq3Qq2b7cbc5b2cbq2bcq2k.10kb7q2Qq2b3Qqb15qQq4Qqb6cbc7bc2b2c4k.11kb9Qqb2Qq2b15Qq3bQq2b6cbc5b2c3bc4k.12kb9q3bq3b15Qq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".718k9.56k11g5f4k11.39k13g13f4k13.29k9i7g15f4i7k9.22k6i12f2g13f6i12k6.17k4i7g5f3r2f5g5f9r2g4f4i7k4.14k3i5g13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6kb8Qq2kQ2qk3i33k8Qq6c2k.7kb7Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb7q3bQqb2Qq2k18Q2q2k9b4c2b2cq3c3bck.9kb6q3Qq2b2Qq2b16Qq3Qq2b7cbc5b2cbq2bc3k.10kb10Qqb2q3b16Qqb2Qq2b6cbc7bc2b2c4k.11kb9q3b2q2b16Qqb2q3b6cbc5b2c3bc4k.12kb9q2b21Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i10g9f3i11k9.22k6i14g13f3i15k6.17k4i17rf2g9f6ri17k4.14k3i14b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6kb9k3Q2qk3i33k9c2qc2bc2k.7kb11Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb10Q2qb5k18Q2qk10b4c2b2cbc5bck.9kb10q3b20Qq4b9cbc5b2cbcb2c3k.10kb10q2b21Qqb11cbc7bc2b2c4k.11kb32q3b10cbc5b2c3bc4k.12kb32q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"]}, {"pal": {"k": "#3b2a1e", "a": "#d6eef3", "b": "#c3e2e9", "c": "#8fc3d3", "y": "#e3ecd0", "w": "#ffffff", "f": "#f7efde", "g": "#fffbf0", "n": "#e3d2b6", "p": "#f3cdd3", "q": "#e45a9a", "Q": "#f59ac0", "Z": "#b83a78", "o": "#26262c", "O": "#9a9aa8", "i": "#a9d3dd", "r": "#7a5a4a"}, "f": [".20o5.o2w2o5.9ow2o4.44ow2o5Oo7.8o2w2o5.42o2w2o13.2o5.oOo7.42oOo12Oo2.ow2o13.36o5.o19w2o10Oo2.3o5.27ow2o10Oo9goOo15.2ow2o4.25o2w2o13fo5g2o16k.o2w2o5.24oOo14fg8o6Oo2go5f2koOo7.24o9fo5fg9o9g3o5fo9k2.22o6Oo2g4rf2g10o7p3ow2o10Oo2f2k2.20o9g4f3g10po5p3o2w2o13f4k.18kfo7g4r2f3g9p9oOo14f6k.16kf2go5g6nf5g7p9o9go5g2f6k.14krf2g12rnf7g6p7o6Oo2p8f6rk.13kf3g10pr3nf19o9p10f5k.12kr2f3g9p4r5f12r3fo7p11f4r2k.11k2nf5g7p5n4r4f12no5p12f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6ky3b2ybyQq2Q4q4i32k8Qq4Qq2ck.7kyby2b3Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb2y2b2y2Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kby2b3Qq3Qqy2bQqb2y2by2bybyb4qQq3Qq3b6cbc5b2cQq2bq4k.9kbyb2y2q4Qqby2Qqyb7yb7Qq4Qqb6cbc7bcq3cq4k.10kbyby2q3Qq2y2bQqb4y3b3ybybyqQq2b2Qqb6cbc5b2c3q2c2q2k.11kyb3ybq2Qq2b3Qqbybyb2yb4ybybQq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".27ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.8o9.42o17.2w2o3.oOo7.42oOo12Oo2.ow2o13.36w2o3.o31Oo2.3w2o3.27ow2o10Oo9foOo15.2ow2o4.25o17k2o3g3o16.2o9.24oOo14kf2g6o6Oo2f2o3fk.2oOo7.24o9k2o3k2fg8o9g2f5k2o9.24o6Oo2f8g9o7p2gf7o6Oo2k.23o9g5rf2g10po3p7f4ro9fk2.22o7g6rf4g7p13f3rgo7f4k.20kfgo3g8rnf5g6p11f2r3g3o3g2f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6ky3b2ybyQq2Q4q3i33k8Qq4Qq2ck.7kyby2b3yQq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb2y2b2yQq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kby2b3q4Qqy2bQqb2y2by2bybyb5Qq3Qq2b7cbc5b2cq3bq4k.9kbyb2y2q3Qq2by2Qqyb7yb6qQq4Qqb6cbc7bc2q2c2q2k.11kbyby3q2Qq2y2bQqb4y3b3ybybyQq3b2Qqb6cbc5b2c3bc4k.12kyb3yby2qQqb2Qq2bybyb2yb4ybybQq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".28w2o3.14o.50o.4ow2o4.11w2o3.46w2o3.o9.9ow2o4.44ow2o5Oo7.4o.3o9.42o17.2w2o3.oOo7.38o.3oOo12Oo2.ow2o13.36w2o3.o16.o14Oo2.35ow2o10Oo9koOo14.35o16.3o3kf2o16.35oOo14.2k2fg4o6Oo2f2o3.37o9.2o3k4fg7o7gf5k5.32o6Oo2k8fg8o7g2f5k10.27o7f8rf2g9o3p6f3rf8k5.22ko7g8rf4g6p11f2r2g5f5k5.17k4io3g6r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6ky3b2ybyQq2Q3q3ki33k8Qq3Qq3ck.7kyby2b3Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb2y2b2yq4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kby2b3q3Qq2y2bQqb2y2by2bybyb5Qq3Qq2b7cbc5b2cbq2bcq2k.10kbyb2y2bq2Qq2by2Qqyb7yb6qQq4Qqb6cbc7bc2b2c4k.11kbyby5bQqy2Qq2b4y3b3ybybyQq3bQq2b6cbc5b2c3bc4k.12kyb3yby2bq3bq3bybyb2yb4ybybQq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".29o3.71ow2o4.63o3.3ow2o4.61ow2o5Oo7.60ow2o13.59oOo12Oo2.54o3.2o17.52ow2o10Oo9.53ow2o13.o5.53oOo14.4o.3k9.43o9.o5k9g5f4k11.32o6Oo2k3ok7g13f4k13.26o9k3i7g15f4i7k9.22ko7i10f2g13f6i12k6.17k4o5i2g5f3r2f5g5f9r2g4f4i7k4.14k3i4og13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6ky3b2ybyQq2kQ2qk3i33k8Qq6c2k.7kyby2b3Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb2y2b2yq3bQqbyQq2k18Q2q2k9b4c2b2cq3c3bck.9kby2b3q3Qq2y2Qq2b2y2by2bybyb5Qq3Qq2b7cbc5b2cbq2bc3k.10kbyb2y2b3yQqbyq3yb7yb7Qqb2Qq2b6cbc7bc2b2c4k.11kbyby5bq3ybq2b4y3b3ybybybQqb2q3b6cbc5b2c3bc4k.12kyb3yby2bq2b3yb2ybyb2yb4ybyb2Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".249o3.71ow2o4.68o2w2o5.67oOo7.62o3.2o9.60ow2o10Oo2.59o2w2o13.11k.47oOo14k28.32o9ko5k13ik21.26o6Oo2k3i10g9f3i11k9.22o9i11g13f3i15k6.17k3o7i11rf2g9f6ri17k4.14k3i2o5i7b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6ky3b2ybybk3Q2qk3i33k9c2qc2bc2k.7kyby2b3yb3Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb2y2b2y3bQ2qbybybk18Q2qk10b4c2b2cbc5bck.9kby2b4yb2q3yby2b2y2by2bybyb5Qq4b9cbc5b2cbcb2c3k.10kbyb2y2b3yq2by3byb7yb7Qqb11cbc7bc2b2c4k.11kbyby5byby2byb5y3b3ybybybq3b10cbc5b2c3bc4k.12kyb3yby2byb4yb2ybyb2yb4ybyb2q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6ky3b2ybybk9i33k9c2bc2bc2k.7kyby2b3yb3yk21ik21bcbc2bc2bc2k.8kb2y2b2y3b2y2bybybk31b4c2b2cbc5bck.9kby2b4yb2y4by2b2y2by2bybyb19cbc5b2cbcb2c3k.10kbyb2y2b3y2b2y3byb7yb20cbc7bc2b2c4k.11kbyby5byby2byb5y3b3ybybyb14cbc5b2c3bc4k.12kyb3yby2byb4yb2ybyb2yb4ybyb17c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"], "n": [".190k.68k7fk7.58k3f15k3.53k2f4g9f8k2.48k.kf3g15f7k.k.38k7fkf2g19f6kfk7.28k3f10g21f14k3.23k2f4g6rf2g12p9f6rg2f8k2.20kf3g9f3g10p13f5g5f7k.18kf2g10r2f3g9p13f4r2g6f6k.16kf2g12nf5g7p13f4ng8f6k.14krf2g12rnf7g6p9f3r2nrp8f6rk.13kf3g10pr3nf19r5fn2p11f5k.12kr2f3g9p4r5f12r3f4n3p12f4r2k.11k2nf5g7p5n4r4f12n5p13f4nk2.9k3irnf7g6p5n10fn10g4p9f5nrik3.6kaki3n2f20n15f20n2i3kbk.5ka2ki2bn3f21n3bnbn3f21n3i3kbk.6ka2k2i2bn5f15n5b5n5f15n5i3k2bk.6ka3k3i2bn10fn10b9n10fn10Q3qk2b2k.6ka4k4i4n15b15n15iqQ5q3bk.6ka6k4Q4q2i3nb23i6ni7kq5Qq3bk.6ky3b2ybyQq2Q4q4i32k8Qq4Qq2ck.7kyby2b3Qq3Qq6k15iQ4q2k15bcbcQqc2Qq2k.8kb2y2b2y2Qq2Qq3Qq2k15qQ5q3k7b4c2b2cbQqcQq3k.9kby2b3Qq3Qqy2bQqb2y2by2bybyb4qQq3Qq3b6cbc5b2cQq2bq4k.9kbyb2y2q4Qqby2Qqyb7yb7Qq4Qqb6cbc7bcq3cq4k.10kbyby2q3Qq2y2bQqb4y3b3ybybyqQq2b2Qqb6cbc5b2c3q2c2q2k.11kyb3ybq2Qq2b3Qqbybyb2yb4ybybQq3b2Qqb8c4b2c4bcbcbk.13kb7qQqb2Qq2b15Qq3bQq2b6cbc4bcbc2bc2bck.15kb7Qqb2q3b15Qq3bq3b5cbc2bcb2cbc2bc3k.17kcb2cbcQqbc2q2c4bcbcbc6Qq2c3q2cbc3bcbc3bc5bcbk.18kc6q3c11bc4b2cqQqc11bc2b2c4bcbc2k.19kbc2b2q2c16bc3bQqc12bc2bc5bc2k.21k2bc16bc7qQq2c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bq4c2b2c9b2c2bcbk.27kc8bc6bcbcbcbcq4cbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".412k13.60k3f13k3.55k2f2g11f6k2.52kf2g15f6k.42k9fg19f5k9.30k3f10g13p5gf14k3.25k2f2g8rf2g10p11f4rg4f6k2.22kf2g10rf4g7p13f3rg6f6k.20kfg12rnf5g6p11f2r3g8f5k.17k2f2g10r3n2f13p5r5n2g3p5gf6k2.14k2rf2g10p3r5f12r3f3n3gp11f4rk2.12k2irf4g7p6n3r4f11n5gp13f3rik2.9k3i2rnf5g6p7n19g4p11f3nri2k3.6kaki4n2f13p5f2n13f10p5f5n2i4kbk.5ka2ki2b2n3f19n3b5n3f19n3i4kbk.6ka2k2i2b2n5f13n5b7n5f13n5i4k2bk.6ka3k3i2b2n19b11n19iQ3qk2b2k.6ka4k4i4bn13b17n13i3qQ4q2b2k.6ka6k5Q3q2i4b23i14k2q5Qq2bk.6ky3b2ybyQq2Q4q3i33k8Qq4Qq2ck.7kyby2b3yQq2Qq5k16ikQ3q2k15bcbcQqcQq3k.8kb2y2b2yQq3Qq3Qq2k16qQ3q3k8b4c2b2cQq2cq4k.9kby2b3q4Qqy2bQqb2y2by2bybyb5Qq3Qq2b7cbc5b2cq3bq4k.9kbyb2y2q3Qq2by2Qqyb7yb6qQq4Qqb6cbc7bc2q2c2q2k.11kbyby3q2Qq2y2bQqb4y3b3ybybyQq3b2Qqb6cbc5b2c3bc4k.12kyb3yby2qQqb2Qq2bybyb2yb4ybybQq3bQq2b8c4b2c4bcbcbk.13kb8Qqb2q3b15Qq3bq3b6cbc4bcbc2bc2bck.15kb7q3b2q2b15Qq2b3q2b5cbc2bcb2cbc2bc3k.17kcb2cbcq2bc8bcbcbc6qQqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cqQq2c10bc2b2c4bcbc2k.19kbc2b2c18bc3q4c11bc2bc5bc2k.21k2bc16bc7q4c2b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".565k11.62k3f11k3.57k2fg11f5k2.50k5fg15f5k5.39k10fg17f5k10.29k5f8rf2g9p9f3rf8k5.22k5fg10rf4g6p11f2r2g5f5k5.17k4ifg8r3grnf10p7r6g8f5ik4.14k3i2fg12r5f12r3f2n3g10f5i2k3.12k2i3rf2g9p5n2r4f10n5g4p9f3ri3k2.9k3i4rf4g6p8n17g5p11f2ri4k3.6kaki4brnf10p9fn11f9p9f2nri5kbk.5ka2ki2b3n3f17n3b7n3f17n3i5kbk.6ka2k2i2b3n5f11n5b9n5f11n5i5k2bk.6ka3k3i2b3n17b13n17i3Q2qk2b2k.6ka4k4i4b2n11b19n11i5Q4q2b2k.6ka6k6Q2qi5b23i14k3q4Qq2bk.6ky3b2ybyQq2Q3q3ki33k8Qq3Qq3ck.7kyby2b3Qq3Qq5k16ik2Q2qk16bcbQq2cq4k.8kb2y2b2yq4Qq3Qq2k17Q3q2k9b4c2b2cq3cq4k.9kby2b3q3Qq2y2bQqb2y2by2bybyb5Qq3Qq2b7cbc5b2cbq2bcq2k.10kbyb2y2bq2Qq2by2Qqyb7yb6qQq4Qqb6cbc7bc2b2c4k.11kbyby5bQqy2Qq2b4y3b3ybybyQq3bQq2b6cbc5b2c3bc4k.12kyb3yby2bq3bq3bybyb2yb4ybybQq3bq3b8c4b2c4bcbcbk.13kb8q2b3q2b15Qq2b3q2b6cbc4bcbc2bc2bck.15kb29qQq2b9cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc6q4c2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cq4c10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".718k9.56k11g5f4k11.39k13g13f4k13.29k9i7g15f4i7k9.22k6i12f2g13f6i12k6.17k4i7g5f3r2f5g5f9r2g4f4i7k4.14k3i5g13n2f17n2g9f4i5k3.12k2i6g15n5f9n5g11f4i6k2.9k3i5bf2g13f2n17g11f6i6k3.6kaki4b2r2f5g5f9rn9rf5g5f9r2i6kbk.5ka2ki2b4n2f17n2b9n2f17n2i6kbk.6ka2k2i2b4n5f9n5b11n5f9n5i6k2bk.6ka3k3i2b3n17b13n17i3Q2k3b2k.6ka4k4i4b3n9b21n9i7Q3q2b2k.6ka6k6Q2i6b23i14k4q2Qq3bk.6ky3b2ybyQq2kQ2qk3i33k8Qq6c2k.7kyby2b3Qq3Qq3kqk16ik2Q2k17bcbQq2cq3ck.8kb2y2b2yq3bQqbyQq2k18Q2q2k9b4c2b2cq3c3bck.9kby2b3q3Qq2y2Qq2b2y2by2bybyb5Qq3Qq2b7cbc5b2cbq2bc3k.10kbyb2y2b3yQqbyq3yb7yb7Qqb2Qq2b6cbc7bc2b2c4k.11kbyby5bq3ybq2b4y3b3ybybybQqb2q3b6cbc5b2c3bc4k.12kyb3yby2bq2b3yb2ybyb2yb4ybyb2Qqb3q2b8c4b2c4bcbcbk.13kb31q3b10cbc4bcbc2bc2bck.15kb30q2b10cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i10g9f3i11k9.22k6i14g13f3i15k6.17k4i17rf2g9f6ri17k4.14k3i14b5r2f15r2i19k3.12k2i8bg9f3rn3f11n3rg8f3i10k2.9k3i5b3g13f3n15g12f3i9k3.6kaki4b4rf2g9f6rn11rf2g9f6ri8kbk.5ka2ki2b5r2f15r2b11r2f15r2i7kbk.6ka2k2i2b4rn3f11n3rb11rn3f11n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6Q2qkb3k.6ka6k6iQi6b23i14k4q3b4k.6ky3b2ybybk3Q2qk3i33k9c2qc2bc2k.7kyby2b3yb3Qq2k19ik2Q2k17bcbc2bc2bc2k.8kb2y2b2y3bQ2qbybybk18Q2qk10b4c2b2cbc5bck.9kby2b4yb2q3yby2b2y2by2bybyb5Qq4b9cbc5b2cbcb2c3k.10kbyb2y2b3yq2by3byb7yb7Qqb11cbc7bc2b2c4k.11kbyby5byby2byb5y3b3ybybybq3b10cbc5b2c3bc4k.12kyb3yby2byb4yb2ybyb2yb4ybyb2q2b13c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6ky3b2ybybk9i33k9c2bc2bc2k.7kyby2b3yb3yk21ik21bcbc2bc2bc2k.8kb2y2b2y3b2y2bybybk31b4c2b2cbc5bck.9kby2b4yb2y4by2b2y2by2bybyb19cbc5b2cbcb2c3k.10kbyb2y2b3y2b2y3byb7yb20cbc7bc2b2c4k.11kbyby5byby2byb5y3b3ybybyb14cbc5b2c3bc4k.12kyb3yby2byb4yb2ybyb2yb4ybyb17c4b2c4bcbcbk.13kb44cbc4bcbc2bc2bck.15kb42cbc2bcb2cbc2bc3k.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bc16bc9bc3b2c2bcbcbcbc2bc5k2.24kcbcbc3bcbcbc2b2c3bc3bc6b2c9b2c2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcbc11bc11bc2bcbck2.40k2bc11bc5bc2b2c3b2c2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51kb6c17k.51kb6c17k.52k23.102"]}, {"pal": {"k": "#b98a2e", "a": "#ffe780", "b": "#fedb62", "c": "#f2c84a", "y": "#d99a30", "w": "#ffffff", "f": "#fffafc", "g": "#ffffff", "n": "#f1e3e8", "p": "#f1d4de", "q": "#d93a85", "Q": "#ee6aa6", "Z": "#ffc2da", "o": "#2c2c34", "O": "#9a9aa6", "i": "#f3d27c", "r": "#e3c9d2"}, "f": [".20oOo2O.oOw2Oo2Oo.9ow2oOo2.44ow2oOo2O2oOo2Oo2.8oOw2Oo2Oo.42oOw2Oo2Oo2Oo2Oo2O.2Oo2Oo.O2oOo2Oo2.42O2oOo2Oo2Oo2OoO2o.Ow2Oo2Oo2Oo2Oo2O.36o2Oo2.o2Oo2Oo2Oo2Oo2Oo2Oow2o2Oo2Oo2OoO2o.3oOo2O.27ow2o2Oo2Oo2OoO2o2Oo2Oo2goO2o2Oo2Oo2Oo2Oo2.2ow2oOo2.25o2w2oOo2Oo2Oo2Oo2fo2Oo2pgoOo2Oo2Oo2Oo2Oo2k.oOw2Oo2Oo.24oOo2Oo2Oo2Oo2Oo2pg4pg3Oo2Oo2Oo2go2Oo2fpkO2oOo2Oo2.24Oo2Oo2Oo2po2Oo2fg3pg4po2Oo2Oo2Opg2o2Oo2fo2Oo2Oo2Ok2.22o2Oo2O2oOg3prf2gpg4pg3Oo2Oo2Op3ow2o2Oo2Oo2OoO2opfk2.20oOo2Oo2Oogpg2f2pg4pg4p2oOo2Op3o2w2oOo2Oo2Oo2Oo2f3pk.18kfo2Oo2Oopg3r2f3gpg4pg2p9oOo2Oo2Oo2Oo2Oo2f2pf3k.16kf2pOo2Oog4pgnf2pf2g2pg4p9Oo2Oo2Oo2go2Oo2gpf4pfk.14krpfg3pg4pg3rnf4pf2g2pg3p7o2Oo2O2oOp8f2pf3rk.13kf3gpg4pg3pr3nfpf4pf4pf4pf2oOo2Oo2Oop10f3pfk.12kr2fpfg3pg4p5r5pf4pf4pfr3po2Oo2Oop11fpf2r2k.11k2nf4pg4pg2p5n4r4f4pf4pf2nOo2Oop12f4nk2.9k3irnfpf4pg4pgp5n10fn10g2pgp9f4pnrik3.6kaki3n2f3pf4pf4pf4pfn15f3pf4pf4pf4pfn2i3kbk.5ka2ki2bn3f4pf4pf4pf4pfn3bnbn3f4pf4pf4pf4pfn3i3kbk.6ka2k2i2bn5f4pf4pf4pn5b5n5f4pf4pf4pn5i3k2bk.6ka3k3i2bn10pn10b9n10pn10QZQZk2b2k.6ka4k4i4n15b15n15iZQZQZQZqZbk.6ka6k4QZQZqZi3nb23i6ni7kqZqZqZqZqbk.6kb8ZqZQZQZqZqZi32k8QZqZqZqZck.7kb7QZqZQZqZqZqk15iZQZQZqk15bcbcQZc2QZqk.8kb8QZqZqZqZqZk15ZQZQZQZqZk7b4c2b2cbZqcQZqZk.9kb6QZqZQZb3Zqb15qZqZqZqZqb6cbc5b2cZqZbZqZqk.9kb6ZqZqZqb3QZb16QZqZqZqb6cbc7bcqZqcqZqZk.10kb5qZqZqZb3Zqb15qZqZb2QZb6cbc5b2c3qZc2qZk.11kb6qZQZqb3QZb15ZqZqb2Zqb8c4b2c4bcbcbk.13kb4y2bZQZy2QZqby2b4y2b4y2QZqZyZqZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b2Zqy2ZqZby2b4y2b4y2ZqZqyqZqb2y2bcbcy2cb2cy2cbc2yk.17kcb2cbcQZbc2Zqc4bcbcbc6QZqc3qZcbc3bcbc3bc5bcbk.18kc6ZqZc11bc4b2cZQZc11bc2b2c4bcbc2k.19kbc2b2qZc16bc3bZqc12bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c3ZQZqc2by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bqZqZc2by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbcZqZqcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".27Ow2Oo2O.11w2oOo.46w2oOo.Oo2Oo2Oo2.9Ow2Oo2O.44Ow2Oo2OoO2o2Oo2O.8Oo2Oo2Oo2.42Oo2Oo2Oo2Oo2Oo2Oo.2w2Oo2.oO2o2Oo2O.42oO2o2Oo2Oo2Oo2Oo2.ow2o2Oo2Oo2Oo2Oo.36w2o2O.oOo2Oo2Oo2Oo2Oo2Oo2Oo2Oo2Oo2Oo2Oo2.3w2oOo.27ow2oOo2Oo2Oo2Oo2Oo2Oo2OfoOo2Oo2Oo2Oo2Oo2O.2Ow2Oo2O.25oOo2Oo2Oo2Oo2Oo2Ok2Oo2g3Oo2Oo2Oo2Oo2Oo2O.2Oo2Oo2Oo2.24O2oOo2Oo2Oo2Oo2Okf2pg4po2Oo2O2oOpfOo2pk.2oO2o2Oo2O.24o2Oo2Oo2Ok2Oo2k2fpg4pg2oOo2Oo2Oog2fpf3k2oOo2Oo2Oo.24oOo2OoO2ofpf4pfg3pg4po2Oo2Oop3f4pf2Oo2Oo2Oo2k.23Oo2Oo2Oo2g4prf2gpg4pg3po2Op8f3ro2Oo2Oo2Ofk2.22oOo2Oo2g3pg2rfpf2g2pg4p13f2prgOo2Oo2Opf3k.20kfgoOog3pg4rnf3pfg3pg2p11fpr3gpgOo2pgf3pfk.17k2f2pg4pg4r3n2pf4pf4pf2p5r5n2pg2p5gfpf4k2.14k2rpfg3pg4pgp3r5pf4pf4pfr3pf2n3gp11f2pfrk2.12k2irf3pg4pg2p6n3r4f4pf4pfn5gp13f3rik2.9k3i2rnpf4pg4p8n19g3p12f3nri2k3.6kaki4n2f2pf4pf4p6f2n13f4pf4p6f4pn2i4kbk.5ka2ki2b2n3f3pf4pf4pf4pn3b5n3f3pf4pf4pf4pn3i4kbk.6ka2k2i2b2n5f3pf4pf4n5b7n5f3pf4pf4n5i4k2bk.6ka3k3i2b2n19b11n19iQZQZk2b2k.6ka4k4i4bn13b17n13i3qZQZQZqb2k.6ka6k5ZQZqZi4b23i14k2ZqZqZQZqbk.6kb8ZqZQZQZqZqi33k8QZqZqZqZck.7kb8ZqZQZqZqZk16ikQZQZqk15bcbcQZcZqZqk.8kb7ZqZqZqZqZqZk16qZQZqZqk8b4c2b2cQZqcqZqZk.9kb6qZqZQZb3Zqb16ZqZqZqZb7cbc5b2cZqZbZqZqk.9kb6ZqZQZqb3QZb15ZQZqZqZqb6cbc7bc2Zqc2Zqk.11kb6ZqZqZb3Zqb15QZqZb2QZb6cbc5b2c3bc4k.12kb8qZqb2ZqZb15ZqZqbQZqb8c4b2c4bcbcbk.13kb4y2b2QZy2qZqby2b4y2b4y2QZqZyZqZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b2ZqZybqZby2b4y2b4y2ZqZby2Zqb2y2bcbcy2cb2cy2cbc2yk.17kcb2cbcqZbc8bcbcbc6qZqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cZQZqc10bc2b2c4bcbc2k.19kbc2b2c18bc3qZqZc11bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c3ZqZqc2by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".28w2Oo2.14o.50o.4ow2o2Oo.11w2Oo2.46w2Oo2.o2Oo2Oo2O.9ow2o2Oo.44ow2o2Oo2Oo2Oo2Oo.4O.3o2Oo2Oo2O.42o2Oo2Oo2Oo2Oo2Oo2.2w2o2O.oOo2Oo2Oo.38o.3oOo2Oo2Oo2Oo2O2oO.ow2oOo2Oo2Oo2Oo2.36w2oOo.Oo2Oo2Oo2Oo2Oo2O.oOo2Oo2Oo2Oo2O2oO.35Ow2Oo2Oo2Oo2O2oOo2Oo2OokO2oOo2Oo2Oo2Oo2O.35Oo2Oo2Oo2Oo2Oo2O.3o2Okfpo2Oo2Oo2Oo2Oo2Oo.35oO2o2Oo2Oo2Oo2Oo.2k2fgpg2oOo2OoO2of2o2O.37oOo2Oo2Oo.2o2Ok4fgpg4po2Oo2Oogfpf3k5.32Oo2Oo2Oo2k8fpg4pg2oOo2Oo2pgf3pfk10.27oOo2Oo2f3pf4rf2g2pg4pgoOop6f3rpf4pf2k5.22kOo2Oo2Ogpg4pgrf2pfg3pg2p11fpr2g2pg2f2pf2k5.17k4iOo2gpg4r3grnf4pf4p8r6gpg4pgf3pfik4.14k3i2fg2pg4pg4r5pf4pf4pfr3pfn3pg4pg4pf4i2k3.12k2i3rfpg4pg4p5n2r4f4pf4pn5g4p9fpfri3k2.9k3i4rf4pg4p9n17g4p12f2ri4k3.6kaki4brnfpf4pf3p9fn11pf4pf3p9f2nri5kbk.5ka2ki2b3n3f2pf4pf4pf4n3b7n3f2pf4pf4pf4n3i5kbk.6ka2k2i2b3n5f2pf4pf3n5b9n5f2pf4pf3n5i5k2bk.6ka3k3i2b3n17b13n17i3ZQZk2b2k.6ka4k4i4b2n11b19n11i5ZQZQZqb2k.6ka6k6QZqi5b23i14k3qZqZQZqbk.6kb8ZqZQZQZqZki33k8QZqZQZqZck.7kb7QZqZQZqZqZk16ik2ZQZk16bcbZqZcZqZqk.8kb7ZqZqZqZqZqZk17ZQZqZk9b4c2b2cqZqcqZqZk.9kb6qZqZqZb3Zqb16ZqZqZqZb7cbc5b2cbqZbcqZk.10kb7qZQZqb3QZb15ZQZqZqZqb6cbc7bc2b2c4k.11kb9QZb2QZqb15QZqZbZqZb6cbc5b2c3bc4k.12kb9ZqZbZqZb15ZqZqbqZqb8c4b2c4bcbcbk.13kb4y2b2qZy2bZqby2b4y2b4y2QZqby2qZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2ZQZqy2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc6qZqZc2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cZqZqc10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".29oOo.71ow2o2Oo.63oOo.3ow2oOo2.61ow2o2Oo2Oo2Oo2Oo.60ow2oOo2Oo2Oo2Oo2.59oOo2Oo2Oo2Oo2O2oO.54o2O.2Oo2Oo2Oo2Oo2Oo2Oo.52Ow2Oo2Oo2Oo2O2oOo2Oo2Oo.53ow2o2Oo2Oo2Oo2Oo.Oo2Oo.53oO2o2Oo2Oo2Oo2Oo.4O.3k9.43oOo2Oo2Oo.Oo2Ook9gpg3fpf2k11.32Oo2Oo2Oo2k3Ok7g3pg4pg4pf3k13.26o2Oo2Oo2Ok3i7g2pg4pg4pg2f2pfi7k9.22kOo2Oo2Oi10fpg4pg4pg3fpf4i12k6.17k4oOo2Oi2g3pgf3r2f3pfg3pgf3pf4pr2g2pgf3pi7k4.14k3i4opg4pg4pg2n2pf4pf4pf4pfn2gpg4pg2f2pfi5k3.12k2i6g4pg4pg4pn5f4pf4n5pg4pg4pf4i6k2.9k3i5bf2gpg4pg4pgf2n17g4pg4pgf3pf2i6k3.6kaki4b2r2pf4pg4pf4pf3rn9rpf4pg4pf4pf3r2i6kbk.5ka2ki2b4n2f2pf4pf4pf4n2b9n2f2pf4pf4pf4n2i6kbk.6ka2k2i2b4n5fpf4pf2n5b11n5fpf4pf2n5i6k2bk.6ka3k3i2b3n17b13n17i3ZQk3b2k.6ka4k4i4b3n9b21n9i7QZQZqb2k.6ka6k6QZi6b23i14k4ZqZqZqbk.6kb8ZqZkZQZk3i33k8QZqZqZqc2k.7kb7QZqZQZqZkZk16ik2ZQk17bcbZqZcZqZck.8kb7ZqZbZqb2ZqZk18QZqZk9b4c2b2cqZqc3bck.9kb6qZqZqZb2QZqb16ZqZqZqZb7cbc5b2cbqZbc3k.10kb10Zqb2ZqZb16QZb2QZqb6cbc7bc2b2c4k.11kb9qZqb2Zqb16Zqb2ZqZb6cbc5b2c3bc4k.12kb9Zqb21QZb3Zqb8c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2bZqZy2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2bqZby2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".249Oo2.71ow2oOo2.68oOw2Oo2Oo.67O2oOo2Oo2.62oOo.2o2Oo2Oo2O.60ow2o2Oo2Oo2OoO2o.59o2w2oOo2Oo2Oo2Oo2.11k.47oOo2Oo2Oo2Oo2Oo2k28.32Oo2Oo2Oo2ko2Oo2k13ik21.26o2Oo2O2oOk3i10g4pg4pf2i11k9.22oOo2Oo2Ooi11g4pg4pg3fpfi15k6.17k3o2Oo2Ooi11rf2pg4pg3fpf4ri17k4.14k3i2Oo2Ooi7b5r2f4pf4pf4pr2i19k3.12k2i8bgpg4pg2f2prn3pf4pf4pn3rpg4pg2f2pi10k2.9k3i5b3gpg4pg4pgf3n15pg4pg4pgf3i9k3.6kaki4b4rf2g2pg4pgf3pf2rn11rf2g2pg4pgf3pf2ri8kbk.5ka2ki2b5r2fpf4pf4pf3r2b11r2fpf4pf4pf3r2i7kbk.6ka2k2i2b4rn3f2pf4pf3n3rb11rn3f2pf4pf3n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6QZqkb3k.6ka6k6iZi6b23i14k4ZqZb4k.6kb9k3ZQZk3i33k9c2Zc2bc2k.7kb11QZqk19ik2ZQk17bcbc2bc2bc2k.8kb10QZqb5k18QZqk10b4c2b2cbc5bck.9kb10qZqb20ZqZqZb9cbc5b2cbcb2c3k.10kb10Zqb21QZb11cbc7bc2b2c4k.11kb32ZqZb10cbc5b2c3bc4k.12kb32qZb13c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2b4y2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2b4y2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2b4y2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2b4y2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102"], "n": [".190k.68k7fk7.58k3fpf4pf4pf3k3.53k2f2pfg3pg4pf4pf3k2.48k.kf2pg4pg4pg4pf4pf2k.k.38k7fkfpg4pg4pg4pg4pf4pkfk7.28k3f3pf4pfg3pg4pg4pg4pg2f2pf4pf4pfk3.23k2f4pg4prf2gpg4pg4p11f4prg2fpf4pfk2.20kf3gpg4pg2f2pg4pg4p14fpf3gpg3fpf4pk.18kf2gpg4pg3r2f3gpg4pg2p13f4r2g3pg2f2pf3k.16kf2pg4pg4pgnf2pf2g2pg4p13f2pfng2pg4pf4pfk.14krpfg3pg4pg3rnf4pf2g2pg3p9f2pr2nrp8f2pf3rk.13kf3gpg4pg3pr3nfpf4pf4pf4pf2r5fn2p11f3pfk.12kr2fpfg3pg4p5r5pf4pf4pfr3pf3n3p12fpf2r2k.11k2nf4pg4pg2p5n4r4f4pf4pf2n5p13f4nk2.9k3irnfpf4pg4pgp5n10fn10g2pgp9f4pnrik3.6kaki3n2f3pf4pf4pf4pfn15f3pf4pf4pf4pfn2i3kbk.5ka2ki2bn3f4pf4pf4pf4pfn3bnbn3f4pf4pf4pf4pfn3i3kbk.6ka2k2i2bn5f4pf4pf4pn5b5n5f4pf4pf4pn5i3k2bk.6ka3k3i2bn10pn10b9n10pn10QZQZk2b2k.6ka4k4i4n15b15n15iZQZQZQZqZbk.6ka6k4QZQZqZi3nb23i6ni7kqZqZqZqZqbk.6kb8ZqZQZQZqZqZi32k8QZqZqZqZck.7kb7QZqZQZqZqZqk15iZQZQZqk15bcbcQZc2QZqk.8kb8QZqZqZqZqZk15ZQZQZQZqZk7b4c2b2cbZqcQZqZk.9kb6QZqZQZb3Zqb15qZqZqZqZqb6cbc5b2cZqZbZqZqk.9kb6ZqZqZqb3QZb16QZqZqZqb6cbc7bcqZqcqZqZk.10kb5qZqZqZb3Zqb15qZqZb2QZb6cbc5b2c3qZc2qZk.11kb6qZQZqb3QZb15ZqZqb2Zqb8c4b2c4bcbcbk.13kb4y2bZQZy2QZqby2b4y2b4y2QZqZyZqZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b2Zqy2ZqZby2b4y2b4y2ZqZqyqZqb2y2bcbcy2cb2cy2cbc2yk.17kcb2cbcQZbc2Zqc4bcbcbc6QZqc3qZcbc3bcbc3bc5bcbk.18kc6ZqZc11bc4b2cZQZc11bc2b2c4bcbc2k.19kbc2b2qZc16bc3bZqc12bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c3ZQZqc2by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bqZqZc2by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbcZqZqcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".412k13.60k3fpf4pf4pfk3.55k2f2pg4pg4pf4pfk2.52kf2pg4pg4pg4pf4pk.42k9fpg4pg4pg4pg3fpf3k9.30k3f3pf4pfg3pg4pg4p6f4pf4pf4k3.25k2f2g2pg4prf2gpg4pg3p12f3rpg3fpf4k2.22kf2g2pg4pg2rfpf2g2pg4p13f2prg3pg2f2pf3k.20kfg2pg4pg4rnf3pfg3pg2p11fpr3gpg4pgf3pfk.17k2f2pg4pg4r3n2pf4pf4pf2p5r5n2pg2p5gfpf4k2.14k2rpfg3pg4pgp3r5pf4pf4pfr3pf2n3gp11f2pfrk2.12k2irf3pg4pg2p6n3r4f4pf4pfn5gp13f3rik2.9k3i2rnpf4pg4p8n19g3p12f3nri2k3.6kaki4n2f2pf4pf4p6f2n13f4pf4p6f4pn2i4kbk.5ka2ki2b2n3f3pf4pf4pf4pn3b5n3f3pf4pf4pf4pn3i4kbk.6ka2k2i2b2n5f3pf4pf4n5b7n5f3pf4pf4n5i4k2bk.6ka3k3i2b2n19b11n19iQZQZk2b2k.6ka4k4i4bn13b17n13i3qZQZQZqb2k.6ka6k5ZQZqZi4b23i14k2ZqZqZQZqbk.6kb8ZqZQZQZqZqi33k8QZqZqZqZck.7kb8ZqZQZqZqZk16ikQZQZqk15bcbcQZcZqZqk.8kb7ZqZqZqZqZqZk16qZQZqZqk8b4c2b2cQZqcqZqZk.9kb6qZqZQZb3Zqb16ZqZqZqZb7cbc5b2cZqZbZqZqk.9kb6ZqZQZqb3QZb15ZQZqZqZqb6cbc7bc2Zqc2Zqk.11kb6ZqZqZb3Zqb15QZqZb2QZb6cbc5b2c3bc4k.12kb8qZqb2ZqZb15ZqZqbQZqb8c4b2c4bcbcbk.13kb4y2b2QZy2qZqby2b4y2b4y2QZqZyZqZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b2ZqZybqZby2b4y2b4y2ZqZby2Zqb2y2bcbcy2cb2cy2cbc2yk.17kcb2cbcqZbc8bcbcbc6qZqc3b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cZQZqc10bc2b2c4bcbc2k.19kbc2b2c18bc3qZqZc11bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c3ZqZqc2by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".565k11.62k3fpf4pf4k3.57k2fgpg4pg4pf4k2.50k5fgpg4pg4pg3fpf3k5.39k10fpg4pg4pg4pgf3pfk10.29k5f3pf4rf2g2pg4pgp9f3rpf4pf2k5.22k5fg3pg4pgrf2pfg3pg2p11fpr2g2pg2f2pf2k5.17k4ifg3pg4r3grnf4pf4p8r6gpg4pgf3pfik4.14k3i2fg2pg4pg4r5pf4pf4pfr3pfn3pg4pg4pf4i2k3.12k2i3rfpg4pg4p5n2r4f4pf4pn5g4p9fpfri3k2.9k3i4rf4pg4p9n17g4p12f2ri4k3.6kaki4brnfpf4pf3p9fn11pf4pf3p9f2nri5kbk.5ka2ki2b3n3f2pf4pf4pf4n3b7n3f2pf4pf4pf4n3i5kbk.6ka2k2i2b3n5f2pf4pf3n5b9n5f2pf4pf3n5i5k2bk.6ka3k3i2b3n17b13n17i3ZQZk2b2k.6ka4k4i4b2n11b19n11i5ZQZQZqb2k.6ka6k6QZqi5b23i14k3qZqZQZqbk.6kb8ZqZQZQZqZki33k8QZqZQZqZck.7kb7QZqZQZqZqZk16ik2ZQZk16bcbZqZcZqZqk.8kb7ZqZqZqZqZqZk17ZQZqZk9b4c2b2cqZqcqZqZk.9kb6qZqZqZb3Zqb16ZqZqZqZb7cbc5b2cbqZbcqZk.10kb7qZQZqb3QZb15ZQZqZqZqb6cbc7bc2b2c4k.11kb9QZb2QZqb15QZqZbZqZb6cbc5b2c3bc4k.12kb9ZqZbZqZb15ZqZqbqZqb8c4b2c4bcbcbk.13kb4y2b2qZy2bZqby2b4y2b4y2QZqby2qZb2y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2ZQZqy2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc6qZqZc2b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2cZqZqc10bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".718k9.56k11gpg3fpf2k11.39k13g3pg4pg4pf3k13.29k9i7g2pg4pg4pg2f2pfi7k9.22k6i12fpg4pg4pg3fpf4i12k6.17k4i7g3pgf3r2f3pfg3pgf3pf4pr2g2pgf3pi7k4.14k3i5pg4pg4pg2n2pf4pf4pf4pfn2gpg4pg2f2pfi5k3.12k2i6g4pg4pg4pn5f4pf4n5pg4pg4pf4i6k2.9k3i5bf2gpg4pg4pgf2n17g4pg4pgf3pf2i6k3.6kaki4b2r2pf4pg4pf4pf3rn9rpf4pg4pf4pf3r2i6kbk.5ka2ki2b4n2f2pf4pf4pf4n2b9n2f2pf4pf4pf4n2i6kbk.6ka2k2i2b4n5fpf4pf2n5b11n5fpf4pf2n5i6k2bk.6ka3k3i2b3n17b13n17i3ZQk3b2k.6ka4k4i4b3n9b21n9i7QZQZqb2k.6ka6k6QZi6b23i14k4ZqZqZqbk.6kb8ZqZkZQZk3i33k8QZqZqZqc2k.7kb7QZqZQZqZkZk16ik2ZQk17bcbZqZcZqZck.8kb7ZqZbZqb2ZqZk18QZqZk9b4c2b2cqZqc3bck.9kb6qZqZqZb2QZqb16ZqZqZqZb7cbc5b2cbqZbc3k.10kb10Zqb2ZqZb16QZb2QZqb6cbc7bc2b2c4k.11kb9qZqb2Zqb16Zqb2ZqZb6cbc5b2c3bc4k.12kb9Zqb21QZb3Zqb8c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2bZqZy2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2bqZby2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".722k.60k31.39k21ik21.29k9i10g4pg4pf2i11k9.22k6i14g4pg4pg3fpfi15k6.17k4i17rf2pg4pg3fpf4ri17k4.14k3i14b5r2f4pf4pf4pr2i19k3.12k2i8bgpg4pg2f2prn3pf4pf4pn3rpg4pg2f2pi10k2.9k3i5b3gpg4pg4pgf3n15pg4pg4pgf3i9k3.6kaki4b4rf2g2pg4pgf3pf2rn11rf2g2pg4pgf3pf2ri8kbk.5ka2ki2b5r2fpf4pf4pf3r2b11r2fpf4pf4pf3r2i7kbk.6ka2k2i2b4rn3f2pf4pf3n3rb11rn3f2pf4pf3n3ri6k2bk.6ka3k3i2b4n15b15n15i5Qk3b2k.6ka4k4i4b2n11b19n11i6QZqkb3k.6ka6k6iZi6b23i14k4ZqZb4k.6kb9k3ZQZk3i33k9c2Zc2bc2k.7kb11QZqk19ik2ZQk17bcbc2bc2bc2k.8kb10QZqb5k18QZqk10b4c2b2cbc5bck.9kb10qZqb20ZqZqZb9cbc5b2cbcb2c3k.10kb10Zqb21QZb11cbc7bc2b2c4k.11kb32ZqZb10cbc5b2c3bc4k.12kb32qZb13c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2b4y2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2b4y2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102", ".722k.60k31.39k21ik21.29k9i33k9.22k6i45k6.17k4i53k4.14k3i14b23i20k3.12k2i8b39i14k2.9k3i5b47i11k3.6kaki4b51i10kbk.5ka2ki2b53i8kbk.6ka2k2i2b51i8k2bk.6ka3k3i2b47i8k3b2k.6ka4k4i4b39i10k4b3k.6ka6k6i8b23i14k6b5k.6kb9k9i33k9c2bc2bc2k.7kb12k21ik21bcbc2bc2bc2k.8kb18k31b4c2b2cbc5bck.9kb47cbc5b2cbcb2c3k.10kb46cbc7bc2b2c4k.11kb45cbc5b2c3bc4k.12kb47c4b2c4bcbcbk.13kb4y2b4y2b4y2b4y2b4y2b4y2b4y2b2cby2c2bcy2cbc2y2k.15kb3y2b4y2b4y2b4y2b4y2b4y2b4y2bcbcy2cb2cy2cbc2yk.17kcb2cbc3bc8bcbcbc12b2cbc3bcbc3bc5bcbk.18kc8bc11bc4b2c15bc2b2c4bcbc2k.19kbc2b2c18bc3bc14bc2bc5bc2k.21k2bcy2c4y2c4y2cbc2y2c4y2c3by2cbcby2cbc2y2c4k2.24kcy2bc3y2bcbcy2bc3y2c2bcy2c3by2c4y2c2b2y2bcbk.27kc8bc6bcbcbcbc4bcbc4bcbc3b5c2k.29k2c2b3c4b2c5bc3bc2bcbc2bcb2cbc4bc3k2.32k2c6bc12bc2bc5bc3bc5k2.36k2cbcy2c4y2c4y2c4y2c4y2cbcbyk2.40k2by2c4y2c3by2c3by2b2c2y2bc2k2.44k4c2bc2bc10bc5k4.49kb6c17k.51kb6c17k.51ky2b4y2c4y2c4y2c3k.51ky2b4y2c4y2c4y2c3k.52k23.102"]}]};
+
+/* ---- dofu_sim.js ---- */
+/* 福春豆花伯・連吃五碗：規則與計分（純邏輯，不碰畫面和聲音，可以用 node 機器人調難度）。
+   基本：狂點「吃」，每點一口；吃太快累積「噎」，滿了就嗆到；越吃越飽、效率下降；「喝水」清噎、降飽足；豆花伯加料時一點算兩口。
+   每碗多一條規則（累加）：
+     第 2 碗起「冰頭」：跳出 ❄ 時要停手一下，沒停就冰到頭（暈一下）。
+     第 3 碗起「黑珠」：碗上的黑珠要先點掉才吃得到豆花（點珠子，不是點吃鈕）。
+     第 4 碗起「海鷗搶食」：海鷗俯衝過來要點牠趕走，不然搶走一口進度。
+     第 5 碗「大碗蓄力」：小口只能吃到一半，剩下要按住蓄力、放開吃大口；蓄太滿會噎。
+   事件（ev）由畫面層讀走：step、bowlStart、talk、bite、boost、boostEnd、choke、freeze、iceOn、iceEnd、beads、bead、beadLost、gull、shoo、steal、capHit、charge、bigbite、drink、clear、warn、win、lose、blocked。 */
+var DofuSim = (function () {
+  var DIFF = {
+    easy:   { tk: 1.0, rate: 3.0, base: 3.6, cups: 5, up: 6.5, fk: 0.42, need: [16, 22, 28, 34, 40], ice: [4.5, 7.0, 0.7], beads: [3, 0], gulls: [1, 1.3, 0.10], charge: [0.70, 1.60] },
+    normal: { tk: 0.86, rate: 4.0, base: 3.0, cups: 4, up: 8, fk: 0.55, need: [20, 28, 36, 44, 52], ice: [2.8, 4.6, 1.0], beads: [5, 0], gulls: [2, 1.0, 0.14], charge: [0.85, 1.45] },
+    hard:   { tk: 0.9, rate: 4.8, base: 2.6, cups: 3, up: 9.5, fk: 0.64, need: [26, 36, 46, 56, 68], ice: [2.4, 4.0, 1.2], beads: [7, 4.5], gulls: [3, 0.75, 0.18], charge: [1.00, 1.35] }
+  };
+  var NB = 5, READY = 2.6, SWAP = 1.7, DECAY = 36, STUN = 1.3, FREEZE = 1.5, DRINK = 0.85, BOOST = 3.2, GRACE = 0.3, CAPF = 0.55, TLMUL = [1, 1.2, 1.3, 1.45, 1.55];
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  function create(opt) {
+    var df = DIFF[(opt && opt.diff) || 'normal'] || DIFF.normal;
+    var s = {
+      df: df, B: 0, bpm: 100, lastStep: -1, phase: 'ready', t: 0, i: 0, need: 0, prog: 0, tl: 0, tmax: 0, swapT: 0,
+      full: 0, choke: 0, stun: 0, stunKind: '', drink: 0, cups: df.cups, maxCups: df.cups, boost: 0, boostDone: false, boostAt: 0.5,
+      score: 0, chokes: 0, freezes: 0, taps: 0, bites: 0, bowlsDone: 0, fever: false, feverT: 0, taplog: [], rate: 0, ev: [], result: null, talked: false, warned: false, spare: 0,
+      ice: { on: false, t: 0 }, iceT: 0, beads: [], waves: 0, gull: null, gullLeft: 0, gullT: 0, cap: 0, charging: 0, stolen: 0, shooed: 0
+    };
+    function startBowl(i) {
+      s.i = i; s.need = df.need[i]; s.prog = 0; s.tmax = s.tl = (s.need / df.rate * TLMUL[i] + df.base + (i === 4 ? 3 : 0)) * df.tk; s.phase = 'play'; s.t = 0;
+      s.boost = 0; s.boostDone = i === 0; s.boostAt = i === 2 ? 0.12 : 0.45; s.warned = false; s.bpm = 100 + 6 * i;
+      s.ice = { on: false, t: 0 }; s.iceT = i >= 1 ? rnd(df.ice[0], df.ice[1]) : 99; s.beads = []; s.waves = 0; s.gull = null; s.gullLeft = i >= 3 ? df.gulls[0] : 0; s.gullT = rnd(2.2, 4.0); s.cap = i === 4 ? s.need * CAPF : 0; s.charging = 0;
+      s.ev.push({ t: 'bowlStart', i: i, need: s.need, tl: s.tl });
+      if (i === 2 && !s.talked) { s.talked = true; s.ev.push({ t: 'talk' }); }
+      if (i >= 2) spawnBeads(df.beads[0]);
+    }
+    function spawnBeads(n) {
+      var slots = [0, 1, 2, 3, 4, 5, 6], k; for (k = slots.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)), x = slots[k]; slots[k] = slots[j]; slots[j] = x; }
+      for (k = 0; k < n; k++) s.beads.push({ slot: slots[k % 7], age: 0 });
+      s.waves++; s.ev.push({ t: 'beads', n: n });
+    }
+    function eff() { return Math.max(0.28, 1 - df.fk * Math.pow(Math.min(1, s.full / 100), 1.15)); }
+    function fails() { return s.chokes + s.freezes; }
+    function finish(ok) {
+      var f = fails(), stars = ok ? (f === 0 ? 3 : f <= 3 ? 2 : 1) : 0;
+      return { win: ok, stars: stars, score: Math.round(s.score), challenge: ok && f === 0, chokes: s.chokes, freezes: s.freezes, fails: f, cups: s.cups, taps: s.taps, bowls: s.bowlsDone, spare: s.spare, stolen: s.stolen, shooed: s.shooed };
+    }
+    function lose() { if (s.phase === 'win' || s.phase === 'lose') return; s.phase = 'lose'; s.result = finish(false); s.ev.push({ t: 'lose', result: s.result }); }
+    function doChoke() {
+      s.choke = 35; s.stun = STUN; s.stunKind = 'choke'; s.chokes++; s.full = Math.min(100, s.full + 3); s.fever = false; s.feverT = 0; s.charging = 0;
+      s.ev.push({ t: 'choke', n: s.chokes });
+    }
+    function clearBowl() {
+      s.bowlsDone++; s.spare += s.tl / s.tmax; s.score += Math.round(s.tl * 18 + (fails() === 0 ? 40 : 0)); s.full = Math.max(0, s.full - 6); s.ice.on = false; s.gull = null; s.beads = []; s.charging = 0;
+      s.ev.push({ t: 'clear', i: s.i, bowls: s.bowlsDone, tl: s.tl });
+      if (s.i >= NB - 1) { s.phase = 'win'; s.result = finish(true); s.ev.push({ t: 'win', result: s.result }); }
+      else { s.phase = 'swap'; s.swapT = SWAP; s.boost = 0; }
+    }
+    function eat() {
+      if (s.phase !== 'play') return null;
+      if (s.stun > 0 || s.drink > 0) { s.ev.push({ t: 'blocked' }); return { res: 'blocked' }; }
+      if (s.beads.length) { s.ev.push({ t: 'blocked', why: 'beads' }); return { res: 'blocked' }; }
+      if (s.ice.on && s.ice.t > GRACE) {   // ❄ 出現後要停手，還敢吃＝冰到頭
+        s.ice.on = false; s.iceT = rnd(df.ice[0], df.ice[1]); s.stun = FREEZE; s.stunKind = 'freeze'; s.freezes++; s.fever = false; s.feverT = 0;
+        s.ev.push({ t: 'freeze', n: s.freezes }); return { res: 'freeze' };
+      }
+      if (s.cap && s.prog >= s.cap - 1e-6) { s.ev.push({ t: 'capHit' }); return { res: 'capped' }; }
+      s.taps++; var now = s.B;
+      s.taplog.push(now); while (s.taplog.length && (now - s.taplog[0]) * 60 / s.bpm > 1.0) s.taplog.shift();
+      s.rate = s.taplog.length;
+      s.choke += df.up * (s.boost > 0 ? 0.5 : 1);
+      if (s.choke >= 100) { doChoke(); return { res: 'choke' }; }
+      var mul = s.boost > 0 ? 2 : 1, add = eff() * mul;
+      s.prog += s.cap ? Math.min(add, s.cap - s.prog) : add; s.full = Math.min(100, s.full + 0.5); s.bites++;
+      if (s.rate >= 5) { s.feverT += 1; if (s.feverT >= 3 && !s.fever) { s.fever = true; s.ev.push({ t: 'fever' }); } } else if (s.rate < 4) { s.fever = false; s.feverT = 0; }
+      s.score += 10 * mul * (s.fever ? 2 : 1);
+      s.ev.push({ t: 'bite', boost: s.boost > 0, fever: s.fever, eff: eff(), rate: s.rate });
+      if (!s.boostDone && s.prog >= s.need * s.boostAt) { s.boostDone = true; s.boost = BOOST; s.ev.push({ t: 'boost' }); }
+      if (s.prog >= s.need) clearBowl();
+      return { res: 'ok' };
+    }
+    function drink() {
+      if (s.phase !== 'play' || s.cups <= 0 || s.drink > 0) return false;
+      s.cups--; s.drink = DRINK; s.stun = 0; s.choke = 0; s.full = Math.max(0, s.full - 14); s.fever = false; s.feverT = 0; s.charging = 0;
+      s.ev.push({ t: 'drink', cups: s.cups }); return true;
+    }
+    function bead(slot) {
+      if (s.phase !== 'play') return false;
+      for (var k = 0; k < s.beads.length; k++) if (s.beads[k].slot === slot) {
+        s.beads.splice(k, 1); s.score += 8; s.ev.push({ t: 'bead', slot: slot, left: s.beads.length }); return true;
+      }
+      return false;
+    }
+    function shoo() {
+      if (!s.gull || s.phase !== 'play') return false;
+      s.gull = null; s.shooed++; s.score += 40; s.ev.push({ t: 'shoo' }); return true;
+    }
+    /* 大碗蓄力：按住開始，放開吃一大口 */
+    function holdStart() {
+      if (s.phase !== 'play' || s.i !== 4 || s.stun > 0 || s.drink > 0 || s.beads.length || s.charging > 0) return false;
+      if (s.ice.on && s.ice.t > GRACE) return false;
+      s.charging = 0.001; s.ev.push({ t: 'charge', on: true }); return true;
+    }
+    function holdEnd() {
+      var c = s.charging; if (c <= 0) return null; s.charging = 0;
+      if (c < 0.25) return eat();   // 很短＝普通一口
+      var lo = df.charge[0], hi = df.charge[1];
+      if (c > hi) { doChoke(); return { res: 'choke' }; }
+      if (c < lo) { s.prog = Math.min(s.need, s.prog + s.need * 0.03); s.ev.push({ t: 'bigbite', q: 'weak', c: c }); }
+      else { s.prog = Math.min(s.need, s.prog + s.need * 0.16); s.full = Math.min(100, s.full + 4); s.score += 120; s.ev.push({ t: 'bigbite', q: 'good', c: c }); }
+      if (s.prog >= s.need) clearBowl();
+      return { res: 'ok' };
+    }
+    function step(dt) {
+      if (s.phase === 'win' || s.phase === 'lose') return;
+      s.B += dt * s.bpm / 60;
+      while (Math.floor(s.B * 4) > s.lastStep) { s.lastStep++; s.ev.push({ t: 'step', s: s.lastStep }); }
+      if (s.phase === 'ready') { s.t += dt; if (s.t >= READY) startBowl(0); return; }
+      if (s.phase === 'swap') { s.swapT -= dt; if (s.swapT <= 0) startBowl(s.i + 1); return; }
+      s.t += dt; s.tl -= dt;
+      if (s.stun > 0) { s.stun = Math.max(0, s.stun - dt); if (s.stun <= 0) s.stunKind = ''; }
+      if (s.drink > 0) s.drink = Math.max(0, s.drink - dt);
+      if (s.boost > 0) { s.boost -= dt; if (s.boost <= 0) { s.boost = 0; s.ev.push({ t: 'boostEnd' }); } }
+      s.choke = Math.max(0, s.choke - DECAY * dt * (s.stun > 0 ? 0.4 : 1));
+      var now = s.B; while (s.taplog.length && (now - s.taplog[0]) * 60 / s.bpm > 1.0) s.taplog.shift(); s.rate = s.taplog.length;
+      if (s.rate < 4 && s.fever) { s.fever = false; s.feverT = 0; }
+      /* ❄ 冰頭 */
+      if (s.i >= 1 && s.stun <= 0 && s.drink <= 0) {
+        if (s.ice.on) { s.ice.t += dt; if (s.ice.t >= GRACE + df.ice[2]) { s.ice.on = false; s.iceT = rnd(df.ice[0], df.ice[1]); s.score += 30; s.ev.push({ t: 'iceEnd', ok: true }); } }
+        else { s.iceT -= dt; if (s.iceT <= 0 && s.prog < s.need * 0.88 && s.tl > 3) { s.ice = { on: true, t: 0 }; s.ev.push({ t: 'iceOn', hold: df.ice[2] }); } else if (s.iceT <= 0) s.iceT = 1; }
+      }
+      /* 黑珠：第二波、掉落 */
+      if (s.i >= 2) {
+        if (s.i >= 3 && s.waves < 2 && !s.beads.length && s.prog >= s.need * 0.5) spawnBeads(Math.ceil(df.beads[0] / 2));
+        if (df.beads[1] > 0) for (var k = s.beads.length - 1; k >= 0; k--) { s.beads[k].age += dt; if (s.beads[k].age > df.beads[1]) { var sl = s.beads[k].slot; s.beads.splice(k, 1); s.tl -= 1.0; s.ev.push({ t: 'beadLost', slot: sl }); } }
+      }
+      /* 海鷗 */
+      if (s.i >= 3) {
+        if (s.gull) { s.gull.t += dt; if (s.gull.t >= s.gull.dur) { s.prog = Math.max(0, s.prog - s.need * df.gulls[2]); s.stolen++; s.gull = null; s.ev.push({ t: 'steal' }); s.gullT = rnd(2.5, 4.2); } }
+        else if (s.gullLeft > 0) { s.gullT -= dt; if (s.gullT <= 0 && s.prog < s.need * 0.9) { s.gullLeft--; s.gull = { t: 0, dur: df.gulls[1], side: Math.random() < 0.5 ? -1 : 1 }; s.ev.push({ t: 'gull', dur: df.gulls[1], side: s.gull.side }); } else if (s.gullT <= 0) s.gullT = 1; }
+      }
+      /* 蓄力 */
+      if (s.charging > 0) { s.charging += dt; if (s.charging > df.charge[1] + 0.2) { s.charging = 0; doChoke(); } else if (s.stun > 0 || s.drink > 0) s.charging = 0; }
+      if (!s.warned && s.tl < 3 && s.tl > 0) { s.warned = true; s.ev.push({ t: 'warn' }); }
+      if (s.tl <= 0) lose();
+    }
+    return { s: s, step: step, eat: eat, drink: drink, eff: eff, bead: bead, shoo: shoo, holdStart: holdStart, holdEnd: holdEnd };
+  }
+  return { create: create, DIFF: DIFF, NB: NB };
+})();
+
+/* ---- dofu_audio.js ---- */
+/* 福春豆花伯・連吃五碗：音樂與音效（全部用 Web Audio 合成，沒有外部音檔）。
+   音樂：南島風輕快曲（G 大調、烏克麗麗刷弦＋木琴旋律＋貝斯＋沙鈴＋拍手），由遊戲的節拍時鐘一格一格推進（step），
+         所以「點湯匙」的時機和音樂拍子完全對齊；吃到後面碗數越多，樂器一層一層加上去、速度變快。
+   音效：吃一口（湯匙叮＋吸溜）、完美／不錯／嗆到、海鷗叫與趕走、碗落桌、完食、豆花伯說話與驚訝、通關／吃不下。
+   環境：海浪聲（濾波雜訊慢慢起伏）。 */
+var DofuAudio = (function () {
+  var NOTE = function (n) { return 440 * Math.pow(2, n / 12); };            // n＝與 A4 相差的半音數
+  /* 和弦：G → D → Em → C（每小節 16 格）。第一個是貝斯根音，其餘是烏克麗麗刷弦用的音 */
+  var CH = [{ b: -26, v: [-14, -10, -7, -2] }, { b: -31, v: [-19, -12, -7, -3] }, { b: -29, v: [-17, -10, -5, -2] }, { b: -33, v: [-21, -14, -9, -5] }];
+  var MEL = [
+    [2, null, null, 0, null, 2, null, 5, null, null, 2, null, 0, null, -2, null],
+    [0, null, null, 2, null, 5, null, 7, null, null, 5, null, 2, null, 0, null],
+    [-2, null, null, 2, null, 7, null, 5, null, null, 2, null, -2, null, 0, null],
+    [0, null, 2, null, 5, null, 7, null, 10, null, null, 7, null, 5, null, null]];
+  var STRUM = { 0: 1, 4: 0.8, 6: 0.55, 10: 0.7, 12: 0.8, 14: 0.5 };
+  var PENTA = [0, 2, 4, 7, 9];
+  function create(opt) {
+    var ctx = null, master, musicBus, sfxBus, ambBus, noiseBuf, amb = null;
+    var on = function () { try { return opt && opt.enabled ? !!opt.enabled() : true; } catch (e) { return true; } };
+    function ensure() {
+      if (!ctx) {
+        var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+        ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
+        musicBus = ctx.createGain(); musicBus.gain.value = 0.5; musicBus.connect(master);
+        sfxBus = ctx.createGain(); sfxBus.gain.value = 0.9; sfxBus.connect(master);
+        ambBus = ctx.createGain(); ambBus.gain.value = 0.0; ambBus.connect(master);
+        noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return true;
+    }
+    function tone(f, t0, dur, type, vol, bus, f2, dec, atk) {
+      var o = ctx.createOscillator(), g = ctx.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t0);
+      if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t0 + dur);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + (atk || 0.008)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur * (dec || 1));
+      o.connect(g); g.connect(bus || sfxBus); o.start(t0); o.stop(t0 + dur + 0.06);
+    }
+    function noise(t0, dur, vol, ff, q, type, bus, ff2) {
+      var s = ctx.createBufferSource(); s.buffer = noiseBuf; var f = ctx.createBiquadFilter(); f.type = type || 'bandpass'; f.frequency.setValueAtTime(ff || 1200, t0);
+      if (ff2) f.frequency.exponentialRampToValueAtTime(ff2, t0 + dur); f.Q.value = q || 1;
+      var g = ctx.createGain(); g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      s.connect(f); f.connect(g); g.connect(bus || sfxBus); s.start(t0, Math.random()); s.stop(t0 + dur + 0.05);
+    }
+    /* 烏克麗麗：三角波＋高八度正弦，很短的衰減，聽起來像撥弦 */
+    function pluck(n, t0, vol, dur) {
+      var f = NOTE(n); tone(f, t0, dur || 0.34, 'triangle', vol, musicBus, null, 0.9, 0.004); tone(f * 2, t0, (dur || 0.34) * 0.5, 'sine', vol * 0.35, musicBus, null, 0.9, 0.004);
+    }
+    /* 木琴／鋼鼓：正弦＋非整數泛音，敲擊感 */
+    function marimba(n, t0, vol) {
+      var f = NOTE(n); tone(f, t0, 0.42, 'sine', vol, musicBus, null, 0.95, 0.003); tone(f * 3.99, t0, 0.12, 'sine', vol * 0.25, musicBus, null, 0.9, 0.002);
+    }
+    /* —— 音樂：遊戲每過一個 16 分音符叫一次 —— */
+    function step(s, bpm, lvl) {
+      if (!ensure() || !on()) return;
+      var t = ctx.currentTime + 0.012, bar = (s / 16 | 0) % 4, k = s % 16, c = CH[bar], sd = 60 / bpm / 4, L = lvl || 0;
+      if (k === 0 || k === 8 || (k === 6 && L > 0.5)) tone(NOTE(c.b), t, sd * 6, 'triangle', 0.42, musicBus, null, 0.9, 0.006);        // 貝斯
+      if (STRUM[k]) { var amp = STRUM[k], dn = (k % 4 === 0); c.v.forEach(function (n, i) { pluck(n, t + (dn ? i : 3 - i) * 0.011, 0.075 * amp, sd * 3.2); }); }   // 刷弦：下刷／上刷
+      var m = MEL[bar][k]; if (m != null && L > 0.05) marimba(m + (L > 0.7 && bar === 3 ? 12 : 0), t, 0.2);
+      if (k % 4 === 0) tone(95, t, 0.13, 'sine', 0.55, musicBus, 45);                                                                      // 輕輕的大鼓
+      if (L > 0.2 && k % 2 === 0) noise(t, 0.05, k % 4 === 2 ? 0.1 : 0.06, 7500, 1, 'highpass', musicBus);                                  // 沙鈴
+      if (L > 0.4 && (k === 4 || k === 12)) { noise(t, 0.07, 0.32, 1700, 1.4, 'bandpass', musicBus); noise(t + 0.012, 0.05, 0.2, 2400, 1.2, 'bandpass', musicBus); }   // 拍手
+      if (L > 0.65 && k % 4 === 2) pluck(c.v[2] + 12, t, 0.05, sd * 1.4);                                                                  // 高音點綴
+      if (L > 0.85 && (k === 14 || k === 15)) noise(t, 0.06, 0.12, 5000, 1, 'highpass', musicBus);                                         // 最後一碗的滾奏
+    }
+    /* —— 海浪環境聲 —— */
+    function ambient(onOff) {
+      if (!ensure()) return;
+      if (onOff && !amb) {
+        var s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = true; var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 520; f.Q.value = 0.6;
+        var g = ctx.createGain(); g.gain.value = 0.5; var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.13; lg.gain.value = 0.38; lfo.connect(lg); lg.connect(g.gain);
+        s.connect(f); f.connect(g); g.connect(ambBus); s.start(); lfo.start(); amb = { s: s, lfo: lfo };
+      }
+      if (ambBus) ambBus.gain.setTargetAtTime(onOff && on() ? 0.2 : 0.0001, ctx.currentTime, 0.5);
+      if (!onOff && amb) { try { amb.s.stop(ctx.currentTime + 1.5); amb.lfo.stop(ctx.currentTime + 1.5); } catch (e) {} amb = null; }
+    }
+    /* —— 豆花伯的聲音：幾個起伏的鋸齒波經過母音濾波，聽起來像在「欸～」 —— */
+    function voice(t0, notes, vol, dur) {
+      notes.forEach(function (n, i) {
+        var f = NOTE(n), o = ctx.createOscillator(), g = ctx.createGain(), bp = ctx.createBiquadFilter(), bp2 = ctx.createBiquadFilter(), ts = t0 + i * (dur || 0.13);
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(f, ts); o.frequency.linearRampToValueAtTime(f * (i === notes.length - 1 ? 0.88 : 1.04), ts + (dur || 0.13));
+        bp.type = 'bandpass'; bp.frequency.value = 700 + (i % 2) * 220; bp.Q.value = 5; bp2.type = 'bandpass'; bp2.frequency.value = 1500; bp2.Q.value = 6;
+        g.gain.setValueAtTime(0.0001, ts); g.gain.exponentialRampToValueAtTime(vol, ts + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, ts + (dur || 0.13) * 1.15);
+        o.connect(bp); o.connect(bp2); bp.connect(g); bp2.connect(g); g.connect(sfxBus); o.start(ts); o.stop(ts + (dur || 0.13) * 1.2 + 0.05);
+      });
+    }
+    function sfx(name, a) {
+      if (!ensure() || !on()) return; var t = ctx.currentTime + 0.005, i;
+      if (name === 'spoon') { tone(3100, t, 0.07, 'sine', 0.16, sfxBus); tone(4650, t, 0.05, 'sine', 0.07, sfxBus); }
+      else if (name === 'slurp') { noise(t, 0.2, 0.28, 500, 3, 'bandpass', sfxBus, 1500); noise(t + 0.2, 0.12, 0.16, 1500, 3, 'bandpass', sfxBus, 600); tone(260, t, 0.16, 'sine', 0.1, sfxBus, 520); }
+      else if (name === 'perfect') {
+        var n = PENTA[(a | 0) % 5] + 12 * (((a | 0) / 5 | 0) % 2) + 3;
+        sfx('slurp'); tone(NOTE(n + 12), t, 0.3, 'sine', 0.22, sfxBus, null, 0.95, 0.004); tone(NOTE(n + 19), t + 0.06, 0.34, 'sine', 0.16, sfxBus, null, 0.95, 0.004); tone(NOTE(n + 24), t + 0.12, 0.4, 'sine', 0.1, sfxBus);
+      }
+      else if (name === 'good') { sfx('slurp'); tone(NOTE(7), t, 0.18, 'triangle', 0.16, sfxBus, null, 0.9); tone(NOTE(12), t + 0.07, 0.2, 'triangle', 0.1, sfxBus); }
+      else if (name === 'choke') {
+        noise(t, 0.1, 0.5, 700, 1, 'bandpass', sfxBus, 300); noise(t + 0.13, 0.1, 0.42, 900, 1, 'bandpass', sfxBus, 350); noise(t + 0.27, 0.12, 0.38, 800, 1, 'bandpass', sfxBus, 300);
+        tone(220, t + 0.05, 0.5, 'sawtooth', 0.11, sfxBus, 110, 1); tone(NOTE(-9), t + 0.34, 0.5, 'triangle', 0.1, sfxBus, NOTE(-15));
+      }
+      else if (name === 'early') { tone(170, t, 0.12, 'square', 0.1, sfxBus, 110); }
+      else if (name === 'bowlset') { noise(t, 0.05, 0.4, 900, 2, 'bandpass', sfxBus); tone(1900, t + 0.03, 0.25, 'sine', 0.14, sfxBus); tone(2860, t + 0.03, 0.2, 'sine', 0.07, sfxBus); tone(150, t, 0.1, 'sine', 0.3, sfxBus, 80); }
+      else if (name === 'clear') { [0, 4, 7, 12, 16].forEach(function (x, j) { tone(NOTE(x + 3), t + j * 0.07, 0.3, 'triangle', 0.17, sfxBus); tone(NOTE(x + 15), t + j * 0.07, 0.25, 'sine', 0.08, sfxBus); }); sfx('bowlset'); }
+      else if (name === 'heal') { [12, 16, 19, 24].forEach(function (x, j) { tone(NOTE(x), t + j * 0.05, 0.25, 'sine', 0.13, sfxBus); }); }
+      else if (name === 'gull') {
+        [0, 0.2].forEach(function (d, j) { var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(980 - j * 80, t + d); o.frequency.exponentialRampToValueAtTime(620, t + d + 0.16); f.type = 'bandpass'; f.frequency.value = 1500; f.Q.value = 3; g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(0.22, t + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2); o.connect(f); f.connect(g); g.connect(sfxBus); o.start(t + d); o.stop(t + d + 0.25); });
+      }
+      else if (name === 'shoo') { noise(t, 0.28, 0.4, 400, 0.8, 'bandpass', sfxBus, 2600); tone(NOTE(7), t + 0.05, 0.16, 'triangle', 0.14, sfxBus); tone(NOTE(14), t + 0.12, 0.2, 'triangle', 0.14, sfxBus); }
+      else if (name === 'steal') { sfx('gull'); tone(NOTE(-2), t + 0.2, 0.34, 'triangle', 0.16, sfxBus, NOTE(-12)); }
+      else if (name === 'surprise') { voice(t, [3, 8, 6], 0.16, 0.16); tone(NOTE(19), t + 0.1, 0.4, 'sine', 0.1, sfxBus, NOTE(24)); }
+      else if (name === 'talk') { voice(t, [0, 3, 3, 1, -2, 0, -3], 0.15, 0.14); }
+      else if (name === 'hey') { voice(t, [5, 8], 0.14, 0.14); }
+      else if (name === 'laugh') { for (i = 0; i < 5; i++) voice(t + i * 0.11, [4 - (i % 2) * 2], 0.1, 0.09); }
+      else if (name === 'count') { tone(a === 0 ? 880 : 660, t, 0.16, 'square', 0.1, sfxBus); }
+      else if (name === 'go') { tone(1318, t, 0.28, 'square', 0.12, sfxBus); tone(1760, t + 0.1, 0.3, 'triangle', 0.1, sfxBus); }
+      else if (name === 'full') { tone(NOTE(-14), t, 0.5, 'sawtooth', 0.09, sfxBus, NOTE(-19)); }
+      else if (name === 'win') {
+        [0, 4, 7, 12, 7, 12, 16, 19].forEach(function (x, j) { tone(NOTE(x + 3), t + j * 0.11, 0.32, 'triangle', 0.2, sfxBus); tone(NOTE(x + 15), t + j * 0.11, 0.22, 'sine', 0.09, sfxBus); });
+        [0, 4, 7].forEach(function (x) { tone(NOTE(x - 9), t + 0.9, 1.3, 'triangle', 0.16, sfxBus, null, 1); }); noise(t + 0.88, 0.5, 0.18, 6000, 0.7, 'highpass', sfxBus);
+      }
+      else if (name === 'lose') { [0, -2, -4, -7].forEach(function (x, j) { tone(NOTE(x - 2), t + j * 0.22, j === 3 ? 0.9 : 0.24, 'sawtooth', 0.12, sfxBus, NOTE(x - 3.5)); }); }
+      else if (name === 'bite') { var k = (a | 0) % 4; noise(t, 0.06, 0.34, 900 + k * 120, 2.2, 'bandpass', sfxBus, 450); tone(NOTE([0, 4, 7, 4][k] - 5), t, 0.09, 'triangle', 0.16, sfxBus, null, 0.9, 0.003); tone(3200, t, 0.03, 'sine', 0.05, sfxBus); }
+      else if (name === 'bite2') { sfx('bite', a); tone(NOTE(12 + ((a | 0) % 3) * 4), t + 0.02, 0.12, 'sine', 0.11, sfxBus, null, 0.9, 0.003); }
+      else if (name === 'wow') { var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(NOTE(7), t); o.frequency.exponentialRampToValueAtTime(NOTE(19), t + 0.22); o.frequency.exponentialRampToValueAtTime(NOTE(17), t + 0.5); f.type = 'bandpass'; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(2000, t + 0.3); f.Q.value = 4; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55); o.connect(f); f.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.6); [0, 0.07, 0.14].forEach(function (d, j) { tone(NOTE(24 + j * 4), t + d, 0.2, 'sine', 0.08, sfxBus); }); }
+      else if (name === 'drink') { for (i = 0; i < 4; i++) { tone(300 + (i % 2) * 90, t + i * 0.16, 0.14, 'sine', 0.2, sfxBus, 160 + (i % 2) * 40); noise(t + i * 0.16, 0.1, 0.12, 600, 3, 'bandpass', sfxBus, 250); } tone(NOTE(12), t + 0.72, 0.14, 'triangle', 0.1, sfxBus); tone(NOTE(19), t + 0.78, 0.2, 'triangle', 0.09, sfxBus); }
+      else if (name === 'boost') { [0, 4, 7, 12, 16, 19].forEach(function (x, j) { tone(NOTE(x + 15), t + j * 0.045, 0.22, 'triangle', 0.12, sfxBus); }); noise(t, 0.3, 0.12, 7000, 0.7, 'highpass', sfxBus); }
+      else if (name === 'fever') { [0, 7, 12].forEach(function (x, j) { tone(NOTE(x + 12), t + j * 0.05, 0.18, 'square', 0.07, sfxBus); }); }
+      else if (name === 'warn') { tone(1500, t, 0.08, 'square', 0.1, sfxBus); tone(1500, t + 0.14, 0.08, 'square', 0.1, sfxBus); }
+      else if (name === 'burp') { tone(110, t, 0.35, 'sawtooth', 0.14, sfxBus, 70); noise(t, 0.3, 0.12, 300, 1, 'lowpass', sfxBus); }
+      else if (name === 'ice') { [0, 7, 12, 19].forEach(function (x, j) { tone(NOTE(x + 20), t + j * 0.05, 0.3, 'sine', 0.1, sfxBus, null, 0.95, 0.004); }); noise(t, 0.25, 0.1, 9000, 0.7, 'highpass', sfxBus); }
+      else if (name === 'freeze') { tone(NOTE(10), t, 0.5, 'sawtooth', 0.12, sfxBus, NOTE(-6)); noise(t, 0.35, 0.22, 4500, 1.2, 'bandpass', sfxBus, 800); tone(NOTE(22), t + 0.05, 0.4, 'sine', 0.08, sfxBus, NOTE(14)); }
+      else if (name === 'iceok') { tone(NOTE(12), t, 0.12, 'triangle', 0.12, sfxBus); tone(NOTE(19), t + 0.07, 0.16, 'triangle', 0.1, sfxBus); }
+      else if (name === 'bead') { var bk = (a | 0) % 5; tone(NOTE(12 + bk * 2), t, 0.09, 'sine', 0.2, sfxBus, NOTE(16 + bk * 2), 0.95, 0.002); noise(t, 0.04, 0.2, 2500, 2, 'bandpass', sfxBus); }
+      else if (name === 'beadlost') { tone(NOTE(2), t, 0.2, 'triangle', 0.12, sfxBus, NOTE(-8)); }
+      else if (name === 'charge') { tone(NOTE(-5 + (a || 0) * 14), t, 0.07, 'triangle', 0.1, sfxBus); }
+      else if (name === 'bigbite') { noise(t, 0.12, 0.45, 700, 1.4, 'bandpass', sfxBus, 250); tone(NOTE(-9), t, 0.3, 'triangle', 0.2, sfxBus, NOTE(-14)); [0, 4, 7].forEach(function (x, j) { tone(NOTE(x + 12), t + 0.08 + j * 0.06, 0.25, 'triangle', 0.14, sfxBus); }); }
+      else if (name === 'weak') { noise(t, 0.08, 0.2, 800, 2, 'bandpass', sfxBus, 400); tone(NOTE(-4), t, 0.12, 'triangle', 0.08, sfxBus); }
+      else if (name === 'cheer') { [0, 4, 7, 12].forEach(function (x, j) { tone(NOTE(x + 7), t + j * 0.09, 0.2, 'square', 0.07, sfxBus); }); }
+      else if (name === 'tap') { tone(1100, t, 0.05, 'square', 0.07, sfxBus); }
+    }
+    function resume() { if (ctx && ctx.state === 'suspended') ctx.resume(); }
+    function destroy() { ambient(false); try { if (ctx) { var c = ctx; ctx = null; setTimeout(function () { try { c.close(); } catch (e) {} }, 800); } } catch (e) {} }
+    return { ensure: ensure, step: step, sfx: sfx, ambient: ambient, resume: resume, destroy: destroy };
+  }
+  return { create: create };
+})();
+
+/* ---- dofu_game.js ---- */
+/* 福春豆花伯・連吃五碗：遊戲主體（畫面、操作、動畫、特效、流程）。
+   依賴：DofuSim（規則）、DofuAudio（音樂音效）、DofuAssets（豆花伯像素圖，dofu_art.py）、DofuGirl（孫女正面大圖，dofu_girl_art.py）。
+   用法：var g = DofuGame.create({ host, diff:'normal', sound:()=>true, onEnd(res){...} }); g.destroy() 結束。玩法：孫女正面吃豆花，玩家狂點吃、噎滿會嗆到、可喝水。
+   背景＝東吉嶼：海、燈塔、玄武岩、海鷗、小漁船；天色隨碗數從早晨走到午後金黃。 */
+var DofuGame = (function () {
+  var FONT = 'Cubic11, "PingFang TC", sans-serif', INK = '#3b2a1e';
+  var dec = function (s) { return s.replace(/(\D)(\d+)/g, function (m, c, n) { return c.repeat(+n); }); };
+  function cvs(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  function fromRle(d, w, h, pal) { var f = dec(d), c = cvs(w, h), q = c.getContext('2d'); for (var i = 0; i < w * h; i++) { var ch = f[i]; if (ch !== '.' && pal[ch]) { q.fillStyle = pal[ch]; q.fillRect(i % w, (i / w) | 0, 1, 1); } } return c; }
+  function fromRows(rows, pal) { var h = rows.length, w = rows[0].length, c = cvs(w, h), q = c.getContext('2d'); for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) { var ch = rows[j][i]; if (ch !== '.' && pal[ch]) { q.fillStyle = pal[ch]; q.fillRect(i, j, 1, 1); } } return c; }
+  function mix(a, b, t) { var pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16), r = [16, 8, 0].map(function (s) { return Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t); }); return '#' + ((1 << 24) | (r[0] << 16) | (r[1] << 8) | r[2]).toString(16).slice(1); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  var DG = { '0': '01110,10001,10001,10001,10001,10001,01110', '1': '00100,01100,00100,00100,00100,00100,01110', '2': '01110,10001,00001,00010,00100,01000,11111', '3': '11110,00001,00001,01110,00001,00001,11110', '4': '00010,00110,01010,10010,11111,00010,00010', '5': '11111,10000,11110,00001,00001,10001,01110', '6': '00110,01000,10000,11110,10001,10001,01110', '7': '11111,00001,00010,00100,01000,01000,01000', '8': '01110,10001,10001,01110,10001,10001,01110', '9': '01110,10001,10001,01111,00001,00010,01100' };
+
+  /* ——— 小圖（用文字畫的像素圖） ——— */
+  var HEART = ['.kk.kk.', 'kRRkRRk', 'kRRRRRk', '.kRRRk.', '..kRk..', '...k...'];
+  var STAR = ['....k....', '...kYk...', '...kYk...', 'kkkkYkkkk', 'kYYYYYYYk', '.kYYYYYk.', '..kYYYk..', '.kYYkYYk.', '.kYk.kYk.', '.kk...kk.'];
+  var GULL = [
+    ['k.............k', 'wk...........kw', 'wwk....k....kww', '.wwkkkkWkkkkww.', '..kwwwWWWwwwk..', '....kWWWWWk....', '.....kWWWk.....'],
+    ['...............', '.kk.........kk.', 'wwwkk..k..kkwww', '.wwwwkkWkkwwww.', '..kwwwWWWwwwk..', '....kWWWWWk....', '.....kWWWk.....'],
+    ['...............', '...............', 'kk...kkkkk...kk', 'wwkkkWWWWWkkkww', '.kwwwWWWWWwwwk.', '....kWWWWWk....', '.....kWWWk.....']];
+  var GPAL = { k: '#6a7078', w: '#cfd6dc', W: '#fbfcfd' };
+  var HPAL = { k: INK, R: '#ec4a3c' };
+  var SNOW = ['...W...', 'W..W..W', '.W.W.W.', 'WWWWWWW', '.W.W.W.', 'W..W..W', '...W...'], BALLS = [[14, 8], [22, 4], [30, 2], [39, 6], [47, 3], [57, 8], [49, 12]];
+
+  var imgs = null;
+  function images() {
+    if (imgs) return imgs;
+    var A = DofuAssets, I = { boss: {} }, k, q;
+    for (k in A.boss) I.boss[k] = fromRle(A.boss[k], A.w, A.h, A.pal);
+    I.heart = fromRows(HEART, HPAL); I.heartE = fromRows(HEART, { k: '#6b5a4a', R: '#4a3e34' });
+    I.star = fromRows(STAR, { k: INK, Y: '#ffd95a' }); I.starE = fromRows(STAR, { k: '#6b5a4a', Y: '#4a3e34' });
+    I.gull = GULL.map(function (r) { return fromRows(r, GPAL); });
+    I.cloud = [[34, 11, 0], [24, 9, 1], [42, 13, 2]].map(function (a) {
+      var c = cvs(a[0], a[1]), g = c.getContext('2d'), n = a[2];
+      g.fillStyle = '#e4f3f6'; [[.28, .6, .24, .38], [.5, .45, .3, .5], [.74, .62, .22, .36], [.5, .72, .46, .28]].forEach(function (b) { g.beginPath(); g.ellipse(b[0] * a[0], b[1] * a[1], b[2] * a[0], b[3] * a[1], 0, 0, 6.3); g.fill(); });
+      g.fillStyle = '#ffffff'; [[.34, .4, .18, .26], [.52, .3, .2, .3], [.7, .42, .16, .24]].forEach(function (b) { g.beginPath(); g.ellipse(b[0] * a[0], b[1] * a[1], b[2] * a[0], b[3] * a[1], 0, 0, 6.3); g.fill(); });
+      var d = g.getImageData(0, 0, a[0], a[1]), p = d.data; for (var i = 0; i < p.length; i += 4) p[i + 3] = p[i + 3] > 110 ? 255 : 0; g.putImageData(d, 0, 0); return c;
+    });
+    /* 東吉燈塔：白色塔身、深色燈室與紅色頂 */
+    q = cvs(18, 46); var g1 = q.getContext('2d');
+    function R1(c, x, y, w, h) { g1.fillStyle = c; g1.fillRect(x, y, w, h); }
+    R1(INK, 6, 0, 6, 2); R1('#c8453a', 5, 2, 8, 2); R1('#a93a30', 4, 4, 10, 2); R1(INK, 4, 6, 10, 1);
+    R1('#2f3a4a', 5, 7, 8, 7); R1('#9fd8ef', 6, 8, 6, 5); R1('#ffffff', 7, 9, 2, 2); R1(INK, 3, 14, 12, 2); R1('#8d949c', 3, 14, 12, 1);
+    R1('#f4f1e8', 5, 16, 8, 26); R1('#d9d6cb', 10, 16, 3, 26); R1('#ffffff', 6, 16, 2, 26); R1('#c8453a', 5, 24, 8, 4); R1('#a93a30', 10, 24, 3, 4); R1('#c8453a', 5, 34, 8, 4); R1('#a93a30', 10, 34, 3, 4);
+    R1(INK, 4, 42, 10, 2); R1('#4b4b52', 6, 29, 3, 5);
+    g1.fillStyle = INK; for (var yy = 16; yy < 42; yy++) { g1.fillRect(4, yy, 1, 1); g1.fillRect(13, yy, 1, 1); } I.lighthouse = q;
+    /* 玄武岩柱 */
+    q = cvs(56, 40); var g2 = q.getContext('2d'), cols = [[0, 22, 9], [9, 30, 10], [19, 36, 9], [28, 26, 10], [38, 18, 9], [47, 12, 9]];
+    cols.forEach(function (c, i) { var x = c[0], h = c[1], w = c[2], y = 40 - h; g2.fillStyle = '#4c4a55'; g2.fillRect(x, y, w, h); g2.fillStyle = '#65626f'; g2.fillRect(x + 1, y, 3, h); g2.fillStyle = '#35333c'; g2.fillRect(x + w - 2, y, 2, h); g2.fillStyle = '#7c7986'; g2.fillRect(x, y, w, 2); g2.fillStyle = INK; g2.fillRect(x, y - 1, w, 1); g2.fillRect(x - 1 < 0 ? 0 : x - 1, y, 1, h);
+      g2.fillStyle = '#6aa84f'; g2.fillRect(x + 1, y - 1, w - 3, 2); g2.fillStyle = '#8fc66a'; g2.fillRect(x + 2, y - 2, 3, 1); g2.fillRect(x + 6, y - 2, 2, 1);
+      g2.fillStyle = '#35333c'; for (var j = 6; j < h; j += 7) g2.fillRect(x + 1, y + j, w - 3, 1); });
+    I.basalt = q;
+    q = cvs(24, 12); var g3 = q.getContext('2d'); g3.fillStyle = INK; g3.fillRect(2, 8, 20, 2); g3.fillRect(3, 10, 18, 1); g3.fillStyle = '#1d6f8a'; g3.fillRect(3, 7, 18, 3); g3.fillStyle = '#c8453a'; g3.fillRect(3, 7, 18, 1);
+    g3.fillStyle = '#f4f1e8'; g3.fillRect(8, 3, 7, 4); g3.fillStyle = INK; g3.fillRect(7, 2, 9, 1); g3.fillStyle = '#9fd8ef'; g3.fillRect(10, 4, 2, 2); g3.fillStyle = INK; g3.fillRect(18, 0, 1, 8); I.boat = q;
+    I.bowl = []; I.bowlN = [];   /* 每一碗一種樣式：I.bowl[碗序][階段] */
+    DofuBowl.styles.forEach(function (sty) {
+      I.bowl.push(sty.f.map(function (d) { return fromRle(d, DofuBowl.w, DofuBowl.h, sty.pal); }));
+      I.bowlN.push(sty.n.map(function (d) { return fromRle(d, DofuBowl.w, DofuBowl.h, sty.pal); }));
+    });
+    I.snow = fromRows(SNOW, { W: '#d8f1ff' }); I.snowB = fromRows(SNOW, { W: '#6cc3ee' });
+    I.girl = {}; for (k in DofuGirl.f) I.girl[k] = fromRle(DofuGirl.f[k], DofuGirl.w, DofuGirl.h, DofuGirl.pal);
+    imgs = I; return I;
+  }
+
+  function create(o) {
+    var host = o.host, diffKey = o.diff || 'normal', I = images();
+    var cw = host.clientWidth || 360, ch = host.clientHeight || 640;
+    var scale = 2;
+    if (cw >= 560) { var fit = Math.min(6, ch / 312, cw / 176); scale = fit >= 3 ? Math.floor(fit) : Math.max(1, Math.floor(fit * 4) / 4); }   /* 電腦版：依視窗高度放大（最多 6 倍；不足 3 倍時用 1/4 級距），畫面才不會小小一條 */
+    while (scale > 2 && Math.floor(ch / scale) < 312) scale--;
+    if (cw < 560) while (scale > 1 && Math.floor(ch / scale) < 312) scale = 1;
+    var WF = Math.max(176, Math.ceil(cw / scale)), W = cw < 560 ? WF : Math.min(WF, 230), OX = Math.floor((WF - W) / 2), H = Math.max(312, Math.floor(ch / scale));   /* WF＝整個畫面寬（滿版）；W＝操作區寬（電腦版置中 230），背景鋪滿 WF */
+    var cv = cvs(WF, H); cv.style.cssText = 'position:absolute;top:0;left:0;width:' + (WF * scale) + 'px;height:' + (H * scale) + 'px;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none;';
+    host.appendChild(cv); var g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+    var au = DofuAudio.create({ enabled: o.sound });
+    var sim = DofuSim.create({ diff: diffKey }), S = sim.s;
+
+    /* ——— 版面（由下往上排） ——— */
+    var BTN_H = 46, WAT_W = 70, WAT_X = W - 8 - WAT_W, EAT_W = WAT_X - 14;
+    var TB = H - 138, BTN_Y = TB + 68, GX = Math.round(W * 0.38), GIRL_Y = TB - 74, BOWL_X = GX, BOWL_Y = TB + 16, MOUTH = { x: GX, y: TB - 24 };
+    var BOSS_X = W - 74, BOSS_Y = TB - 50, ROOF_Y = TB - 98, HORIZON = Math.max(66, TB - 126), STACK_X = 21, STACK_Y = TB + 36, HUD_H = 52;
+    var st = {
+      t: 0, shake: 0, flash: 0, flashCol: '#fff', pops: [], parts: [], banners: [], bite: null, biteT: 9, tapPar: 0, bossFrame: 'idle', bossHold: 0, beatPulse: 0, bounce: 0,
+      p: 0, tgtP: 0, stack: 0, bowlIn: 0, flyBowl: null, talk: null, ended: false, endT: 0, reveal: false, revT: 0, reported: false, paused: false, hintOn: true, best: 0, newBest: false, winT: 0, glow: 0,
+      cloudX: [0.12, 0.55, 0.85], gullsAmb: [{ x: 0.2, y: 0.5, sp: 9 }, { x: 0.7, y: 0.75, sp: 6 }, { x: 1.1, y: 0.35, sp: 7 }], eatBtn: 0, watBtn: 0, wowT: 0, cheer: 0, loseT: 0, lastBites: 0, cap: null, said: {}, tipT: 0, tip: null, gullFly: null, ceo: null, ceoSay: null, hold: false, chT: 0, capT: 0, beadHint: 0, iceFx: 0
+    };
+    try { st.best = +localStorage.getItem('sunnuDofuBest_' + diffKey) || 0; } catch (e) {}
+    var raf = 0, last = 0, dead = false;
+
+    /* ——— 文字 ——— */
+    function R(x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+    function smallTxt(s, x, y, col, align, shadow) {
+      var parts = String(s).match(/\d+(?:\.\d+)?|[^\d]+/g) || [], ws = [], tot = 0; g.font = '11px ' + FONT;
+      parts.forEach(function (t) { var w = /^\d/.test(t) ? t.split('').reduce(function (a, c) { return a + (c === '.' ? 3 : 6); }, 0) : g.measureText(t).width; ws.push(w); tot += w; });
+      var cx = Math.round(Math.round(x) - (align === 'left' ? 0 : align === 'right' ? tot : tot / 2));
+      function pass(dx, dy, c) {
+        var px = cx + dx; g.fillStyle = c; g.textAlign = 'left'; g.textBaseline = 'middle';
+        parts.forEach(function (t, k) {
+          if (/^\d/.test(t)) { var q = px; t.split('').forEach(function (chh) { if (chh === '.') { g.fillRect(q, Math.round(y) + dy + 3, 1, 1); q += 3; return; } var rows = DG[chh].split(','); for (var j = 0; j < 7; j++) { var oy = j + (j > 2) + (j > 4), hh = (j === 2 || j === 4) ? 2 : 1; for (var i = 0; i < 5; i++) if (rows[j][i] === '1') g.fillRect(q + i, Math.round(y) + dy - 4 + oy, 1, hh); } q += 6; }); }
+          else g.fillText(t, px, Math.round(y) + dy);
+          px += ws[k];
+        });
+      }
+      if (shadow !== false) pass(1, 1, INK); pass(0, 0, col || '#fff6dc');
+    }
+    function txt(s, x, y, size, col, align, shadow) {
+      size = Math.max(1, Math.round(size / 11)) * 11; s = String(s);
+      if (size <= 11 && /\d/.test(s)) { smallTxt(s, x, y, col, align, shadow); return; }
+      g.font = size + 'px ' + FONT; g.textAlign = align || 'center'; g.textBaseline = 'middle';
+      if (shadow !== false) { g.fillStyle = INK; g.fillText(s, x + 1, y + 1); } g.fillStyle = col || '#fff6dc'; g.fillText(s, x, y);
+    }
+    function pcirc(cx, cy, r, col, th) { g.fillStyle = col; th = th || 1; for (var a = 0; a < 360; a += 360 / Math.max(24, Math.round(r * 5))) { var rad = a * Math.PI / 180; g.fillRect(Math.round(cx + Math.cos(rad) * r), Math.round(cy + Math.sin(rad) * r), th, th); } }
+    function ellFill(cx, cy, rx, ry, col) { g.fillStyle = col; for (var y = -ry; y <= ry; y++) { var w = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry)))); g.fillRect(Math.round(cx - w), Math.round(cy + y), w * 2, 1); } }
+    function pop(text, x, y, col, big) { st.pops.push({ text: text, x: x, y: y, age: 0, col: col || '#fff6dc', big: !!big }); }
+    function banner(text, col, ttl) { st.banners.push({ text: text, col: col || '#ffd95a', age: 0, ttl: ttl || 1.8 }); }
+    function burst(x, y, n, cols, sp, grav) { for (var i = 0; i < n; i++) { var a = Math.random() * 6.283, v = (0.4 + Math.random()) * (sp || 40); st.parts.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (sp || 40) * 0.5, g: grav == null ? 120 : grav, age: 0, life: 0.5 + Math.random() * 0.6, c: cols[i % cols.length], s: Math.random() < 0.3 ? 2 : 1 }); } }
+    function buzz(n) { try { if (navigator.vibrate) navigator.vibrate(n); } catch (e) {} }
+    function cupIcon(x, y, fill, a) { g.globalAlpha = a == null ? 1 : a; R(x, y, 7, 9, INK); R(x + 1, y + 1, 5, 7, '#e6f4fa'); if (fill) R(x + 1, y + 3, 5, 5, '#6cc3ee'); R(x + 1, y + 1, 1, 7, '#ffffff'); g.globalAlpha = 1; }
+
+    /* ——— 操作 ——— */
+    function rel(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * WF - OX, y: (e.clientY - r.top) / r.height * H }; }
+    function resume() { st.paused = false; last = performance.now(); au.ambient(true); }
+    function doEat() {
+      if (dead || st.ended) return; au.ensure();
+      if (st.paused) { resume(); return; }
+      st.eatBtn = 0.1; var r = sim.eat();
+      if (r && r.res === 'blocked') au.sfx('tap');
+    }
+    function doDrink() {
+      if (dead || st.ended) return; au.ensure(); if (st.paused) { resume(); return; }
+      st.watBtn = 0.2; if (!sim.drink()) au.sfx('tap');
+    }
+    function gullPos() {
+      var gl = S.gull; if (!gl) return null;
+      var u = clamp(gl.t / gl.dur, 0, 1), e = Math.pow(u, 1.6), sx = gl.side < 0 ? -12 : W + 12, sy = HUD_H + 34, tx = BOWL_X + gl.side * 4, ty = BOWL_Y - 14;
+      return { x: lerp(sx, tx, e), y: lerp(sy, ty, e) + Math.sin(u * 9) * 3 * (1 - u), u: u };
+    }
+    function beadPos(b) { var m = clamp(1 - S.prog / S.need, 0, 1), B = BALLS[b.slot]; return { x: BOWL_X + (st.bowlIn > 0 ? Math.round(Math.pow(st.bowlIn, 2) * (W * 0.7)) : 0) - DofuBowl.w / 2 + B[0], y: BOWL_Y - DofuBowl.cy + B[1] + (1 - m) * 4 }; }
+    function pressDown() {
+      if (dead || st.ended) return; au.ensure();
+      if (st.paused) { resume(); return; }
+      if (S.phase === 'play' && S.i === 4 && S.cap && S.prog >= S.cap - 1e-6 && !S.beads.length) { if (sim.holdStart()) { st.hold = true; st.eatBtn = 0.1; return; } }
+      doEat();
+    }
+    function pressUp() { if (!st.hold) return; st.hold = false; st.eatBtn = 0.1; sim.holdEnd(); }
+    function down(e) {
+      if (dead && !(st.ended && st.band)) return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} var p = rel(e);   /* 主程式結算後會 freeze()（dead=true），但結算頁的商品橫幅仍要能點 */
+      if (st.ended) { if (!st.reveal) { if (st.endT > 1.2) { st.reveal = true; st.revT = 0; if (S.phase === 'win') try { au.sfx('cheer'); } catch (x) {} } return; } if (st.band && st.revT >= st.band.t0 && p.x >= st.band.x && p.x <= st.band.x + st.band.w && p.y >= st.band.y && p.y <= st.band.y + st.band.h) openShop(); else if (st.revT > 1.6 && !st.reported) st.revT = 99; return; }   /* 點橫幅＝開商品頁；點別處＝跳過等待直接往下 */
+      if (st.paused) { pressDown(); return; }
+      if (p.x >= WAT_X - 4 && p.y >= BTN_Y - 6 && p.y <= BTN_Y + BTN_H + 6) { doDrink(); return; }
+      if (S.phase === 'play') {
+        var gp = gullPos(); if (gp && Math.hypot(p.x - gp.x, p.y - gp.y) < 26) { au.ensure(); sim.shoo(); return; }
+        if (S.beads.length) {
+          var best = null, bd = 17; S.beads.forEach(function (b) { var q = beadPos(b), d = Math.hypot(p.x - q.x, p.y - q.y); if (d < bd) { bd = d; best = b; } });
+          au.ensure(); if (best) { sim.bead(best.slot); } else { au.sfx('tap'); st.beadHint = 1; } return;
+        }
+      }
+      pressDown();
+    }
+    function openShop() {
+      var url = ''; try { url = typeof o.shopUrl === 'function' ? o.shopUrl() : (o.shopUrl || ''); } catch (e) {}
+      if (!url || !/^https?:\/\//i.test(url)) return; try { au.sfx('cheer'); } catch (e) {} try { window.open(url, '_blank', 'noopener'); } catch (e) {}
+    }
+    cv.addEventListener('pointermove', function (e) { if (!st.ended || !st.band) { cv.style.cursor = ''; return; } var p = rel(e); cv.style.cursor = (st.revT >= st.band.t0 && p.x >= st.band.x && p.x <= st.band.x + st.band.w && p.y >= st.band.y && p.y <= st.band.y + st.band.h) ? 'pointer' : ''; });
+    function isEatKey(k) { return k === ' ' || k === 'Enter' || k === 'ArrowDown' || k === 'ArrowUp' || k === 'f' || k === 'F' || k === 'j' || k === 'J' || k === 'd' || k === 'D' || k === 'k' || k === 'K'; }
+    function kd(e) {
+      if (dead) return; var k = e.key;
+      if (isEatKey(k)) { e.preventDefault(); if (!e.repeat) pressDown(); }
+      else if (k === 'g' || k === 'G' || k === 'w' || k === 'W' || k === 'ArrowRight' || k === 'ArrowLeft' || k === 'Shift') { e.preventDefault(); if (!e.repeat) doDrink(); }
+      else if (k === 'p' || k === 'P' || k === 'Escape') { if (!st.ended) { st.paused = !st.paused; if (!st.paused) resume(); else au.ambient(false); } }
+    }
+    function ku(e) { if (isEatKey(e.key)) pressUp(); }
+    function vis() { if (document.hidden && !st.ended && st.t > 0.5) { st.paused = true; au.ambient(false); } else last = performance.now(); }
+    cv.addEventListener('pointerdown', down); cv.addEventListener('pointerup', pressUp); cv.addEventListener('pointercancel', pressUp); window.addEventListener('keydown', kd); window.addEventListener('keyup', ku); document.addEventListener('visibilitychange', vis);
+
+    /* ——— 事件（音效與特效） ——— */
+    /* 孫女的台詞：影片字幕原句（使用者提供）。依「第幾碗、吃到幾成」出現，用影片字幕的白字黑框樣式顯示 */
+    var LINES = [{ i: 0, at: 0.35, t: '豆花好綿哦' }, { i: 0, at: 0.85, t: '還沒吃完就想再來一碗了怎麼辦' }, { i: 1, at: 0.5, t: '深深著迷了怎麼辦' }, { i: 3, at: 0.12, t: '刷～～', wow: true }, { i: 3, at: 0.5, t: '就這樣在你口中融化' }, { i: 4, at: 0.3, t: '第一次吃豆花吃到續碗' }];
+    function say(t, wow) { st.cap = { text: t, t: 0, dur: 2.6 }; if (wow) { st.wowT = 1.0; au.sfx('hey'); } }
+    var TIPS = [null, ['看到雪花就停手', '還敢吃就冰到頭'], ['先點掉碗上黑珠', '再繼續吃豆花'], ['海鷗俯衝時點牠', '被搶走會退步'], ['小口只能吃一半', '按住吃鈕蓄力']];
+    var CHEER = ['好好吃！', '嗯嗯～', '再來！', '太好吃了！', '好甜！'];
+    function handle(ev) {
+      switch (ev.t) {
+        case 'step': au.step(ev.s, S.bpm, clamp(0.08 + S.i * 0.18 + (S.rate >= 5 ? 0.18 : 0) + (S.boost > 0 ? 0.12 : 0), 0, 1)); if (ev.s % 4 === 0) st.beatPulse = 1; break;
+        case 'bowlStart':
+          st.tgtP = (ev.i + 0.5) / 5; st.bowlIn = 1.0; st.bossFrame = 'ladle'; st.bossHold = 1.2; st.wowT = 1.0; st.lastBites = 0;
+          if (ev.i > 0) { au.sfx('bowlset'); setTimeout(function () { if (!dead) au.sfx('wow'); }, 250); pop('哇～豆花！', GX + 4, GIRL_Y - 6, '#fff6dc', false); banner(ev.i === 4 ? '最後一碗！' : '第 ' + (ev.i + 1) + ' 碗', ev.i === 4 ? '#ffd95a' : '#fff6dc', 1.4); TIPS[ev.i].forEach(function (l) { banner(l, '#ffe9a0', 4.2); }); } st.capT = 0;
+          break;
+        case 'talk': st.talk = { t: 0, text: '你沒吃午餐哦？' }; st.bossFrame = 'surprise'; st.bossHold = 1.6; au.sfx('surprise'); setTimeout(function () { if (!dead) au.sfx('talk'); }, 650); break;
+        case 'bite': st.bite = { t: 0, dur: 0.15 }; st.biteT = 0; st.tapPar ^= 1; st.bounce = 1; st.hintOn = false; st.lastBites++;
+          au.sfx(ev.fever ? 'bite2' : 'bite', S.taps); burst(MOUTH.x + (Math.random() - 0.5) * 8, MOUTH.y + 6, ev.fever ? 3 : 1, ['#fffaf0', '#fff1d0', '#e8b070'], 36, 140);
+          if (st.lastBites % 14 === 0) pop(CHEER[(st.lastBites / 14 | 0) % CHEER.length], GX + 40, GIRL_Y + 14, '#ffe9a0', false);
+          break;
+        case 'fever': au.sfx('fever'); banner('狂吃中！分數×2', '#ff9a5a', 1.4); st.bossFrame = 'laugh'; st.bossHold = 0.9; break;
+        case 'boost': au.sfx('boost'); banner('加料！一點吃兩口', '#9be28a', 1.6); st.bossFrame = 'ladle'; st.bossHold = 1.1; st.glow = 1; burst(BOWL_X, BOWL_Y - 8, 14, ['#ffd95a', '#fff6dc', '#9be28a'], 50); break;
+        case 'boostEnd': st.glow = 0; break;
+        case 'iceOn': au.sfx('ice'); st.iceFx = 1; break;
+        case 'iceEnd': au.sfx('iceok'); pop('忍住了！', GX, GIRL_Y - 4, '#bfe6f5', true); st.iceFx = 0; break;
+        case 'freeze': au.sfx('freeze'); pop('冰到頭！', GX, GIRL_Y - 4, '#9fd8ef', true); st.shake = 0.35; st.flash = 0.12; st.flashCol = '#9fd8ef'; buzz(60); st.iceFx = 0; st.bossFrame = 'surprise'; st.bossHold = 1.0; burst(GX, GIRL_Y + 10, 14, ['#d8f1ff', '#9fd8ef', '#ffffff'], 70, 90); break;
+        case 'beads': au.sfx('bowlset'); if (S.i === 2 || S.waves === 2) pop(S.waves === 2 ? '又來一批黑珠！' : '點掉黑珠！', BOWL_X, BOWL_Y - 34, '#fff6dc', false); break;
+        case 'bead': au.sfx('bead', ev.left); (function () { var q = beadPos({ slot: ev.slot }); burst(q.x, q.y, 6, ['#26262c', '#9a9aa8', '#ffffff'], 40, 140); })(); break;
+        case 'beadLost': au.sfx('beadlost'); pop('珠子掉了！-1秒', BOWL_X, BOWL_Y - 30, '#ec9a8a', false); break;
+        case 'gull': au.sfx('gull'); banner('海鷗來了！點牠！', '#fff6dc', 1.4); st.ceoSay = { text: '汪！海鷗！', t: 0 }; break;
+        case 'shoo': au.sfx('shoo'); (function () { var q = st.lastGull || { x: BOWL_X, y: BOWL_Y - 20 }; pop('趕走了！', q.x, q.y, '#fff6dc', true); burst(q.x, q.y, 12, ['#ffffff', '#cfd6dc'], 70, 100); })(); break;
+        case 'steal': au.sfx('steal'); st.shake = 0.3; (function () { var q = st.lastGull || { x: BOWL_X, y: BOWL_Y - 20 }; pop('豆花被搶了！', GX, GIRL_Y - 4, '#ec6a5c', true); st.gullFly = { x: q.x, y: q.y, t: 0, side: S.gull ? S.gull.side : 1 }; })(); st.bossFrame = 'worry'; st.bossHold = 1.0; break;
+        case 'capHit': if (st.capT <= 0) { st.capT = 1.4; au.sfx('weak'); pop('按住「吃」蓄力！', W / 2, HUD_H + 76, '#ffd95a', false); } break;
+        case 'charge': au.sfx('charge', 0); break;
+        case 'bigbite': if (ev.q === 'good') { au.sfx('bigbite'); pop('大口！', GX, GIRL_Y - 4, '#ffd95a', true); st.biteT = 0; st.tapPar ^= 1; st.bounce = 1; st.shake = 0.2; burst(MOUTH.x, MOUTH.y + 4, 16, ['#fffaf0', '#fff1d0', '#e8b070'], 70, 140); } else { au.sfx('weak'); pop('太小口了…', GX, GIRL_Y - 4, '#c8b89a', false); st.biteT = 0; } break;
+        case 'choke': au.sfx('choke'); setTimeout(function () { if (!dead) au.sfx('burp'); }, 450); pop('嗆到了！', GX, GIRL_Y - 4, '#ec6a5c', true); st.shake = 0.45; st.flash = 0.1; st.flashCol = '#ff8a7a'; buzz(80); st.bossFrame = 'worry'; st.bossHold = 1.2; burst(MOUTH.x, MOUTH.y, 14, ['#fffaf0', '#ffe9a0', '#d9923a'], 70, 170); break;
+        case 'drink': au.sfx('drink'); pop('咕嚕咕嚕～', GX, GIRL_Y - 4, '#bfe6f5', true); burst(MOUTH.x, MOUTH.y + 4, 8, ['#8fdcf2', '#e6f4fa'], 40, 160); break;
+        case 'warn': au.sfx('warn'); pop('快沒時間了！', W / 2, 74, '#ec6a5c', true); break;
+        case 'clear': au.sfx('clear'); st.stack = ev.bowls; st.flyBowl = { t: 0, k: ev.bowls - 1, from: { x: BOWL_X, y: BOWL_Y }, to: { x: STACK_X, y: STACK_Y - (ev.bowls - 1) * 6 } }; st.bossFrame = 'laugh'; st.bossHold = 1.0; st.cheer = 1.4; banner('完食第 ' + ev.bowls + ' 碗！', '#ffd95a', 1.4); burst(GX, GIRL_Y + 20, 14, ['#ffd95a', '#fff6dc', '#ffb0c0'], 50); break;
+        case 'win': au.sfx('win'); st.ceo = { t: 0, x0: st.ceoLast ? st.ceoLast.x - OX : W - 20, y0: st.ceoLast ? st.ceoLast.y : HORIZON }; setTimeout(function () { if (!dead) au.sfx('cheer'); }, 1100); setTimeout(function () { if (!dead) say('好像吃太多了…'); }, 900); au.ambient(true); st.ended = true; st.endT = 0; st.bossFrame = 'thumb'; st.bossHold = 99; burst(W / 2, 90, 70, ['#ffd95a', '#ec6a5c', '#78bfe8', '#86cf62', '#f9b5c4', '#fff6dc'], 90, 80); finishWin(ev.result); break;
+        case 'lose': au.sfx('lose'); st.ended = true; st.endT = 0; st.bossFrame = 'worry'; st.bossHold = 99; st.shake = 0.5; st.loseT = 0.0001; break;
+      }
+    }
+    function finishWin(r) { try { var b = +localStorage.getItem('sunnuDofuBest_' + diffKey) || 0; if (r.score > b) { st.newBest = b > 0; localStorage.setItem('sunnuDofuBest_' + diffKey, String(r.score)); st.best = r.score; } else st.best = b; } catch (e) {} }
+
+    /* ——— 更新 ——— */
+    function update(dt) {
+      st.t += dt; st.biteT += dt; st.p += (st.tgtP - st.p) * Math.min(1, dt * 0.8);
+      ['beatPulse', 'shake', 'flash', 'eatBtn', 'watBtn', 'bounce', 'wowT', 'cheer'].forEach(function (k) { st[k] = Math.max(0, st[k] - dt * (k === 'beatPulse' ? 3.2 : k === 'bounce' ? 7 : 1.6)); });
+      if (st.bossHold > 0) { st.bossHold -= dt; if (st.bossHold <= 0) st.bossFrame = 'idle'; }
+      if (st.bowlIn > 0) st.bowlIn = Math.max(0, st.bowlIn - dt / 0.9);
+      if (st.bite) { st.bite.t += dt; if (st.bite.t >= st.bite.dur) st.bite = null; }
+      if (st.talk) { st.talk.t += dt; if (st.talk.t > 3.2) st.talk = null; }
+      if (st.flyBowl) { st.flyBowl.t += dt; if (st.flyBowl.t > 0.55) st.flyBowl = null; }
+      if (st.loseT > 0) st.loseT += dt;
+      if (st.tipT > 0) st.tipT -= dt; st.capT = Math.max(0, st.capT - dt); st.beadHint = Math.max(0, st.beadHint - dt * 2);
+      if (st.ceoSay) { st.ceoSay.t += dt; if (st.ceoSay.t > 1.8) st.ceoSay = null; }
+      if (st.gullFly) { st.gullFly.t += dt; st.gullFly.x += st.gullFly.side * 60 * dt; st.gullFly.y -= 38 * dt; if (st.gullFly.t > 1.6) st.gullFly = null; }
+      if (st.ceo) st.ceo.t += dt;
+      if (S.charging > 0) { st.chT += dt; if (st.chT > 0.11) { st.chT = 0; au.sfx('charge', clamp(S.charging / S.df.charge[1], 0, 1)); } }
+      st.gullsAmb.forEach(function (a) { a.x += a.sp * dt / W; if (a.x > 1.15) { a.x = -0.15; a.y = 0.25 + Math.random() * 0.6; } });
+      st.cloudX = st.cloudX.map(function (x, i) { x += (0.004 + i * 0.002) * dt; return x > 1.2 ? -0.2 : x; });
+      if (!st.paused) sim.step(dt);
+      if (S.phase === 'play' && !st.ended) for (var li = 0; li < LINES.length; li++) { var L = LINES[li]; if (L.i === S.i && !st.said[li] && S.prog >= S.need * L.at && !(S.i === 2 && st.talk && st.talk.t < 1.8)) { st.said[li] = 1; say(L.t, L.wow); } }
+      if (st.cap) { st.cap.t += dt; if (st.cap.t > st.cap.dur) st.cap = null; }
+      for (var k = 0; k < S.ev.length; k++) handle(S.ev[k]); S.ev.length = 0;
+      for (var i = st.parts.length - 1; i >= 0; i--) { var q = st.parts[i]; q.age += dt; q.vy += q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt; if (q.age > q.life) st.parts.splice(i, 1); }
+      for (i = st.pops.length - 1; i >= 0; i--) { st.pops[i].age += dt; if (st.pops[i].age > 1.1) st.pops.splice(i, 1); }
+      for (i = st.banners.length - 1; i >= 0; i--) { st.banners[i].age += dt; if (st.banners[i].age > st.banners[i].ttl) st.banners.splice(i, 1); }
+      if (!st.ended && Math.random() < dt * 4) st.parts.push({ x: BOWL_X + (Math.random() - 0.5) * 56, y: BOWL_Y - 12 + Math.random() * 6, vx: (Math.random() - 0.5) * 3, vy: -3 - Math.random() * 3, g: 0, age: 0, life: 1.1, c: '#d8f1ff', s: Math.random() < 0.4 ? 2 : 1, steam: true });
+      if (S.boost > 0 && Math.random() < dt * 14) st.parts.push({ x: BOWL_X + (Math.random() - 0.5) * 50, y: BOWL_Y - 6 + (Math.random() - 0.5) * 10, vx: 0, vy: -20, g: -10, age: 0, life: 0.7, c: Math.random() < 0.5 ? '#ffd95a' : '#fff6dc', s: 2 });
+      if (st.ended) { st.endT += dt; if (!st.reveal && st.endT > 0) { st.reveal = true; st.revT = 0; } if (st.reveal) st.revT += dt;   /* 結束後立刻自動跳出結算（使用者要 0 秒） */ if (!st.reported && st.reveal && st.revT > 6.0) { st.reported = true; if (o.onEnd) { try { o.onEnd(S.result); } catch (e) { if (window.console) console.error(e); } } } }
+    }
+
+    /* ——— 繪圖：背景 ——— */
+    var SKY = [['#8fd8f0', '#fdf1d0', '#2a95b8', '#5fd0cf'], ['#4cb4ec', '#c8f0f8', '#1d7fa8', '#46c1c9'], ['#5f9fd6', '#ffd9a0', '#1f6f98', '#e0a77a']];
+    function skyCol(idx) { var p = clamp(st.p, 0, 1) * 2, a = Math.floor(p), b = Math.min(2, a + 1), t = p - a; return mix(SKY[a][idx], SKY[b][idx], t); }
+    var ceoImg = null; if (o.chars && o.chars.ceo) { ceoImg = new Image(); ceoImg.src = o.chars.ceo; }
+    function ease(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+    function drawCeo(T, hz) {   /* 夾褲 CEO 坐船經過：五種搞笑橋段輪流 */
+      var P = 13, gi = Math.floor(T / P) % 5, u = (T % P) / P, dir = gi === 3 ? -1 : 1;
+      var bob = Math.sin(T * 1.7) * 1.2, x = dir > 0 ? -30 + u * (W + 60) : W + 30 - u * (W + 60), by = hz + 9 + bob, rot = 0, bub = null, wob = 0;
+      var hasD = ceoImg && ceoImg.complete && ceoImg.naturalWidth, ch = 20, cw = hasD ? Math.round(ceoImg.naturalWidth * ch / ceoImg.naturalHeight) : 20;
+      if (st.ceo) hasD = false;
+      var dx = 0, dy = 0, inWater = false;
+      if (gi === 1 && u > 0.4 && u < 0.58) { rot = (u - 0.4) / 0.18 * Math.PI * 2; bub = '轉圈圈～'; }
+      if (gi === 3) { rot = -0.22; bub = u > 0.3 && u < 0.5 ? '嗚呼～～' : null; }
+      if (gi === 4) { x = W * 0.5 + (u < 0.25 ? (-1 + ease(u / 0.25)) * (W * 0.5 + 30) : u > 0.75 ? ease((u - 0.75) / 0.25) * (W * 0.5 + 30) : 0); }
+      if (gi === 0 && u > 0.3 && u < 0.4) bub = '汪！';
+      var fx = 0;
+      if (gi === 2 && u > 0.33 && u < 0.82) {   /* 掉進海裡再游回船上 */
+        var fx0 = dir * 0 + (-30 + 0.33 * (W + 60)), back = ease((u - 0.6) / 0.22);
+        dx = (fx0 - x) * (1 - back); dy = (hz + 17 + Math.sin(T * 6) * 1) - (by + 8) ; dy *= (1 - back); inWater = back < 1; bub = u < 0.6 ? '救命啊汪～' : null;
+      }
+      if (!st.ceo) st.ceoLast = { x: x, y: by };
+      if (st.ceoSay && !bub) bub = st.ceoSay.text;
+      if (st.ceo) bub = null;
+      g.save(); g.translate(Math.round(x), Math.round(by + 6)); g.rotate(rot);
+      if (hasD && !inWater) { g.drawImage(ceoImg, -Math.round(cw / 2), -ch + 2 + Math.round(wob), cw, ch); }
+      g.drawImage(I.boat, -12, -6);
+      g.restore();
+      if (hasD && inWater) {
+        var px = Math.round(x + dx), py = Math.round(by + 8 + dy);
+        g.save(); g.beginPath(); g.rect(px - cw, py - ch, cw * 2, ch + 1); g.clip(); g.drawImage(ceoImg, px - Math.round(cw / 2), py - ch + 5, cw, ch); g.restore();
+        for (var r = 0; r < 3; r++) R(px - 9 - r * 3 + Math.round(Math.sin(T * 6 + r) * 2), py + 5 + (r % 2), 6, 1, '#ffffff');
+        for (r = 0; r < 4; r++) R(px - 8 + ((T * 20 + r * 9) % 17), py - 4 - ((T * 18 + r * 7) % 9), 1, 1, '#dff4ff');
+      }
+      if (gi === 3) { for (var s = 0; s < 6; s++) R(x - dir * (14 + s * 5), by + 9 + (s % 2) * 2, 2, 1, '#ffffff'); }
+      if (gi === 4 && u > 0.25 && u < 0.75) {   /* 釣魚 */
+        var px2 = Math.round(x) + 8, py2 = Math.round(by) - 8; R(px2, py2, 12, 1, INK); R(px2 + 12, py2, 1, 10 + Math.round(Math.sin(T * 3)), '#cfe8f4');
+        if (u > 0.5 && u < 0.62) { var k2 = (u - 0.5) / 0.12, fy = hz + 12 - Math.sin(k2 * Math.PI) * 18; R(px2 + 10, fy, 6, 3, '#f08a4b'); R(px2 + 15, fy, 2, 3, '#f5c06a'); R(px2 + 10, fy + 1, 1, 1, INK); bub = '釣到了！'; }
+      }
+      if (bub) { var bxp = clamp(Math.round(x + dx * (inWater ? 1 : 0)), 28, W - 28); txt(bub, bxp, Math.round(by) - 36, 11, '#ffffff', 'center', true); }
+    }
+    function drawBackdrop(T) {
+      var top = skyCol(0), bot = skyCol(1), hz = HORIZON, y;
+      for (y = 0; y < hz; y += 2) R(0, y, W, 2, mix(top, bot, Math.pow(y / hz, 1.2)));
+      var sx = lerp(W * 0.2, W * 0.78, clamp(st.p, 0, 1)), sy = hz - 28 - Math.sin(clamp(st.p, 0, 1) * Math.PI) * 26, warm = clamp((st.p - 0.55) * 2.2, 0, 1), sc = mix('#fff7c2', '#ffb35c', warm);
+      ellFill(sx, sy, 15, 15, mix(sc, bot, 0.75)); ellFill(sx, sy, 11, 11, mix(sc, bot, 0.5)); ellFill(sx, sy, 7, 7, sc);
+      for (var i = 0; i < 3; i++) g.drawImage(I.cloud[i], Math.round(st.cloudX[i] * (W + 80) - 40), Math.round(HUD_H + 6 + i * 16));
+      st.gullsAmb.forEach(function (a, i) { var f = Math.floor(T * 4 + i) % 3; g.drawImage(I.gull[f === 2 ? 1 : f], Math.round(a.x * W), Math.round(HUD_H + 8 + (hz - HUD_H - 30) * a.y * 0.9)); });
+      var st0 = skyCol(2), sb = skyCol(3); for (y = hz; y < ROOF_Y + 14; y += 2) R(0, y, W, 2, mix(st0, sb, clamp((y - hz) / Math.max(1, ROOF_Y - hz), 0, 1)));
+      R(0, hz, W, 1, mix(bot, '#ffffff', 0.5));
+      for (i = 0; i < 9; i++) { var yy = hz + 4 + i * 4; if (yy > ROOF_Y) break; var off = (T * (6 + i * 0.7) + i * 37) % (W + 40), wx = off - 20; R(wx, yy, 12 + (i % 3) * 5, 1, mix(sb, '#ffffff', 0.55)); R((wx + W / 2) % (W + 20), yy + 2, 8 + (i % 2) * 6, 1, mix(sb, '#ffffff', 0.35)); }
+      g.drawImage(I.basalt, -6, hz - 38); R(0, hz + 1, 46, 3, '#35333c'); R(0, hz + 3, 46, 2, mix(sb, '#ffffff', 0.4));
+      var lx = W - 34; ellFill(lx + 8, hz + 3, 24, 7, '#6aa84f'); ellFill(lx + 8, hz + 4, 24, 5, '#56903f'); g.drawImage(I.lighthouse, lx, hz - 42);
+      drawCeo(T, hz);
+      ellFill(lx + 9, hz - 36, 2, 2, (Math.floor(T * 2) % 2) ? '#fffbd0' : '#ffe27a');
+    }
+    function drawStall(T) {
+      /* 屋簷（波浪鐵皮）→ 粉紅牆＋藍窗框 → 桌子 */
+      var y = ROOF_Y;
+      R(-4, y, W + 8, 12, '#8aa79a'); for (var i = 0; i < W + 8; i += 4) { R(-4 + i, y, 2, 12, '#a3bfb2'); R(-2 + i, y, 1, 12, '#6f8c80'); } R(-4, y + 11, W + 8, 2, INK); R(-4, y - 1, W + 8, 1, INK); R(-4, y + 13, W + 8, 3, 'rgba(59,42,30,.25)');
+      R(0, y + 13, W, TB - y - 13, '#e3687f'); R(0, y + 13, W, 2, '#c4506a');
+      R(6, y + 20, W - 12, TB - y - 24, '#1c8ad2'); R(8, y + 22, W - 16, TB - y - 28, '#2e4c44'); R(8, y + 22, W - 16, 5, '#3a6258');
+      R(8, y + 22, W - 16, 1, '#6fb6e8'); R(Math.round(W / 2) - 1, y + 22, 3, TB - y - 28, '#1c8ad2');
+      R(10, y + 40, 18, TB - y - 48, '#e8eeea'); R(10, y + 40, 18, 1, '#ffffff'); R(10, y + 52, 18, 1, '#b9c2be'); R(25, y + 55, 2, 5, '#9aa3a0');   // 窗內冰箱
+    }
+    function drawTable(T) {
+      var y0 = TB, y1 = TB + 46;
+      R(0, y0, W, y1 - y0, '#c08a55'); for (var j = 0; j < 4; j++) { var yy = y0 + 2 + j * 11; R(0, yy, W, 1, '#a9743f'); R(0, yy + 1, W, 1, '#cf9a63'); }
+      for (j = 0; j < W; j += 23) R(j + ((j * 7) % 5), y0, 1, y1 - y0, '#a9743f');
+      R(0, y0, W, 2, '#e2b078'); R(0, y0 - 2, W, 2, INK);
+      R(0, y1, W, 14, '#1c8ad2'); R(0, y1, W, 2, '#5db4ee'); R(0, y1 + 12, W, 2, '#1478b8'); R(0, y1 - 1, W, 1, INK); R(0, y1 + 14, W, 1, INK);
+      for (j = 6; j < W; j += 38) R(j, y1 + 4, 14, 6, '#e3687f');
+      var gy = y1 + 15; for (j = gy; j < H; j += 2) R(0, j, W, 2, mix('#e9d3a0', '#c9a56a', clamp((j - gy) / Math.max(1, H - gy), 0, 1)));
+      for (j = 0; j < 30; j++) { var px = (j * 47 + 13) % W, py = gy + 3 + (j * 31) % Math.max(1, H - gy - 4); R(px, py, 2, 1, '#b48d55'); if (j % 3 === 0) R(px + 3, py + 2, 1, 1, '#f6e6bd'); }
+      R(W - 24, TB + 6, 12, 14, INK); R(W - 23, TB + 7, 10, 12, '#d9923a'); R(W - 23, TB + 7, 3, 12, '#f2b863'); R(W - 22, TB + 3, 8, 4, INK); R(W - 21, TB + 4, 6, 2, '#a8703a');   // 糖水壺
+    }
+    /* ——— 豆花與碗 ——— */
+    function drawBowl(cx, cy, f, T) {   /* 仙人掌豆花：預先畫好的 6 階段像素圖（dofu_bowl_art.py），吃越多豆花塊越小、黑珠越少 */
+      var m = clamp(f, 0, 1), k = clamp(Math.round((1 - m) * 5), 0, 5), im = (S.i >= 2 && S.phase !== 'ready' ? I.bowlN : I.bowl)[Math.min(S.i, 4)][k], sq = 1 + (st.bounce > 0.5 ? 0 : 0);
+      ellFill(cx + 2, cy + 30, 31, 5, 'rgba(59,42,30,.28)');
+      g.drawImage(im, Math.round(cx - DofuBowl.w / 2), Math.round(cy - DofuBowl.cy + (st.beatPulse > 0.7 ? -1 : 0)));
+    }
+    function spoonXY(u) {   // 湯匙：碗 → 嘴 → 碗
+      var rest = { x: BOWL_X + 12, y: BOWL_Y - 4 }, tx = MOUTH.x + 5, ty = MOUTH.y + 2, a = u < 0.5 ? u * 2 : (1 - u) * 2, e = a * a * (3 - 2 * a);
+      return { x: lerp(rest.x, tx, e) + Math.sin(a * 3.14) * -5, y: lerp(rest.y, ty, e) - Math.sin(a * 3.14) * 6, full: u < 0.5 };
+    }
+    function seg(x0, y0, x1, y1, col, wd, hand) {
+      var n = Math.max(2, Math.round(Math.hypot(x1 - x0, y1 - y0))), h = Math.floor(wd / 2);
+      for (var i = 0; i <= n; i++) { var t = i / n; g.fillStyle = col; g.fillRect(Math.round(lerp(x0, x1, t)) - h, Math.round(lerp(y0, y1, t)) - h, wd, wd); }
+    }
+    function arm(x0, y0, ex, ey, x1, y1) {   /* 手臂：肩膀→手肘（放在桌上）→手；黃袖子＋皮膚色的手，不橫過臉 */
+      seg(x0, y0, ex, ey, INK, 7); seg(ex, ey, x1, y1, INK, 7);
+      seg(x0, y0, ex, ey, '#f8d84e', 5); seg(ex, ey, lerp(ex, x1, 0.72), lerp(ey, y1, 0.72), '#f8d84e', 5); seg(lerp(ex, x1, 0.72), lerp(ey, y1, 0.72), x1, y1, '#fbd9bd', 4);
+      seg(ex, ey + 1, lerp(ex, x1, 0.6), lerp(ey, y1, 0.6) + 1, '#e4b02c', 1);
+    }
+    function hand(x, y, s) {   /* 手：方方圓圓的手掌＋朝碗那一側 3 根手指（不再是一顆圓球像珍珠）；s=+1 碗在右邊、-1 碗在左邊 */
+      var SK = '#fbd9bd', SH = '#e3a883';
+      R(x - 4, y - 5, 8, 11, INK); R(x - 5, y - 4, 10, 9, INK);
+      R(x - 3, y - 4, 6, 9, SK); R(x - 4, y - 3, 8, 7, SK);
+      R(x - 3 * s - (s > 0 ? 1 : 0), y - 4, 2, 1, '#ffffff');   // 高光
+      var fx = s > 0 ? x + 1 : x - 4; R(fx, y - 2, 3, 1, SH); R(fx, y, 3, 1, SH); R(fx, y + 2, 3, 1, SH);   // 手指縫
+      R(x - 3 * s - (s > 0 ? 1 : 0), y + 3, 3, 1, SH);   // 掌緣陰影
+    }
+    function drawSpoon(x, y, loaded, ang) {
+      var len = 16, ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len;
+      g.fillStyle = INK; for (var i = 0; i <= len; i++) g.fillRect(Math.round(x + Math.cos(ang) * i) - 1, Math.round(y + Math.sin(ang) * i) - 1, 3, 3);
+      g.fillStyle = '#a8703a'; for (i = 3; i <= len; i++) g.fillRect(Math.round(x + Math.cos(ang) * i), Math.round(y + Math.sin(ang) * i), 1, 1);
+      ellFill(x, y, 5, 3, INK); ellFill(x, y, 4, 2, '#d7dce2'); R(x - 3, y - 1, 2, 1, '#ffffff');
+      if (loaded) { ellFill(x, y - 2, 4, 3, '#fff7e0'); R(x - 2, y - 3, 2, 1, '#ffffff'); }
+    }
+    /* ——— 孫女 ——— */
+    function girlFrame() {
+      var T = st.t, ph = S.phase;
+      if (ph === 'win') return Math.floor(T * 3) % 2 ? 'full' : 'joy';
+      if (ph === 'lose') return 'stuffed';
+      if (S.stun > 0) return S.stunKind === 'freeze' ? 'brain' : 'choke';
+      if (S.drink > 0) return 'drink';
+      if (ph === 'ready' || st.wowT > 0.2 || (ph === 'swap' && S.swapT < 0.7)) return 'wow';
+      if (ph === 'swap') return 'joy';
+      if (st.cheer > 0.5) return 'joy';
+      if (st.biteT < 0.3) { if (st.biteT < 0.075) return (S.rate >= 5 || S.fever) ? 'hurry' : 'open'; return st.tapPar ? 'chewA' : 'chewB'; }
+      if (st.biteT < 0.9) return st.tapPar ? 'chewA' : 'chewB';
+      if (S.full >= 95) return 'stuffed'; if (S.full >= 78) return 'full';
+      return (Math.floor(T * 0.7) % 6 === 0 && (T * 0.7 % 1) < 0.16) ? 'blink' : 'idle';
+    }
+    function drawGirl(T) {
+      var fr = girlFrame(), img = I.girl[fr] || I.girl.idle, bob = Math.round(st.bounce * 2 + Math.sin(T * 2.4) * 0.8), sx = 0;
+      if (S.stun > 0) sx = Math.round(Math.sin(T * 60) * 2);
+      if (S.phase === 'lose' && st.loseT > 0) bob += Math.round(Math.min(1, st.loseT * 2) * 8);
+      var x = GX - 36 + sx, y = GIRL_Y + bob;
+      if (S.boost > 0 || st.glow > 0.2) { g.globalAlpha = 0.28 + Math.sin(T * 12) * 0.08; ellFill(GX, GIRL_Y + 36, 40, 40, '#ffe27a'); g.globalAlpha = 1; }
+      g.drawImage(img, x, y);
+      if (fr === 'wow') { var sp = Math.floor(T * 6) % 2; R(GX - 34, GIRL_Y + 8 + sp * 2, 2, 2, '#ffd95a'); R(GX + 32, GIRL_Y + 4 + (1 - sp) * 2, 2, 2, '#ffd95a'); }
+      if (S.stun > 0 && fr !== 'brain') { txt('?!', GX + 34, GIRL_Y + 6 + Math.round(Math.sin(T * 20)), 11, '#ffffff'); }
+      if (fr === 'brain') { var fl = Math.floor(T * 8) % 2; g.drawImage(fl ? I.snow : I.snowB, GX - 40, GIRL_Y + 2 + fl * 2); g.drawImage(fl ? I.snowB : I.snow, GX + 33, GIRL_Y - 2 + (1 - fl) * 2); g.drawImage(I.snow, GX - 3, GIRL_Y - 12 + fl * 2); }
+      if (fr === 'joy' && S.phase === 'win') for (var i = 0; i < 3; i++) txt('♪', GX - 30 + i * 30, GIRL_Y - 4 - Math.round(Math.abs(Math.sin(T * 5 + i)) * 5), 11, '#ffd95a');
+    }
+    function drawBoss(T) {
+      var f = st.bossFrame; if (f === 'idle') { f = (Math.floor(T * 0.8) % 7 === 0 && (T * 0.8 % 1) < 0.14) ? 'blink' : 'idle'; if (st.talk && st.talk.t > 0.9) f = (Math.floor(st.talk.t * 7) % 2) ? 'talk' : 'idle'; }
+      var img = I.boss[f] || I.boss.idle, bob = Math.round(Math.sin(T * 2.4 + 1) * 1 + st.beatPulse * 1.2);
+      g.drawImage(img, BOSS_X, BOSS_Y + bob);
+      if (st.talk) {
+        var tx = st.talk.text, shown = Math.min(tx.length, Math.floor(st.talk.t * 10)), bw = 11 * tx.length + 14, bx = clamp(W - bw - 6, 6, W - bw - 6), by = ROOF_Y - 38, a = st.talk.t < 0.2 ? st.talk.t / 0.2 : st.talk.t > 2.8 ? (3.2 - st.talk.t) / 0.4 : 1;
+        g.globalAlpha = clamp(a, 0, 1); R(bx - 1, by - 1, bw + 2, 24, INK); R(bx, by, bw, 22, '#fffdf4'); var tailX = clamp(BOSS_X + 36, bx + 8, bx + bw - 16); R(tailX, by + 22, 7, 3, INK); R(tailX + 1, by + 22, 5, 2, '#fffdf4'); R(tailX + 2, by + 24, 2, 2, INK); txt(tx.slice(0, shown), bx + 7, by + 11, 11, INK, 'left', false); g.globalAlpha = 1;
+      }
+    }
+    function drawStack(T) {
+      var n = st.stack - (st.flyBowl ? 1 : 0);
+      for (var i = 0; i < n; i++) { var y = STACK_Y - i * 6; g.drawImage(I.bowl[Math.min(i, 4)][5], Math.round(STACK_X - 19), Math.round(y - 10), 38, 25); }   /* 吃完的空碗：每碗都是自己的碗樣（縮小） */
+      if (!st.stack) ellFill(STACK_X, STACK_Y + 8, 14, 3, 'rgba(59,42,30,.15)');
+      if (st.stack) txt(st.stack + '／5', STACK_X, STACK_Y - n * 6 - 12, 11, '#fff6dc');
+      var fb = st.flyBowl; if (fb) { var u = clamp(fb.t / 0.5, 0, 1), e = u * u * (3 - 2 * u), x = lerp(fb.from.x, fb.to.x, e), y2 = lerp(fb.from.y, fb.to.y, e) - Math.sin(u * 3.14) * 30; g.drawImage(I.bowl[Math.min(fb.k || 0, 4)][5], Math.round(x - 38 * (1 - e * 0.6)), Math.round(y2 - 18 * (1 - e * 0.6)), Math.round(76 * (1 - e * 0.6)), Math.round(50 * (1 - e * 0.6))); }
+    }
+    /* ——— HUD 與按鈕 ——— */
+    function drawHud() {
+      R(-OX, 0, WF, HUD_H, 'rgba(36,26,18,.7)'); R(-OX, HUD_H, WF, 1, INK); R(-OX, HUD_H - 1, WF, 1, 'rgba(255,246,220,.2)');
+      for (var i = 0; i < S.maxCups; i++) cupIcon(8 + i * 9, 5, i < S.cups, i < S.cups ? 1 : 0.45);
+      var bx = Math.round(W / 2 - 30);
+      for (i = 0; i < 5; i++) { var done = i < S.bowlsDone, cur = i === S.i && S.phase !== 'win'; ellFill(bx + i * 13 + 6, 11, 6, 3, INK); ellFill(bx + i * 13 + 6, 10, 5, 2, done ? '#ffd95a' : cur ? '#fff6dc' : '#6b5a4a'); if (cur) R(bx + i * 13 + 5, 16, 3, 1, '#ffd95a'); }
+      smallTxt(S.score, W - 8, 10, '#fff6dc', 'right');
+      var hw = Math.floor((W - 16 - 6) / 2) - 24, f1 = clamp(S.full / 100, 0, 1), f2 = clamp(S.choke / 100, 0, 1), col1 = f1 < 0.5 ? '#86cf62' : f1 < 0.8 ? '#ffd95a' : '#ec6a5c', danger = f2 > 0.7;
+      /* 彩色徽章＋亮底空槽：飽＝綠牌、噎＝藍牌（危險時轉紅閃），空的部分是淺米色，一眼看出還剩多少 */
+      [[8, '飽', f1, col1, '#58b83e'], [8 + hw + 24 + 6, '噎', f2, danger ? (Math.floor(st.t * 8) % 2 ? '#ff5a4a' : '#ec3a2c') : '#78bfe8', danger ? '#d6483a' : '#2f8fcf']].forEach(function (a2) {
+        var x = a2[0], bx = x + 24;
+        R(x, 19, 22, 14, INK); R(x + 1, 20, 20, 12, a2[4]); R(x + 1, 20, 20, 2, 'rgba(255,255,255,.3)'); txt(a2[1], x + 11, 26, 11, '#ffffff', 'center', true);
+        R(bx, 19, hw, 14, INK); R(bx + 1, 20, hw - 2, 12, '#cdbfa8'); R(bx + 1, 20, Math.round((hw - 2) * a2[2]), 12, a2[3]); R(bx + 1, 20, Math.round((hw - 2) * a2[2]), 3, 'rgba(255,255,255,.45)');
+      });
+      /* 本碗時間 */
+      var tf = S.phase === 'play' ? clamp(S.tl / S.tmax, 0, 1) : S.phase === 'ready' ? 1 : S.phase === 'swap' ? 1 : S.phase === 'win' ? clamp(S.tl / S.tmax, 0, 1) : clamp(S.tl / S.tmax, 0, 1), tcol = tf > 0.4 ? '#78bfe8' : tf > 0.2 ? '#ffd95a' : (Math.floor(st.t * 6) % 2 ? '#ff5a4a' : '#ec3a2c');
+      R(8, 36, W - 16, 10, INK); R(9, 37, W - 18, 8, '#4a3e34'); R(9, 37, Math.round((W - 18) * tf), 8, tcol); R(9, 37, Math.round((W - 18) * tf), 2, 'rgba(255,255,255,.35)');
+      var pf = S.phase === 'play' ? clamp(S.prog / S.need, 0, 1) : S.phase === 'swap' ? 1 : 0; if (S.phase === 'play') { R(9, 43, Math.round((W - 18) * pf), 2, '#ffd95a'); if (S.cap) R(9 + Math.round((W - 18) * S.cap / S.need), 41, 1, 5, '#ffffff'); }
+      smallTxt(Math.max(0, S.tl).toFixed(1), W / 2, 41, '#ffffff', 'center');
+    }
+    function drawButtons() {
+      var pr = st.eatBtn > 0 ? 3 : 0, y = BTN_Y + pr, pulse = st.hintOn && S.phase !== 'ready' && Math.floor(st.t * 4) % 2;
+      R(8, BTN_Y + 4, EAT_W, BTN_H, INK); R(8, y, EAT_W, BTN_H, INK); R(9, y + 1, EAT_W - 2, BTN_H - 2, pulse ? '#ffe9a0' : '#ffd95a'); R(9, y + 1, EAT_W - 2, 3, '#ffeb9a'); R(9, y + BTN_H - 5, EAT_W - 2, 4, '#e0a92a');
+      var charged = S.phase === 'play' && S.i === 4 && S.cap && S.prog >= S.cap - 1e-6;
+      if (charged) { txt('蓄力！', 8 + EAT_W / 2 + 12, y + 14, 22, INK, 'center', false); txt('按住再放開', 8 + EAT_W / 2 + 12, y + 31, 11, '#6b4a1e', 'center', false); }
+      else txt('狂吃！', 8 + EAT_W / 2 + 12, y + BTN_H / 2, 22, INK, 'center', false);
+      g.save(); g.translate(8 + 15, y + 21); g.rotate(-0.6); R(-1, -7, 2, 14, INK); ellFill(0, -9, 4, 3, INK); ellFill(0, -9, 3, 2, '#fff'); g.restore();
+      var can = S.cups > 0 && S.phase === 'play', sp = st.watBtn > 0 ? 3 : 0, hot = can && S.choke > 60 && Math.floor(st.t * 6) % 2;
+      R(WAT_X, BTN_Y + 4, WAT_W, BTN_H, INK); R(WAT_X, BTN_Y + sp, WAT_W, BTN_H, INK); R(WAT_X + 1, BTN_Y + sp + 1, WAT_W - 2, BTN_H - 2, can ? (hot ? '#ffffff' : '#bfe6f5') : '#8fa5ad'); R(WAT_X + 1, BTN_Y + sp + 1, WAT_W - 2, 3, can ? '#e8f7fd' : '#a9bcc3');
+      cupIcon(WAT_X + 8, BTN_Y + sp + 15, can, 1); txt('喝水', WAT_X + 42, BTN_Y + sp + 14, 11, can ? INK : '#566a72', 'center', false); txt('×' + S.cups, WAT_X + 42, BTN_Y + sp + 28, 11, can ? '#2a6f98' : '#566a72', 'center', false);
+    }
+    function drawBeads(T) {
+      if (S.phase !== 'play' || !S.beads.length) return;
+      S.beads.forEach(function (b) {
+        var q = beadPos(b), pulse = 0.5 + 0.5 * Math.sin(T * 8 + b.slot), life = S.df.beads[1] ? 1 - b.age / S.df.beads[1] : 1, warn = life < 0.35;
+        ellFill(q.x, q.y + 1, 5, 5, INK); ellFill(q.x, q.y, 4, 4, '#26262c'); R(q.x - 2, q.y - 3, 2, 2, '#ffffff'); R(q.x + 2, q.y + 1, 1, 1, '#9a9aa8');
+        pcirc(q.x, q.y, 7 + pulse * 1.5, warn ? (Math.floor(T * 8) % 2 ? '#ff5a4a' : '#ffffff') : (st.beadHint > 0 ? '#ffd95a' : 'rgba(255,255,255,.85)'));
+      });
+    }
+    function drawGull(T) {
+      var gp = gullPos();
+      if (gp) {
+        st.lastGull = gp; var f = Math.floor(T * 8) % 3, im = I.gull[f === 2 ? 1 : f];
+        for (var k = 1; k <= 5; k++) { var u2 = gp.u + (1 - gp.u) * k / 6; R(lerp(gp.x, BOWL_X, k / 6), lerp(gp.y, BOWL_Y - 14, k / 6), 1, 1, 'rgba(255,255,255,.7)'); }
+        g.drawImage(im, Math.round(gp.x - 15), Math.round(gp.y - 7), 30, 14); pcirc(gp.x, gp.y, 15, 'rgba(255,255,255,.55)');
+        if (Math.floor(T * 7) % 2) txt('!', gp.x, gp.y - 18, 22, '#ec3a2c');
+      }
+      var gf = st.gullFly; if (gf) { var f2 = Math.floor(T * 9) % 3; g.drawImage(I.gull[f2 === 2 ? 1 : f2], Math.round(gf.x - 15), Math.round(gf.y - 7), 30, 14); ellFill(gf.x, gf.y + 9, 4, 3, INK); ellFill(gf.x, gf.y + 9, 3, 2, '#fff7e0'); }
+    }
+    function drawIceFx(T) {
+      if (S.phase !== 'play' || !S.ice.on) return;
+      var pu = 0.5 + 0.5 * Math.sin(T * 10), hold = S.df.ice[2], hit = S.ice.t > 0.3;
+      g.globalAlpha = 0.14 + pu * 0.12; g.fillStyle = '#9fd8ef'; g.fillRect(-OX, HUD_H + 1, WF, 7); g.fillRect(-OX, H - 8, WF, 8); g.fillRect(-OX, HUD_H + 1, 7, H); g.fillRect(WF - OX - 7, HUD_H + 1, 7, H); g.globalAlpha = 1;
+      txt('停手！', W / 2, GIRL_Y - 14, 22, '#d8f1ff'); g.drawImage(I.snow, Math.round(W / 2 - 52), Math.round(GIRL_Y - 18)); g.drawImage(I.snow, Math.round(W / 2 + 45), Math.round(GIRL_Y - 18));
+      var bw = 90, frac = hit ? clamp(1 - (S.ice.t - 0.3) / hold, 0, 1) : 1; R(W / 2 - bw / 2 - 1, GIRL_Y + 2, bw + 2, 7, INK); R(W / 2 - bw / 2, GIRL_Y + 3, bw, 5, '#4a3e34'); R(W / 2 - bw / 2, GIRL_Y + 3, Math.round(bw * frac), 5, hit ? '#78bfe8' : '#ffffff');
+      g.drawImage(Math.floor(T * 6) % 2 ? I.snow : I.snowB, Math.round(BOWL_X - 56), Math.round(BOWL_Y - 30)); g.drawImage(Math.floor(T * 6) % 2 ? I.snowB : I.snow, Math.round(BOWL_X + 50), Math.round(BOWL_Y - 26));
+    }
+    function drawCharge() {
+      if (S.phase !== 'play' || S.i !== 4 || !S.cap || S.prog < S.cap - 1e-6) return;
+      var lo = S.df.charge[0], hi = S.df.charge[1], mx = hi + 0.2, x0 = 9, bw = EAT_W - 2, y = BTN_Y - 11;
+      function vx(v) { return x0 + Math.round(bw * clamp(v / mx, 0, 1)); }
+      R(8, y - 1, EAT_W, 12, INK); R(x0, y, bw, 10, '#4a3e34'); R(vx(lo), y, vx(hi) - vx(lo), 10, '#86cf62'); R(vx(lo), y, vx(hi) - vx(lo), 2, '#b6ee9a');
+      if (S.charging > 0) { var over = S.charging > hi; R(x0, y + 3, vx(S.charging) - x0, 4, over ? '#ff5a4a' : S.charging >= lo ? '#ffd95a' : '#ffffff'); R(vx(S.charging), y - 2, 2, 14, '#ffffff'); }
+    }
+    function drawCeoCheer(T) {
+      if (!st.ceo || !ceoImg || !ceoImg.complete || !ceoImg.naturalWidth) return;
+      var c = st.ceo, h = 26, w = Math.round(ceoImg.naturalWidth * h / ceoImg.naturalHeight), gy = H - 18, tx = 6 + Math.round(w / 2) + 10, u = clamp(c.t / 1.1, 0, 1), e = ease(u);
+      var x = lerp(c.x0, tx, e), y = lerp(c.y0 + 8, gy, e) - Math.sin(u * Math.PI) * 46;
+      if (u >= 1) y = gy - Math.abs(Math.sin(c.t * 7)) * 7;
+      g.drawImage(ceoImg, Math.round(x - w / 2), Math.round(y - h), w, h);
+      if (u >= 1) {
+        var sw = Math.sin(c.t * 14) * 3;
+        [[-w / 2 - 5, -1], [w / 2 + 5, 1]].forEach(function (a2) { var px = x + a2[0], py = y - h * 0.6 - Math.abs(sw) - 2; for (var k = 0; k < 5; k++) { var an = k * 1.26 + c.t * 9 * a2[1]; R(px + Math.cos(an) * 4, py + Math.sin(an) * 4, 2, 2, k % 2 ? '#ff9aa6' : '#ffd95a'); } R(px, py, 2, 2, '#fff6dc'); });
+        txt(Math.floor(c.t * 2.2) % 2 ? '加油！' : '加油！加油！', clamp(x + 14, 40, W - 40), y - h - 8, 11, '#ffd95a');
+      }
+    }
+    function drawPops() {
+      st.pops.forEach(function (p) { var u = p.age / 1.1, y = p.y - u * 22 - (p.big ? Math.sin(Math.min(1, p.age * 6) * 3.14) * 5 : 0); g.globalAlpha = u > 0.7 ? (1 - u) / 0.3 : 1; txt(p.text, p.x, y, p.big ? 22 : 11, p.col); g.globalAlpha = 1; });
+      st.banners.forEach(function (b, i) { var u = b.age / b.ttl, a = u < 0.12 ? u / 0.12 : u > 0.8 ? (1 - u) / 0.2 : 1, y = HUD_H + 14 + i * 20 - (u < 0.12 ? (1 - u / 0.12) * 8 : 0); g.globalAlpha = clamp(a, 0, 1); var w = String(b.text).length * 11 + 16; R(W / 2 - w / 2 - 1, y - 9, w + 2, 20, INK); R(W / 2 - w / 2, y - 8, w, 18, 'rgba(36,26,18,.78)'); txt(b.text, W / 2, y, 11, b.col, 'center', false); g.globalAlpha = 1; });
+    }
+    function drawReady() {
+      if (S.phase === 'ready') {
+        var n = Math.floor(clamp(2.6 - S.t, 0, 2.6)), fr = (2.6 - S.t) % 1;
+        if (S.t < 1.6) txt('哇～豆花！', W / 2, HUD_H + 40, 22, '#fff6dc');
+        else { var l = n >= 1 ? String(n) : '開動！'; txt(l, W / 2, HUD_H + 40, n >= 1 ? 33 : 22, n >= 1 ? '#fff6dc' : '#ffd95a'); }
+      }
+      if (st.hintOn && (S.phase === 'ready' || S.i === 0)) {
+        var w = 160; R(W / 2 - w / 2, HUD_H + 62, w, 40, 'rgba(36,26,18,.72)'); txt('用力狂點「吃」！', W / 2, HUD_H + 71, 11, '#fff6dc', 'center', false); txt('太快會噎到，快嗆了就喝水', W / 2, HUD_H + 84, 11, '#bfe6f5', 'center', false); txt('每碗有時間限制', W / 2, HUD_H + 96, 11, '#ffe9a0', 'center', false);
+      }
+    }
+    function drawEnd() {
+      if (!st.ended || !st.reveal) return; var r = S.result; if (!r) return; var win = !!r.win, u = clamp(st.revT / 0.5, 0, 1), px = 14, pw = W - 28, py = HUD_H + 8, ph = win ? 200 : 164, pad = 12;
+      if (!win) { g.fillStyle = 'rgba(36,26,18,' + 0.5 * u + ')'; g.fillRect(-OX, HUD_H + 1, WF, H - HUD_H - 1); } else { g.fillStyle = 'rgba(255,230,150,' + 0.18 * u + ')'; g.fillRect(-OX, HUD_H + 1, WF, H - HUD_H - 1); }
+      var t0 = win ? 1.6 : 0.3;   // 贏了先看 CEO 跑來加油，再出結算
+      if (st.revT < t0) return; g.globalAlpha = clamp((st.revT - t0) / 0.4, 0, 1);
+      R(px - 1, py - 1, pw + 2, ph + 2, INK); R(px, py, pw, ph, '#fff6dc'); R(px + 2, py + 2, pw - 4, ph - 4, '#3a2a1e'); R(px + 3, py + 3, pw - 6, ph - 6, '#4a3626');
+      /* 標題區：大標＋星星（贏）或一句說明（輸） */
+      txt(win ? '完食五碗！' : '吃不下了……', W / 2, py + 17, 22, win ? '#ffd95a' : '#ec9a8a');
+      var ry;
+      if (win) { for (var i = 0; i < 3; i++) { var on = i < r.stars; g.drawImage(on ? I.star : I.starE, Math.round(W / 2 - 33 + i * 24), py + 32 + (on ? Math.round(Math.sin(st.revT * 5 + i) * 1.5) : 0), 18, 20); } ry = py + 66; }
+      else { txt('第' + '一二三四五'.charAt(Math.min(4, S.bowlsDone)) + '碗沒吃完', W / 2, py + 40, 11, '#fff6dc'); ry = py + 60; }
+      /* 成績：左標籤、右數字，中間用點點牽線，一列一個重點 */
+      g.font = '11px ' + FONT;
+      [['分數', r.score, '#ffffff'], ['嗆到', r.chokes, r.chokes ? '#ec6a5c' : '#9be28a'], ['冰頭', r.freezes, r.freezes ? '#9fd8ef' : '#9be28a'], ['剩下水杯', r.cups, '#bfe6f5']].forEach(function (a2, k) {
+        var y = ry + k * 15, lw = a2[0].length * 11, vs = String(a2[1]), vw = vs.split('').reduce(function (s2, c2) { return s2 + 6; }, 0), x0 = px + pad, x1 = px + pw - pad;
+        txt(a2[0], x0, y, 11, '#ffe9a0', 'left'); smallTxt(a2[1], x1, y, a2[2], 'right');
+        for (var dx = x0 + lw + 5; dx < x1 - vw - 5; dx += 3) R(dx, y + 4, 1, 1, 'rgba(255,233,160,.38)');
+      });
+      /* 底部：黃色橫幅放邀請，字用深色，跟遊戲的黃色按鈕同一套 */
+      var bh = win ? 46 : 36, by = py + ph - bh - (win && st.best ? 20 : 12), bx = px + 8, bw = pw - 16;
+      st.band = { x: bx, y: by, w: bw, h: bh, t0: t0 }; var pulse = Math.floor(st.revT * 2.5) % 2;
+      R(bx, by, bw, bh, INK); R(bx + 1, by + 1, bw - 2, bh - 2, pulse ? '#ffe27a' : '#ffd95a'); R(bx + 1, by + 1, bw - 2, 2, '#ffeb9a'); R(bx + 1, by + bh - 4, bw - 2, 3, '#e0a92a');
+      if (win) {
+        var big = '五碗豆花勇者！', sz = big.length * 22 <= bw - 10 ? 22 : 11;
+        txt(big, W / 2, by + 15, sz, INK, 'center', false); txt('到賣場選購豆花周邊商品吧～', W / 2, by + 34, 11, '#6b4a1e', 'center', false);
+        if (st.best) txt(st.newBest ? '新紀錄！' : '最佳 ' + st.best, W / 2, py + ph - 10, 11, st.newBest ? '#ffd95a' : '#c8b89a');
+      } else { txt('想吃更多豆花嗎', W / 2, by + 12, 11, INK, 'center', false); txt('來選購豆花周邊吧～', W / 2, by + 26, 11, '#6b4a1e', 'center', false); }
+      g.globalAlpha = 1;
+    }
+    function drawCaption() {
+      if (!st.cap || st.paused) return; var c = st.cap, a = c.t < 0.15 ? c.t / 0.15 : c.t > c.dur - 0.3 ? (c.dur - c.t) / 0.3 : 1, y = TB + 54; g.globalAlpha = clamp(a, 0, 1); g.font = '11px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = '#000'; [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [-1, 1], [1, -1]].forEach(function (d) { g.fillText(c.text, W / 2 + d[0], y + d[1]); }); g.fillStyle = '#fff'; g.fillText(c.text, W / 2, y); g.globalAlpha = 1;
+    }
+    function drawPause() { if (!st.paused) return; g.fillStyle = 'rgba(36,26,18,.6)'; g.fillRect(-OX, HUD_H + 1, WF, H - HUD_H - 1); txt('暫停', W / 2, H * 0.4, 33, '#ffd95a'); txt('點一下繼續', W / 2, H * 0.4 + 30, 11, '#fff6dc'); }
+    function drawParts() { st.parts.forEach(function (q) { var a = q.steam ? Math.sin(q.age / q.life * 3.14) * 0.55 : clamp(1 - q.age / q.life, 0, 1); g.globalAlpha = a; g.fillStyle = q.steam ? '#d8f1ff' : q.c; g.fillRect(Math.round(q.x), Math.round(q.y), q.s || 1, q.s || 1); g.globalAlpha = 1; }); }
+
+    /* ——— 主繪圖 ——— */
+    function col(fn) { g.save(); g.translate(OX, 0); try { fn(); } finally { g.restore(); } }   /* 操作區（置中）座標 */
+    function wide(fn) { var w0 = W; W = WF; try { fn(); } finally { W = w0; } }   /* 背景鋪滿整個畫面寬 */
+    function frameDraw() {
+      var T = st.t; g.save(); g.imageSmoothingEnabled = false;
+      if (st.shake > 0) g.translate(Math.round((Math.random() - 0.5) * 6 * st.shake), Math.round((Math.random() - 0.5) * 6 * st.shake));
+      wide(function () { drawBackdrop(T); drawStall(T); }); col(function () { drawBoss(T); drawGirl(T); }); wide(function () { drawTable(T); }); col(function () { drawStack(T); });
+      g.save(); g.translate(OX, 0);
+      var f = S.phase === 'play' ? 1 - S.prog / S.need : S.phase === 'win' || S.phase === 'swap' ? 0 : S.phase === 'ready' ? 1 : 1 - S.prog / Math.max(1, S.need), slide = st.bowlIn > 0 ? Math.pow(st.bowlIn, 2) * (W * 0.7) : 0, bxs0 = BOWL_X + Math.round(slide);
+      var fr0 = girlFrame(), arms = fr0 !== 'wow' && fr0 !== 'drink' && fr0 !== 'brain' && fr0 !== 'full' && S.phase !== 'lose', bxs = bxs0;
+      var sp = st.bite && !(S.stun > 0) ? spoonXY(st.bite.t / st.bite.dur) : null, sx0 = sp ? sp.x : BOWL_X + 24, sy0 = sp ? sp.y : BOWL_Y - 6 + Math.round(Math.sin(T * 3) * 1);
+      var hxL = bxs - 28, hyL = BOWL_Y + 6, hxR = sx0 + Math.cos(-0.95) * 16, hyR = sy0 + Math.sin(-0.95) * 16;
+      if (arms) { arm(GX - 25, TB - 4, GX - 36, TB + 8, hxL, hyL); arm(GX + 25, TB - 4, GX + 40, TB + 8, hxR, hyR); }   // 手臂在碗後面，碗不會被擋住
+      if (S.phase !== 'win' && S.phase !== 'swap') drawBowl(bxs0, BOWL_Y, S.phase === 'lose' ? clamp(f, 0.15, 1) : f, T);   // 吃完的空碗飛去碗堆了，桌上不留碗
+      if (S.phase !== 'win' && S.phase !== 'swap') drawSpoon(sx0, sy0, sp ? true : false, -0.95);
+      if (arms) { hand(hxL, hyL, 1); hand(hxR, hyR, -1); }
+      drawBeads(T); drawGull(T); drawCeoCheer(T); drawIceFx(T);
+      drawParts(); drawPops();
+      g.restore();
+      g.restore();
+      col(function () { drawHud(); if (!(st.ended && S.phase === 'win')) { drawButtons(); drawCharge(); } drawCaption(); drawReady(); drawEnd(); drawPause(); });
+      if (st.flash > 0) { g.globalAlpha = clamp(st.flash * 2.5, 0, 0.5); g.fillStyle = st.flashCol; g.fillRect(0, 0, WF, H); g.globalAlpha = 1; }
+    }
+    function loop(now) {
+      if (dead) return; raf = requestAnimationFrame(loop);
+      var dt = Math.max(0, Math.min(0.05, (now - last) / 1000 || 0.016)); last = now;
+      if (!st.paused) { try { update(dt); } catch (e) { if (window.console) console.error(e); } }
+      frameDraw();
+    }
+    function destroy() { dead = true; cancelAnimationFrame(raf); au.destroy(); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); document.removeEventListener('visibilitychange', vis); if (cv.parentNode) cv.parentNode.removeChild(cv); }
+    banner('東吉嶼豆花到底多好吃！', '#fff6dc', 2.6); au.ambient(true); setTimeout(function () { if (!dead) au.sfx('wow'); }, 350); last = performance.now(); raf = requestAnimationFrame(loop);
+    return {
+      destroy: destroy, state: st, sim: sim, canvas: cv, eat: doEat, drink: doDrink, layout: { W: W, WF: WF, OX: OX, H: H, scale: scale },
+      freeze: function () { if (dead) return; try { frameDraw(); } catch (e) {} dead = true; cancelAnimationFrame(raf); au.destroy(); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); document.removeEventListener('visibilitychange', vis); },
+      step: function (dt) { update(dt); }, draw: frameDraw
+    };
+  }
+  return { create: create };
+})();
+
+  /* ---- ring_assets.js ---- */
+var RingAssets = {"fish": {"w": 74, "h": 83, "pal": {"k": "#8f86b3", "g": "#c9c9cc", "w": "#ffffff", "y": "#f4dd7a", "Y": "#fbf3bd"}, "d": ".110k4.69k7.66k3g2k4.64k3g3k2wk2.62k3g4k2wk3.61k2g5k2w2k2.60k2g6k3wk3.58k3y4g3k2w2k2.58k2gyk2yg3k2w2k2.57k2g2y3g5kw2k3.56k2g10w4k2.55k2g10w5k2.55k2g10w5k2.54k2g9kgw5k2.54k2g4k6w2k2w2k2.54k2g4k6wk3w3k2.52k2g7k2w2k5w2k2.52k2g3kg4wk4wk6.52k2g2k10w3k5.51k2g4k7w8k2.51k2g7w12k2.15g.35k2g3kg3w12k2.14g2.21g.11k4g2k2g3w12k5.11g2.21g.6k9g2k2g3w12k10.5g3.21g.2k9yk2g3k2g3w12k2y3k9.g2.22gk5y7k2g9w11k2y8k6g.20k2gky11k2g3k2g4w11k2y13g2k2.16k3.gy12k2g3k2g4w11k2y13g2k3.14k3y.gky11k2g3k2g4w11k2y12k2gy2k2.13k4.k15g3k2g5w10k16g2k4.11k4.4k13g10w10k14.2g2.k3.12k.17k2g10w10k3.14g.3k.30k2g3k2g5w10k2.50k2g3k2g5w10k2.50k2g3k2g5w10k2.50k2g3k3g5w9k2.50k2g4kg6w9k2.50k2g4k2g5w9k2.50k2g4k2g5w9k2.50k2g4k2g5w9k2.50k2g4k2g5w9k2.50k2g4k2g5w8k2.51k3g10w8k2.52k2g4kg5w8k2.52k2g4k2g4w8k2.51gk2g4k2g4w7k3.51gk3g3k3g3w7k2.52g2k2g4kg4w7k2y.51g2k2g10w6k2y2.50g2k2g4k2g4w6k2y3.49g3k2g3k2g4w5k2y4.50g2k2g3k3g3w5k2y2.53gk3g3k2g4w4k2y.54g2k2g9w4k2y.55gk3g8w4k2.56g2k2g3k2g4w3k2.57gk3g2k2g4w3k2.57g2k3gk2g5w2k2.58g2k2g8w2k2.61k2g8wk2.62k2g8k7.57k3g8k8.57k3g6k2w3k5.56k4g5kwy4.k4.55k5g2k2w4y3.k3.56k7w5.y3k4.55k2wywywy5.2yg2k3.54k2wywyw5y3g4k3.53k3ywyw3kw.kg6k3.53k2y2wywk14.53k2y2wyw2k13.54k2ywy2wk2.65k2y2wywk2.66k2y3wk2.66k3yg2k2.67k2g4k2.67k2g3k2.68k2g2k2.69k2gk2.70k5.70k4.72k2.21"}};
+
+/* ---- ring_sim.js ---- */
+/* 古厝呷飯・吊環五仔魚乾：規則與物理（純邏輯，沒有畫面；可用 node 機器人調難度）。
+   一場＝體操套路三段，每段都在把五仔魚「曬乾」（曬乾度 0–100）：
+     ① 擺盪：吊環左右晃，按住左／右壓住擺幅，魚穩在中間才曬得到太陽（最多 60）。海風陣陣、海鷗來叼魚（點牠趕走）、雲遮住太陽。
+     ② 十字支撐：按住＝出力、放開＝休息，把「力量條」維持在會移動的綠區裡（最多 25）。出力過頭會滑掉。
+     ③ 大迴旋：三拍節奏，跟著拍子點（最多 10）；最後落地：準星掃過目標，點中最好（最多 5）。
+   曬乾度達標＝成功。用法：var s = RingSim.create({diff:'normal'}); 每格 s.step(dt)；s.setPush(-1|0|1)、s.setHold(bool)、s.tap()、s.shoo()；讀 s.s（狀態）、取走 s.s.ev（事件）。 */
+var RingSim = (function () {
+  var DIFF = {
+    easy:   { d1: 16, d2: 9,  bpm: 84,  push: 8.5, wind: 0.5, gust: 2.2, zone: 0.42, zw: 0.19, thr: 44, gl: 0.24, pf: 0.09,  per: 1.4, tz: 0.36, steal: 5,  gulls: [7],        tk: 1 },
+    normal: { d1: 18, d2: 10, bpm: 96,  push: 8.0, wind: 0.8, gust: 2.8, zone: 0.33, zw: 0.15, thr: 50, gl: 0.19, pf: 0.07,  per: 1.1, tz: 0.26, steal: 8,  gulls: [5.5, 12.5], tk: 1 },
+    hard:   { d1: 20, d2: 11, bpm: 108, push: 7.0, wind: 1.2, gust: 3.6, zone: 0.25, zw: 0.12, thr: 73, gl: 0.15, pf: 0.055, per: 0.9, tz: 0.18, steal: 11, gulls: [5, 11, 16],  tk: 1 }
+  };
+
+  var READY = 2.4, CROSS_IN = 1.2, SPIN_IN = 1.8, GULL_T = 2.6, TIMEOUT = 4.5;
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function create(o) {
+    var df = DIFF[(o && o.diff) || 'normal'] || DIFF.normal;
+    var s = {
+      phase: 'ready', t: 0, pt: 0, df: df, ev: [], result: null,
+      th: 0.32, om: 0, push: 0, wind: 0, gust: null, nextGust: 2.2, gusts: 0,
+      dry: 0, stabSum: 0, stabN: 0, crossIn: 0, crossT: 0, steals: 0, shoos: 0, slips: 0, gull: null, gullI: 0, cloud: { at: rnd(5, 8), t: -1 },
+      hold: false, x: 0.35, zc: 0.55, stun: 0, spinT: 0, beats: [], bi: 0, hits: [], bpmT: 0, land: null, ang: 0, sunCover: 1, q: 0
+    };
+    function ev(t, extra) { var e = extra || {}; e.t = t; s.ev.push(e); }
+    function addDry(v, cap) { s.dry = clamp(s.dry + v, 0, 100); }
+    function startSwing() { s.phase = 'swing'; s.pt = 0; ev('swing'); }
+    function startCross() { s.phase = 'cross'; s.pt = 0; s.crossIn = CROSS_IN; s.x = 0.35; s.hold = false; s.dryBase = s.dry; ev('cross'); }
+    function startSpin() {
+      s.phase = 'spin'; s.pt = 0; s.bi = 0; s.beats = []; s.hits = []; var bt = 60 / df.bpm;
+      for (var i = 0; i < 3; i++) s.beats.push({ at: SPIN_IN + i * bt * 1.0 * 1.5, done: false, q: '' });
+      ev('spin');
+    }
+    function startLand() { s.phase = 'land'; s.pt = 0; s.land = { pos: 0, dir: 1, done: false, q: '', tz: df.tz, c: 0.5 + rnd(-0.18, 0.18), timeout: false }; ev('land'); }
+    function finish() {
+      s.phase = 'done'; s.pt = 0;
+      var d = s.dry, win = d >= df.thr, mist = s.steals + s.slips;
+      var stars = !win ? 0 : (d >= 88 && mist <= 1) ? 3 : d >= Math.min(84, df.thr + 14) ? 2 : 1;
+      var perf = 0, goodB = 0; s.hits.forEach(function (h) { if (h === 'perfect') perf++; else if (h === 'good') goodB++; });
+      var stab = s.stabN ? s.stabSum / s.stabN : 0;
+      s.result = {
+        win: win, stars: stars, score: Math.round(d * 10 + stab * 200 + perf * 50 + (s.land && s.land.q === 'perfect' ? 100 : 0)), dry: Math.round(d), thr: df.thr, steals: s.steals, slips: s.slips, shoos: s.shoos,
+        challenge: win && s.steals === 0 && s.slips === 0, judge: { stab: Math.round(stab * 100) / 10, cross: Math.round((s.crossGood || 0) * 100) / 10, beat: Math.round((perf + goodB * 0.6) / 3 * 100) / 10, land: s.land ? (s.land.q === 'perfect' ? 10 : s.land.q === 'good' ? 6 : 2) : 0 }
+      };
+      ev(win ? 'win' : 'lose');
+    }
+    function stepSwing(dt) {
+      s.pt += dt;
+      /* 風：慢慢變化的底風＋偶爾一陣突襲（先有預告） */
+      s.wind = df.wind * (Math.sin(s.pt * 0.7 + 0.8) * 0.7 + Math.sin(s.pt * 1.9) * 0.3);
+      var gw = 0;
+      if (!s.gust && s.pt >= s.nextGust && s.pt < df.d1 - 1.6) { s.gust = { dir: Math.random() < 0.5 ? -1 : 1, t: 0 }; ev('gustWarn', { dir: s.gust.dir }); }
+      if (s.gust) { s.gust.t += dt; if (s.gust.t > 0.9 && s.gust.t < 1.8) gw = s.gust.dir * df.gust; if (s.gust.t >= 1.8) { s.gust = null; s.nextGust = s.pt + rnd(2.6, 4.2); s.gusts++; } }
+      var acc = -9 * Math.sin(s.th) - 0.35 * s.om + s.wind + gw + s.push * df.push;
+      s.om += acc * dt; s.th += s.om * dt; s.th = clamp(s.th, -1.15, 1.15);
+      /* 雲遮太陽 */
+      if (s.cloud.t < 0 && s.pt >= s.cloud.at) { s.cloud.t = 0; ev('cloud'); }
+      if (s.cloud.t >= 0) { s.cloud.t += dt; if (s.cloud.t > 3.4) { s.cloud.t = -2; s.cloud.at = 1e9; } }
+      s.sunCover = s.cloud.t >= 0 && s.cloud.t < 3.4 ? 0.35 : 1;
+      /* 曬乾：穩在區間內才有；區間外只剩一點點 */
+      var u = Math.abs(s.th) / df.zone, q = u < 1 ? 1 - 0.55 * u : 0.12; s.q = q;
+      s.stabSum += q * dt; s.stabN += dt;
+      addDry(60 / df.d1 * q * s.sunCover * dt);
+      /* 海鷗 */
+      if (!s.gull && s.gullI < df.gulls.length && s.pt >= df.gulls[s.gullI]) { s.gull = { t: 0, side: Math.random() < 0.5 ? -1 : 1, state: 'in' }; s.gullI++; ev('gull'); }
+      if (s.gull) {
+        s.gull.t += dt;
+        if (s.gull.state === 'in' && s.gull.t >= GULL_T) { s.gull.state = 'dive'; ev('gullDive'); }
+        if (s.gull.state === 'dive' && s.gull.t >= GULL_T + 0.45) { s.steals++; addDry(-df.steal); ev('steal'); s.gull.state = 'out'; s.gull.t = 0; }
+        if (s.gull.state === 'out' && s.gull.t > 1.4) s.gull = null;
+      }
+      if (s.pt >= df.d1) { s.dry1 = s.dry; startCross(); }
+    }
+    function stepCross(dt) {
+      s.pt += dt;
+      s.om *= Math.pow(0.02, dt); s.th += s.om * dt; s.th *= Math.pow(0.04, dt); s.push = 0;   // 吊環慢慢靜止
+      if (s.crossIn > 0) { s.crossIn -= dt; return; }
+      s.crossT += dt;
+      var t = s.crossT; s.zc = 0.52 + 0.14 * Math.sin(t * 0.9 + 0.5) + 0.05 * Math.sin(t * 2.3);
+      if (s.stun > 0) { s.stun -= dt; s.x = Math.max(0.2, s.x - 0.5 * dt); }
+      else s.x = clamp(s.x + ((s.hold ? 0.5 : -0.42) + 0.18 * Math.sin(t * 2.7 + 1)) * dt, 0, 1.02);
+      var inZ = Math.abs(s.x - s.zc) <= df.zw, below = s.x < s.zc - df.zw;
+      s.zoneIn = inZ;
+      if (s.stun <= 0) { addDry(25 / df.d2 * (inZ ? 1 : below ? 0.22 : 0) * dt); s.crossGood = ((s.crossGood || 0) * (t - dt) + (inZ ? 1 : below ? 0.2 : 0) * dt) / Math.max(0.0001, t); }
+      if (s.x >= 1 && s.stun <= 0) { s.slips++; s.stun = 0.9; addDry(-4); ev('slip'); }
+      if (t >= df.d2) startSpin();
+    }
+    function stepSpin(dt) {
+      s.pt += dt; s.th *= Math.pow(0.05, dt);
+      var gl = df.gl, bt = 60 / df.bpm, i;
+      for (i = 0; i < s.beats.length; i++) { var b = s.beats[i]; if (!b.done && s.pt > b.at + gl) { b.done = true; b.q = 'miss'; s.hits.push('miss'); ev('beat', { i: i, q: 'miss' }); } }
+      if (s.beats.every(function (b) { return b.done; }) && s.pt > s.beats[2].at + 0.9) startLand();
+    }
+    function stepLand(dt) {
+      s.pt += dt; var L = s.land;
+      if (L.done) { if (s.pt > L.doneAt + 1.0) finish(); return; }
+      L.pos += L.dir * dt / df.per * 2; if (L.pos >= 1) { L.pos = 1; L.dir = -1; } if (L.pos <= 0) { L.pos = 0; L.dir = 1; }
+      if (s.pt > TIMEOUT) { L.done = true; L.q = 'miss'; L.doneAt = s.pt; L.timeout = true; ev('landing', { q: 'miss' }); }
+    }
+    return {
+      s: s, diff: df,
+      step: function (dt) {
+        s.t += dt;
+        if (s.phase === 'ready') { s.pt += dt; s.th = 0.32 * Math.cos(s.t * 3) * Math.exp(-s.t * 0.1); if (s.pt >= READY) { s.th = 0.32; s.om = 0; startSwing(); } }
+        else if (s.phase === 'swing') stepSwing(dt);
+        else if (s.phase === 'cross') stepCross(dt);
+        else if (s.phase === 'spin') stepSpin(dt);
+        else if (s.phase === 'land') stepLand(dt);
+        else if (s.phase === 'done') s.pt += dt;
+      },
+      setPush: function (u) { s.push = s.phase === 'swing' ? clamp(u, -1, 1) : 0; },
+      setHold: function (h) { s.hold = !!h; },
+      shoo: function () { var G = s.gull; if (G && G.state !== 'out' && s.phase === 'swing') { G.state = 'out'; G.t = 0; s.shoos++; addDry(1.5); ev('shoo'); return true; } return false; },
+      tap: function () {
+        if (s.phase === 'spin') {
+          var gl = df.gl, best = -1, bd = 9, i;
+          for (i = 0; i < s.beats.length; i++) { var b = s.beats[i]; if (b.done) continue; var d = Math.abs(s.pt - b.at); if (d < bd) { bd = d; best = i; } }
+          if (best < 0 || bd > gl + 0.12) { ev('stray'); return null; }
+          var b2 = s.beats[best]; b2.done = true; var q = bd <= df.pf ? 'perfect' : bd <= gl ? 'good' : 'miss'; b2.q = q; s.hits.push(q);
+          addDry(q === 'perfect' ? 3.33 : q === 'good' ? 2.1 : 0); s.ang += q === 'miss' ? 0.5 : 1; ev('beat', { i: best, q: q }); return q;
+        }
+        if (s.phase === 'land' && !s.land.done) {
+          var L = s.land, d2 = Math.abs(L.pos - L.c), q2 = d2 <= L.tz * 0.22 ? 'perfect' : d2 <= L.tz * 0.5 ? 'good' : 'miss';
+          L.done = true; L.q = q2; L.doneAt = s.pt; addDry(q2 === 'perfect' ? 5 : q2 === 'good' ? 3 : 0); ev('landing', { q: q2 }); return q2;
+        }
+        return null;
+      }
+    };
+  }
+  return { create: create, DIFF: DIFF };
+})();
+
+/* ---- ring_game.js ---- */
+/* 古厝呷飯・吊環五仔魚乾：遊戲主體（畫面、操作、特效）。
+   依賴：RingSim（規則）、RingAssets（魚像素圖，ring_fish_art.py 依使用者給的插畫產生）、DofuAudio（音樂音效，共用豆花的合成器）。
+   用法：var g = RingGame.create({ host, diff:'normal', sound:()=>true, onEnd(res){...} }); g.destroy() 結束。
+   玩法：吊環五仔魚乾——擺盪壓住左右、十字支撐把力量條維持在綠區、三拍大迴旋、落地；每一段都在曬乾魚。 */
+var RingGame = (function () {
+  var FONT = 'Cubic11, "PingFang TC", sans-serif', INK = '#3b2a1e';
+  var DG = { '0': '01110,10001,10001,10001,10001,10001,01110', '1': '00100,01100,00100,00100,00100,00100,01110', '2': '01110,10001,00001,00010,00100,01000,11111', '3': '11110,00001,00001,01110,00001,00001,11110', '4': '00010,00110,01010,10010,11111,00010,00010', '5': '11111,10000,11110,00001,00001,10001,01110', '6': '00110,01000,10000,11110,10001,10001,01110', '7': '11111,00001,00010,00100,01000,01000,01000', '8': '01110,10001,10001,01110,10001,10001,01110', '9': '01110,10001,10001,01111,00001,00010,01100' };
+  function cvs(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  var dec = function (s) { return s.replace(/(\D)(\d+)/g, function (m, c, n) { return c.repeat(+n); }); };
+  function fromRle(d, w, h, pal) { var f = dec(d), c = cvs(w, h), q = c.getContext('2d'); for (var i = 0; i < w * h; i++) { var ch = f[i]; if (ch !== '.' && pal[ch]) { q.fillStyle = pal[ch]; q.fillRect(i % w, (i / w) | 0, 1, 1); } } return c; }
+  function fromRows(rows, pal) { var h = rows.length, w = rows[0].length, c = cvs(w, h), q = c.getContext('2d'); for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) { var ch = rows[j][i]; if (ch !== '.' && pal[ch]) { q.fillStyle = pal[ch]; q.fillRect(i, j, 1, 1); } } return c; }
+  function mix(a, b, t) { var pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16), r = [16, 8, 0].map(function (s) { return Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t); }); return '#' + ((1 << 24) | (r[0] << 16) | (r[1] << 8) | r[2]).toString(16).slice(1); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  var STAR = ['....k....', '...kYk...', '...kYk...', 'kkkkYkkkk', 'kYYYYYYYk', '.kYYYYYk.', '..kYYYk..', '.kYYkYYk.', '.kYk.kYk.', '.kk...kk.'];
+  var GULL = [
+    ['k.............k', 'wk...........kw', 'wwk....k....kww', '.wwkkkkWkkkkww.', '..kwwwWWWwwwk..', '....kWWWWWk....', '.....kWWWk.....'],
+    ['...............', '.kk.........kk.', 'wwwkk..k..kkwww', '.wwwwkkWkkwwww.', '..kwwwWWWwwwk..', '....kWWWWWk....', '.....kWWWk.....'],
+    ['...............', '...............', 'kk...kkkkk...kk', 'wwkkkWWWWWkkkww', '.kwwwWWWWWwwwk.', '....kWWWWWk....', '.....kWWWk.....']];
+  var GPAL = { k: '#6a7078', w: '#cfd6dc', W: '#fbfcfd' };
+  /* 魚乾色階：新鮮銀白 → 曬成金褐色 */
+  var DRY_TO = { g: '#b98a4a', w: '#f1d08c', y: '#d9a640', Y: '#e8c070', k: '#7d6590' };
+  var imgs = null;
+  function images() {
+    if (imgs) return imgs; var I = {}, F = RingAssets.fish; I.fish = [];
+    for (var L = 0; L <= 5; L++) { var pal = {}; for (var k in F.pal) pal[k] = mix(F.pal[k], DRY_TO[k] || F.pal[k], L / 5); I.fish.push(fromRle(F.d, F.w, F.h, pal)); }
+    I.star = fromRows(STAR, { k: INK, Y: '#ffd95a' }); I.starE = fromRows(STAR, { k: '#6b5a4a', Y: '#4a3e34' });
+    I.gull = GULL.map(function (r) { return fromRows(r, GPAL); });
+    imgs = I; return I;
+  }
+  /* 魚在吊環上的握環點（魚鰭尖，單位＝像素圖座標） */
+  var FW = 74, FH = 83, GRIP_X = 37, GRIP_Y = 29, GRIP_DX = 29.5;
+
+  function create(o) {
+    var host = o.host, diffKey = o.diff || 'normal', I = images();
+    var cw = host.clientWidth || 360, ch = host.clientHeight || 640;
+    var scale = 2;
+    if (cw >= 560) { var fit = Math.min(6, ch / 312, cw / 176); scale = fit >= 3 ? Math.floor(fit) : Math.max(1, Math.floor(fit * 4) / 4); }
+    while (scale > 2 && Math.floor(ch / scale) < 312) scale--;
+    if (cw < 560) while (scale > 1 && Math.floor(ch / scale) < 312) scale = 1;
+    var WF = Math.max(176, Math.ceil(cw / scale)), W = cw < 560 ? WF : Math.min(WF, 230), OX = Math.floor((WF - W) / 2), H = Math.max(312, Math.floor(ch / scale));
+    var cv = cvs(WF, H); cv.style.cssText = 'position:absolute;top:0;left:0;width:' + (WF * scale) + 'px;height:' + (H * scale) + 'px;image-rendering:pixelated;touch-action:none;user-select:none;-webkit-user-select:none;';
+    host.appendChild(cv); var g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+    var au = DofuAudio.create({ enabled: o.sound });
+    var sim = RingSim.create({ diff: diffKey }), S = sim.s, DF = sim.diff;
+
+    /* ——— 版面 ——— */
+    var HUD_H = 52, BTN_H = 46, BTN_Y = H - 70, GY = BTN_Y - 52, AY = HUD_H + 14, CX = Math.round(W / 2);
+    var L = clamp(GY - 14 - (FH - GRIP_Y) - AY, 50, 120), RC = L + 24;   // 繩長；魚身中心離轉軸的距離
+    var st = {
+      t: 0, shake: 0, flash: 0, flashCol: '#fff', pops: [], parts: [], banners: [], ended: false, endT: 0, reveal: false, revT: 0, reported: false, paused: false,
+      push: 0, keyL: false, keyR: false, ptrHold: false, ptrPush: 0, keyHold: false, musT: 0, musStep: 0, lastPh: '', best: 0, newBest: false,
+      angV: 0, dropT: -1, drop: null, dripT: 0, wob: 0, cloudX: [0.15, 0.6, 0.9], beatPing: -1, warnT: 0, gustDir: 0, gustT: 0, lastBeat: -1, sparkles: []
+    };
+    try { st.best = +localStorage.getItem('sunnuRingBest_' + diffKey) || 0; } catch (e) {}
+    var raf = 0, last = 0, dead = false;
+
+    /* ——— 文字 ——— */
+    function R(x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+    function smallTxt(s, x, y, col, align, shadow) {
+      var parts = String(s).match(/\d+(?:\.\d+)?|[^\d]+/g) || [], ws = [], tot = 0; g.font = '11px ' + FONT;
+      parts.forEach(function (t) { var w = /^\d/.test(t) ? t.split('').reduce(function (a, c) { return a + (c === '.' ? 3 : 6); }, 0) : g.measureText(t).width; ws.push(w); tot += w; });
+      var cx = Math.round(Math.round(x) - (align === 'left' ? 0 : align === 'right' ? tot : tot / 2));
+      function pass(dx, dy, c) {
+        var px = cx + dx; g.fillStyle = c; g.textAlign = 'left'; g.textBaseline = 'middle';
+        parts.forEach(function (t, k) {
+          if (/^\d/.test(t)) { var q = px; t.split('').forEach(function (chh) { if (chh === '.') { g.fillRect(q, Math.round(y) + dy + 3, 1, 1); q += 3; return; } var rows = DG[chh].split(','); for (var j = 0; j < 7; j++) { var oy = j + (j > 2) + (j > 4), hh = (j === 2 || j === 4) ? 2 : 1; for (var i = 0; i < 5; i++) if (rows[j][i] === '1') g.fillRect(q + i, Math.round(y) + dy - 4 + oy, 1, hh); } q += 6; }); }
+          else g.fillText(t, px, Math.round(y) + dy);
+          px += ws[k];
+        });
+      }
+      if (shadow !== false) pass(1, 1, INK); pass(0, 0, col || '#fff6dc');
+    }
+    function txt(s, x, y, size, col, align, shadow) {
+      size = Math.max(1, Math.round(size / 11)) * 11; s = String(s);
+      if (size <= 11 && /\d/.test(s)) { smallTxt(s, x, y, col, align, shadow); return; }
+      g.font = size + 'px ' + FONT; g.textAlign = align || 'center'; g.textBaseline = 'middle';
+      if (shadow !== false) { g.fillStyle = INK; g.fillText(s, x + 1, y + 1); } g.fillStyle = col || '#fff6dc'; g.fillText(s, x, y);
+    }
+    function ellFill(cx, cy, rx, ry, col) { g.fillStyle = col; for (var y = -ry; y <= ry; y++) { var w = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry)))); g.fillRect(Math.round(cx - w), Math.round(cy + y), w * 2, 1); } }
+    function pline(x0, y0, x1, y1, c, w) { g.fillStyle = c; var n = Math.max(1, Math.round(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)))); for (var i = 0; i <= n; i++) g.fillRect(Math.round(x0 + (x1 - x0) * i / n - (w || 2) / 2), Math.round(y0 + (y1 - y0) * i / n), w || 2, 1); }
+    function pcirc(cx, cy, r, col, th) { g.fillStyle = col; th = th || 1; for (var a = 0; a < 360; a += 360 / Math.max(24, Math.round(r * 5))) { var rad = a * Math.PI / 180; g.fillRect(Math.round(cx + Math.cos(rad) * r), Math.round(cy + Math.sin(rad) * r), th, th); } }
+    function pop(text, x, y, col, big) { st.pops.push({ text: text, x: x, y: y, age: 0, col: col || '#fff6dc', big: !!big }); }
+    function banner(text, col, ttl) { st.banners.push({ text: text, col: col || '#ffd95a', age: 0, ttl: ttl || 1.8 }); }
+    function burst(x, y, n, cols, sp, grav) { for (var i = 0; i < n; i++) { var a = Math.random() * 6.283, v = (0.4 + Math.random()) * (sp || 40); st.parts.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (sp || 40) * 0.5, g: grav == null ? 120 : grav, age: 0, life: 0.5 + Math.random() * 0.6, c: cols[i % cols.length], s: Math.random() < 0.3 ? 2 : 1 }); } }
+    function buzz(n) { try { if (navigator.vibrate) navigator.vibrate(n); } catch (e) {} }
+    function col(fn) { g.save(); g.translate(OX, 0); try { fn(); } finally { g.restore(); } }
+    function wide(fn) { var w0 = W; W = WF; try { fn(); } finally { W = w0; } }
+
+    /* ——— 操作 ——— */
+    function rel(e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * WF - OX, y: (e.clientY - r.top) / r.height * H }; }
+    function resume() { st.paused = false; last = performance.now(); au.ambient(true); }
+    function gullXY() {
+      var G = S.gull; if (!G) return null;
+      var tx = CX + Math.sin(S.th) * L, ty = AY + Math.cos(S.th) * L + 12, sx = CX + G.side * (W / 2 + 30), sy = AY + 10;
+      if (G.state === 'in') { var u = clamp(G.t / 2.6, 0, 1), e = u * u * (3 - 2 * u); return { x: lerp(sx, tx + G.side * 34, e) + Math.sin(G.t * 5) * 4, y: lerp(sy, ty - 32, e) + Math.sin(G.t * 3) * 5 }; }
+      if (G.state === 'dive') { var v = clamp((G.t - 2.6) / 0.45, 0, 1); return { x: lerp(tx + G.side * 34, tx, v), y: lerp(ty - 32, ty, v) }; }
+      var o2 = G.t; return { x: tx + G.side * (20 + o2 * 90), y: ty - 10 - o2 * 70 };
+    }
+    function pressAction(p) {
+      if (S.phase === 'swing') return;
+      if (S.phase === 'cross') { st.ptrHold = true; return; }
+      if (S.phase === 'spin' || S.phase === 'land') { var q = sim.tap(); if (q === null && S.phase === 'spin') au.sfx('tap'); }
+    }
+    function down(e) {
+      if (dead) return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} var p = rel(e); au.ensure();
+      if (st.ended) { if (!st.reveal && st.endT > 0.3) { st.reveal = true; st.revT = 0; } else if (st.reveal && st.revT > 1.2 && !st.reported) st.revT = 99; return; }
+      if (st.paused) { resume(); return; }
+      if (S.phase === 'swing') {
+        var gp = gullXY(); if (gp && Math.hypot(p.x - gp.x, p.y - gp.y) < 26 && sim.shoo()) return;
+        st.ptrPush = p.x < CX ? -1 : 1; return;
+      }
+      pressAction(p);
+    }
+    function up() { st.ptrHold = false; st.ptrPush = 0; }
+    function kd(e) {
+      if (dead) return; var k = e.key;
+      if (k === 'ArrowLeft' || k === 'a' || k === 'A') { e.preventDefault(); st.keyL = true; if (S.phase !== 'swing' && !e.repeat) pressAction(); }
+      else if (k === 'ArrowRight' || k === 'd' || k === 'D') { e.preventDefault(); st.keyR = true; if (S.phase !== 'swing' && !e.repeat) pressAction(); }
+      else if (k === ' ' || k === 'Enter' || k === 'ArrowUp' || k === 'ArrowDown') { e.preventDefault(); if (!e.repeat) { if (S.phase === 'cross') st.keyHold = true; else if (S.phase === 'swing') { au.ensure(); } else pressAction(); } }
+      else if (k === 'p' || k === 'P' || k === 'Escape') { if (!st.ended) { st.paused = !st.paused; if (!st.paused) resume(); else au.ambient(false); } }
+    }
+    function ku(e) { var k = e.key; if (k === 'ArrowLeft' || k === 'a' || k === 'A') st.keyL = false; else if (k === 'ArrowRight' || k === 'd' || k === 'D') st.keyR = false; else if (k === ' ' || k === 'Enter' || k === 'ArrowUp' || k === 'ArrowDown') st.keyHold = false; }
+    function vis() { if (document.hidden && !st.ended && st.t > 0.5) { st.paused = true; au.ambient(false); } else last = performance.now(); }
+    cv.addEventListener('pointerdown', down); cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); window.addEventListener('keydown', kd); window.addEventListener('keyup', ku); document.addEventListener('visibilitychange', vis);
+
+    /* ——— 事件（音效與特效） ——— */
+    var PHASE_TIP = { swing: '① 擺盪：壓住左右，別讓魚晃出去！', cross: '② 十字支撐：按住出力，放開休息！', spin: '③ 大迴旋：跟著拍子點！', land: '落地！準星到綠區就點！' };
+    function fishPos() { var a = S.th; return { x: CX + Math.sin(a) * L, y: AY + Math.cos(a) * L + 24 }; }
+    function handle(ev) {
+      var fp = fishPos();
+      switch (ev.t) {
+        case 'swing': banner(PHASE_TIP.swing, '#fff6dc', 3.2); au.sfx('go'); break;
+        case 'cross': banner(PHASE_TIP.cross, '#fff6dc', 3.0); au.sfx('heal'); break;
+        case 'spin': banner(PHASE_TIP.spin, '#fff6dc', 2.6); au.sfx('heal'); break;
+        case 'land': banner(PHASE_TIP.land, '#ffe9a0', 2.4); au.sfx('go'); break;
+        case 'gustWarn': st.warnT = 1.0; st.gustDir = ev.dir; au.sfx('warn'); break;
+        case 'cloud': banner('太陽被雲遮住了…', '#d8e6ef', 2.4); break;
+        case 'gull': au.sfx('gull'); banner('海鷗來了！點牠趕走！', '#ffe9a0', 2.0); break;
+        case 'gullDive': au.sfx('gull'); break;
+        case 'steal': au.sfx('steal'); pop('魚被叼一口！', fp.x, fp.y - 20, '#ec6a5c', false); st.shake = 0.4; st.flash = 0.2; st.flashCol = '#ec6a5c'; burst(fp.x, fp.y, 14, ['#c9c9cc', '#ffffff'], 40); buzz(60); break;
+        case 'shoo': au.sfx('shoo'); pop('趕走了！', fp.x, fp.y - 26, '#9be28a', false); break;
+        case 'slip': au.sfx('freeze'); pop('手滑了！', fp.x, fp.y - 20, '#ec6a5c', true); st.shake = 0.5; buzz(80); break;
+        case 'stray': au.sfx('tap'); break;
+        case 'beat': {
+          var qn = ev.q; st.lastBeat = ev.i;
+          if (qn === 'perfect') { au.sfx('perfect', ev.i); pop('完美！', CX, BTN_Y - 52, '#ffd95a', true); burst(CX, BTN_Y - 30, 16, ['#ffd95a', '#fff6dc'], 60); buzz(20); }
+          else if (qn === 'good') { au.sfx('good'); pop('不錯', CX, BTN_Y - 52, '#fff6dc', false); }
+          else { au.sfx('weak'); pop('漏拍…', CX, BTN_Y - 52, '#ec9a8a', false); }
+          break;
+        }
+        case 'landing': {
+          var q2 = ev.q; st.dropT = 0; st.drop = { q: q2, x0: CX + Math.sin(S.th) * L };
+          if (q2 === 'perfect') { au.sfx('clear'); pop('完美落地！', CX, GY - 40, '#ffd95a', true); burst(CX, GY - 6, 28, ['#ffd95a', '#fff6dc', '#ffffff'], 80, 80); buzz(30); }
+          else if (q2 === 'good') { au.sfx('good'); pop('穩穩落地', CX, GY - 40, '#fff6dc', false); burst(CX, GY - 4, 10, ['#fff6dc'], 40); }
+          else { au.sfx('burp'); pop('踉蹌落地…', CX, GY - 40, '#ec9a8a', false); burst(CX, GY - 2, 12, ['#d9c9a0', '#b9a070'], 30); }
+          break;
+        }
+        case 'win': au.sfx('win'); st.ended = true; st.endT = 0; au.ambient(true); burst(CX, GY - 30, 60, ['#ffd95a', '#ffffff', '#f4dd7a', '#ffb35c'], 90, 60); break;
+        case 'lose': au.sfx('lose'); st.ended = true; st.endT = 0; st.shake = 0.4; break;
+      }
+    }
+    function finishWin(r) { try { var b = +localStorage.getItem('sunnuRingBest_' + diffKey) || 0; if (r.score > b) { st.newBest = b > 0; localStorage.setItem('sunnuRingBest_' + diffKey, String(r.score)); st.best = r.score; } else st.best = b; } catch (e) {} }
+
+    /* ——— 更新 ——— */
+    function update(dt) {
+      st.t += dt;
+      var push = (st.keyL ? -1 : 0) + (st.keyR ? 1 : 0) + st.ptrPush; sim.setPush(clamp(push, -1, 1)); sim.setHold(st.ptrHold || st.keyHold);
+      sim.step(dt);
+      var evs = S.ev; S.ev = []; evs.forEach(function (e) { handle(e); if (e.t === 'win' || e.t === 'lose') finishWin(S.result || {}); });
+      /* 音樂：遊戲內一個 16 分音符叫一次 */
+      if (!st.ended) { var bpm = S.phase === 'spin' || S.phase === 'land' ? DF.bpm : 92, sd = 60 / bpm / 4; st.musT += dt; while (st.musT >= sd) { st.musT -= sd; au.step(st.musStep++, bpm, S.phase === 'ready' ? 0.1 : S.phase === 'swing' ? 0.35 : S.phase === 'cross' ? 0.2 : 0.7); } }
+      /* 拍子提示音：每個目標拍子到時叫一次 */
+      if (S.phase === 'spin') S.beats.forEach(function (b, i) { if (!b._ping && S.pt >= b.at) { b._ping = true; au.sfx('count', i === 0 ? 0 : 1); } });
+      ['shake', 'flash', 'warnT'].forEach(function (k) { st[k] = Math.max(0, st[k] - dt * (k === 'shake' ? 1.6 : k === 'warnT' ? 1 : 1.6)); });
+      st.angV += (S.ang - st.angV) * Math.min(1, dt * 7);
+      if (st.dropT >= 0) st.dropT += dt;
+      /* 水滴：魚還濕的時候一直滴 */
+      if (!st.ended && S.dry < 70 && (S.phase === 'swing' || S.phase === 'cross' || S.phase === 'ready')) { st.dripT -= dt; if (st.dripT <= 0) { st.dripT = 0.18 + S.dry / 100 * 0.9 + Math.random() * 0.2; var fp = fishPos(); st.parts.push({ x: fp.x + (Math.random() - 0.5) * 20, y: fp.y + 22, vx: 0, vy: 10, g: 140, age: 0, life: 1.2, c: '#9fd8ef', s: 1, floor: GY }); } }
+      st.cloudX = st.cloudX.map(function (x, i) { return (x + dt * (0.006 + i * 0.0035)) % 1.3; });
+      st.banners.forEach(function (b) { b.age += dt; }); st.banners = st.banners.filter(function (b) { return b.age < b.ttl; });
+      st.pops.forEach(function (p) { p.age += dt; }); st.pops = st.pops.filter(function (p) { return p.age < 1.1; });
+      st.parts.forEach(function (q) { q.age += dt; q.vy += (q.g || 0) * dt; q.x += q.vx * dt; q.y += q.vy * dt; if (q.floor && q.y > q.floor) q.age = 99; }); st.parts = st.parts.filter(function (q) { return q.age < q.life; });
+      if (st.ended) { st.endT += dt; if (!st.reveal && st.endT > 0.8) { st.reveal = true; st.revT = 0; } if (st.reveal) st.revT += dt; if (!st.reported && st.reveal && st.revT > 6.0) { st.reported = true; if (o.onEnd) { try { o.onEnd(S.result); } catch (e) { if (window.console) console.error(e); } } } }
+    }
+
+    /* ——— 畫面：背景（鋪滿整個畫面寬） ——— */
+    function prog() { return clamp((S.phase === 'ready' ? 0 : S.phase === 'swing' ? S.pt / DF.d1 * 0.5 : S.phase === 'cross' ? 0.5 + S.crossT / DF.d2 * 0.3 : S.phase === 'spin' ? 0.82 : 0.92) + (S.phase === 'done' ? 0.08 : 0), 0, 1); }
+    function drawBackdrop(T) {
+      var p = prog(), hz = GY - 46;
+      var top = p < 0.5 ? mix('#9fd8ef', '#5fb8ea', p * 2) : mix('#5fb8ea', '#f2b46e', (p - 0.5) * 2), bot = p < 0.5 ? mix('#fbeec2', '#d6f1fb', p * 2) : mix('#d6f1fb', '#fbdca0', (p - 0.5) * 2);
+      for (var y = 0; y < hz; y += 2) R(0, y, W, 2, mix(top, bot, Math.pow(y / hz, 1.2)));
+      var sx = lerp(W * 0.18, W * 0.82, p), sy = hz - 20 - Math.sin(p * Math.PI) * 78, cover = S.phase === 'swing' && S.sunCover < 1;
+      ellFill(sx, sy, 15, 15, mix('#fff7c2', '#ffd27a', p)); ellFill(sx, sy, 11, 11, '#fffbe0');
+      if (!cover) for (var i = 0; i < 8; i++) { var a = i * 0.785 + T * 0.2; R(sx + Math.cos(a) * 21, sy + Math.sin(a) * 21, 2, 2, 'rgba(255,247,194,.8)'); }
+      for (i = 0; i < 3; i++) { var cx2 = st.cloudX[i] * (W + 80) - 40, cy = HUD_H + 8 + i * 15; ellFill(cx2, cy, 18 + i * 3, 6, '#ffffff'); ellFill(cx2 + 8, cy - 3, 11, 5, '#ffffff'); }
+      if (cover) { var cc = clamp(S.cloud.t / 0.6, 0, 1); ellFill(sx - 4, sy, 30 * cc, 10, '#cfd9df'); ellFill(sx + 8, sy - 4, 20 * cc, 8, '#e1eaef'); ellFill(sx - 16, sy + 3, 16 * cc, 7, '#bfccd4'); }
+      /* 魚塭：一格一格的水面＋水車 */
+      R(0, hz, W, 46, '#5ea6c0'); for (i = 0; i < W; i += 46) { R(i, hz, 2, 46, '#c9a56a'); }
+      for (i = 0; i < 6; i++) { var yy = hz + 5 + i * 7, off = (T * (4 + i) + i * 31) % (W + 30); R(off - 20, yy, 16, 1, '#a8d6e6'); R((off + W / 2) % (W + 30) - 20, yy + 2, 10, 1, '#8cc6dc'); }
+      R(0, hz, W, 1, '#2f6a82');
+      for (i = 0; i < 2; i++) { var wx = 24 + i * (W - 80), wy = hz + 24; R(wx, wy, 14, 2, '#7a5a3a'); var ph = T * 5 + i; for (var k = 0; k < 4; k++) { var aa = ph + k * 1.57; R(wx + 7 + Math.cos(aa) * 7, wy + 1 + Math.sin(aa) * 3, 2, 2, '#e8f4f8'); } }
+      /* 古厝：紅磚牆＋燕尾屋脊（在左邊遠處） */
+      var hx = 6, hy = hz - 34;
+      R(hx, hy + 12, 58, 34, '#b4513f'); for (var by = 0; by < 34; by += 4) { R(hx, hy + 12 + by, 58, 1, '#8c3a2c'); for (var bx = (by / 4 % 2) * 4; bx < 58; bx += 8) R(hx + bx, hy + 12 + by, 1, 4, '#8c3a2c'); }
+      R(hx - 4, hy + 6, 66, 7, '#5a3a32'); R(hx - 2, hy + 4, 62, 3, '#6e4a40'); for (i = 0; i < 62; i += 3) R(hx - 2 + i, hy + 6, 1, 6, '#493028');
+      R(hx - 6, hy + 2, 6, 3, '#5a3a32'); R(hx - 8, hy, 4, 3, '#5a3a32'); R(hx + 58, hy + 2, 6, 3, '#5a3a32'); R(hx + 62, hy, 4, 3, '#5a3a32');
+      R(hx + 24, hy + 26, 10, 20, '#3d2a22'); R(hx + 25, hy + 27, 8, 18, '#6b4a34'); R(hx + 8, hy + 22, 8, 8, '#f6e2a8'); R(hx + 9, hy + 23, 6, 6, '#ffd95a'); R(hx + 42, hy + 22, 8, 8, '#f6e2a8'); R(hx + 43, hy + 23, 6, 6, '#ffd95a');
+      /* 曬魚架：竹竿掛一排小魚乾（右邊） */
+      var rx = W - 74, ry = hz - 12; R(rx, ry - 2, 3, 22, '#8c6a3e'); R(rx + 56, ry - 2, 3, 22, '#8c6a3e'); R(rx - 2, ry, 63, 2, '#a98250');
+      for (i = 0; i < 7; i++) { var fx = rx + 4 + i * 8, sw = Math.sin(T * 1.6 + i) * 1; R(fx, ry + 2, 1, 3, '#7a5a3a'); R(fx - 1 + sw, ry + 5, 4, 8, i % 2 ? '#e3c58a' : '#d6b476'); R(fx + sw, ry + 13, 2, 3, '#b8955a'); }
+      /* 沙地曬場 */
+      for (y = hz + 46; y < H; y += 2) R(0, y, W, 2, mix('#e9d3a0', '#c9a56a', clamp((y - hz - 46) / Math.max(1, H - hz - 46), 0, 1)));
+      R(0, hz + 46, W, 2, '#8c6a3e'); R(0, hz + 47, W, 1, INK);
+      for (i = 0; i < 26; i++) { var px = (i * 47 + 13) % W, py = hz + 52 + (i * 31) % Math.max(1, H - hz - 56); R(px, py, 2, 1, '#b48d55'); if (i % 3 === 0) R(px + 3, py + 2, 1, 1, '#f6e6bd'); }
+    }
+    function drawGround() {
+      var mw = 150, mx = CX - mw / 2;   // 體操墊
+      R(mx - 1, GY - 1, mw + 2, 14, INK); R(mx, GY, mw, 12, '#3f86c8'); R(mx, GY, mw, 3, '#6cb0e8'); R(mx, GY + 9, mw, 3, '#2d6aa8'); for (var i = mx + 12; i < mx + mw; i += 18) R(i, GY + 3, 1, 6, '#2d6aa8');
+      /* 擺盪時的「曬太陽區」：墊子上的綠色區間＋魚現在的位置 */
+      if (S.phase === 'swing' || S.phase === 'ready') {
+        var zx0 = CX + Math.sin(-DF.zone) * L, zx1 = CX + Math.sin(DF.zone) * L;
+        g.globalAlpha = 0.5 + 0.2 * Math.sin(st.t * 4); R(zx0, GY + 1, zx1 - zx0, 10, '#9be28a'); g.globalAlpha = 1; R(zx0, GY, 1, 12, '#3f8a3a'); R(zx1, GY, 1, 12, '#3f8a3a');
+        var fx = CX + Math.sin(S.th) * L; R(fx - 1, GY - 2, 3, 14, Math.abs(S.th) < DF.zone ? '#ffffff' : '#ec6a5c');
+      }
+    }
+    /* ——— 畫面：魚＆吊環 ——— */
+    function drawFish(x, y, dry) {
+      var d = clamp(dry / 100, 0, 1) * 5, lo = Math.floor(d), t = d - lo; g.drawImage(I.fish[lo], Math.round(x), Math.round(y));
+      if (t > 0.02 && lo < 5) { g.globalAlpha = t; g.drawImage(I.fish[lo + 1], Math.round(x), Math.round(y)); g.globalAlpha = 1; }
+    }
+    function drawRig(T) {
+      var th = S.th, landed = st.dropT >= 0, fishOnRig = !landed, px = CX + Math.sin(th) * L, py = AY + Math.cos(th) * L;
+      /* 吊環繩（上端固定在橫桿上，下端跟著魚擺盪）＋環 */
+      [-1, 1].forEach(function (sd) {
+        var ax = CX + sd * GRIP_DX, bx = px + sd * GRIP_DX;
+        pline(ax, AY, bx, py - 10, '#8f86b3', 2);
+        for (var a = 0; a < 360; a += 12) { var rad = a * Math.PI / 180; g.fillStyle = '#c9c9cc'; g.fillRect(Math.round(bx + Math.cos(rad) * 5.5), Math.round(py - 4 + Math.sin(rad) * 8), 2, 2); }
+      });
+      if (fishOnRig) {
+        var rot = S.phase === 'spin' || S.phase === 'land' ? st.angV / 3 * Math.PI * 2 : -th * 0.3, tr = 0;
+        if (S.phase === 'cross') { var near = S.x > S.zc + DF.zw; tr = (near ? 1.4 : S.stun > 0 ? 2 : 0.25) * (Math.sin(T * 40) > 0 ? 1 : -1); }
+        g.save(); g.translate(Math.round(px + tr), Math.round(py)); g.rotate(rot); drawFish(-GRIP_X, -GRIP_Y, S.dry); g.restore();
+      }
+      /* 橫桿（吊環架）＋兩根立柱 */
+      var bx0 = CX - 58, bx1 = CX + 58;
+      R(bx0 - 5, AY - 6, 6, GY - AY + 18, '#8c6a3e'); R(bx0 - 4, AY - 6, 2, GY - AY + 18, '#b88a52'); R(bx1 - 1, AY - 6, 6, GY - AY + 18, '#8c6a3e'); R(bx1 + 3, AY - 6, 2, GY - AY + 18, '#6e4f2c');
+      R(bx0 - 7, AY - 8, bx1 - bx0 + 14, 6, INK); R(bx0 - 6, AY - 7, bx1 - bx0 + 12, 4, '#a98250'); R(bx0 - 6, AY - 7, bx1 - bx0 + 12, 1, '#d3a870');
+      R(bx0 - 8, GY + 11, 10, 3, INK); R(bx1 - 2, GY + 11, 10, 3, INK);
+      if (landed && S.phase !== 'done') {}
+      /* 落地的魚 */
+      if (landed) {
+        var u = clamp(st.dropT / 0.45, 0, 1), fy0 = AY + L - GRIP_Y, fy1 = GY - (FH - 6), yy = lerp(fy0, fy1, u * u), q = st.drop.q, bounce = u >= 1 ? Math.abs(Math.sin((st.dropT - 0.45) * 9)) * Math.max(0, 8 - (st.dropT - 0.45) * 14) : 0;
+        var tilt = q === 'miss' && u >= 1 ? Math.sin((st.dropT - 0.45) * 12) * Math.max(0, 0.35 - (st.dropT - 0.45) * 0.5) : 0;
+        g.save(); g.translate(Math.round(lerp(st.drop.x0, CX, u)), Math.round(yy - bounce + FH / 2)); g.rotate(tilt); drawFish(-GRIP_X, -FH / 2, S.dry); g.restore();
+        if (S.phase === 'done' && S.result && S.result.win && Math.floor(T * 3) % 2) { R(CX - 26, GY - 70, 2, 2, '#fff'); R(CX + 28, GY - 52, 2, 2, '#fff'); R(CX + 14, GY - 80, 2, 2, '#ffd95a'); }
+      }
+    }
+    function drawGull(T) {
+      var G = S.gull; if (!G) return; var p = gullXY(); if (!p) return; var f = G.state === 'dive' ? 2 : Math.floor(T * 6) % 3, im = I.gull[f === 2 && G.state !== 'dive' ? 1 : f];
+      g.save(); g.translate(Math.round(p.x), Math.round(p.y)); if (G.state === 'out') g.rotate(-0.3 * G.side); g.drawImage(im, -15, -7, 30, 14); g.restore();
+      if (G.state === 'in' && Math.floor(T * 4) % 2) txt('點牠！', p.x, p.y - 14, 11, '#ffe9a0');
+    }
+    /* ——— 畫面：HUD、操作區、結算 ——— */
+    function drawHud() {
+      R(-OX, 0, WF, HUD_H, 'rgba(36,26,18,.78)'); R(-OX, HUD_H, WF, 1, INK); R(-OX, HUD_H - 1, WF, 1, 'rgba(255,246,220,.2)');
+      var idx = { ready: -1, swing: 0, cross: 1, spin: 2, land: 2, done: 3 }[S.phase], names = ['擺盪', '十字撐', '迴旋'];
+      for (var i = 0; i < 3; i++) { var done = i < idx, cur = i === idx, x = 8 + i * 52; R(x, 4, 48, 13, INK); R(x + 1, 5, 46, 11, done ? '#ffd95a' : cur ? '#fff6dc' : '#5a4b3f'); txt(names[i], x + 24, 11, 11, done || cur ? INK : '#a89a88', 'center', false); }
+      /* 曬乾度 */
+      var d = clamp(S.dry / 100, 0, 1), bx = 8, bw = W - 16 - 32, thr = DF.thr / 100;
+      R(bx, 19, 30, 14, INK); R(bx + 1, 20, 28, 12, '#d9a640'); R(bx + 1, 20, 28, 2, 'rgba(255,255,255,.3)'); txt('曬乾', bx + 15, 26, 11, '#fff', 'center', true);
+      R(bx + 32, 19, bw, 14, INK); R(bx + 33, 20, bw - 2, 12, '#cdbfa8'); R(bx + 33, 20, Math.round((bw - 2) * d), 12, d >= thr ? '#ffc93a' : '#e8b84a'); R(bx + 33, 20, Math.round((bw - 2) * d), 3, 'rgba(255,255,255,.45)');
+      R(bx + 33 + Math.round((bw - 2) * thr) - 1, 17, 2, 18, '#ffffff'); txt('目標', bx + 33 + Math.round((bw - 2) * thr), 41, 11, '#ffe9a0', 'center', true);
+      smallTxt(Math.round(S.dry) + '%', W - 10, 11, '#fff6dc', 'right');
+      /* 階段時間條 */
+      var tf = S.phase === 'swing' ? 1 - S.pt / DF.d1 : S.phase === 'cross' ? 1 - S.crossT / DF.d2 : S.phase === 'ready' ? 1 : 0;
+      if (S.phase === 'swing' || S.phase === 'cross') { R(bx, 47, W - 16, 3, INK); R(bx + 1, 48, Math.round((W - 18) * clamp(tf, 0, 1)), 1, '#78bfe8'); }
+    }
+    function bigBtn(x, y, w, h, label, sub, on, colr) {
+      var pr = on ? 3 : 0; R(x, y + 4, w, h, INK); R(x, y + pr, w, h, INK); R(x + 1, y + pr + 1, w - 2, h - 2, colr[on ? 1 : 0]); R(x + 1, y + pr + 1, w - 2, 3, colr[2]); R(x + 1, y + pr + h - 5, w - 2, 4, colr[3]);
+      txt(label, x + w / 2, y + pr + h / 2 - (sub ? 5 : 0), 22, INK, 'center', false); if (sub) txt(sub, x + w / 2, y + pr + h - 12, 11, '#6b4a1e', 'center', false);
+    }
+    function drawControls(T) {
+      var Y = BTN_Y, hw = (W - 24) / 2, Y_ = ['#ffd95a', '#ffe9a0', '#ffeb9a', '#e0a92a'], B_ = ['#bfe6f5', '#e8f7fd', '#e8f7fd', '#8fc2d8'];
+      if (S.phase === 'swing' || S.phase === 'ready') {
+        var pl = (st.keyL || st.ptrPush < 0), pr = (st.keyR || st.ptrPush > 0);
+        bigBtn(8, Y, hw, BTN_H, '◀', '往左壓', pl, B_); bigBtn(16 + hw, Y, hw, BTN_H, '▶', '往右壓', pr, B_);
+      } else if (S.phase === 'cross') bigBtn(8, Y, W - 16, BTN_H, '撐住！', '按住出力・放開休息', st.ptrHold || st.keyHold, Y_);
+      else if (S.phase === 'spin') bigBtn(8, Y, W - 16, BTN_H, '點！', '跟著拍子', false, Y_);
+      else if (S.phase === 'land') bigBtn(8, Y, W - 16, BTN_H, '落地！', '準星在綠區時點', false, Y_);
+    }
+    function drawMeters(T) {
+      /* 十字支撐：右邊的力量條 */
+      if (S.phase === 'cross' && S.crossIn <= 0) {
+        var mx = W - 26, my = HUD_H + 22, mh = GY - my - 4;
+        R(mx - 1, my - 1, 14, mh + 2, INK); R(mx, my, 12, mh, '#4a3e34');
+        var zy0 = my + mh * (1 - (S.zc + DF.zw)), zy1 = my + mh * (1 - (S.zc - DF.zw)); R(mx, zy0, 12, zy1 - zy0, '#86cf62'); R(mx, zy0, 12, 2, '#b6ef9a');
+        var cy = my + mh * (1 - clamp(S.x, 0, 1)), danger = S.x > S.zc + DF.zw; R(mx - 3, cy - 1, 18, 3, danger ? (Math.floor(T * 10) % 2 ? '#ff5a4a' : '#fff') : '#ffffff'); R(mx - 3, cy + 2, 18, 1, INK);
+        txt('力', mx + 6, my - 9, 11, '#fff6dc'); if (danger) txt('快滑了！', mx - 6, cy - 12, 11, '#ff9a8a', 'right');
+      }
+      /* 大迴旋：三顆拍子圈，縮小到內圈時點 */
+      if (S.phase === 'spin') {
+        var cy2 = BTN_Y - 24;
+        S.beats.forEach(function (b, i) {
+          var x = CX + (i - 1) * 56, dtm = b.at - S.pt, state = b.done ? b.q : '';
+          pcirc(x, cy2, 9, 'rgba(255,246,220,.9)', 2);
+          if (state) { ellFill(x, cy2, 8, 8, state === 'perfect' ? '#ffd95a' : state === 'good' ? '#9be28a' : '#ec6a5c'); }
+          else if (dtm > -0.3 && dtm < 1.5) { var rr = 9 + clamp(dtm, 0, 1.5) * 20; g.globalAlpha = clamp(1.3 - dtm * 0.6, 0.25, 1); pcirc(x, cy2, rr, '#ffd95a', 2); g.globalAlpha = 1; }
+          txt(String(i + 1), x, cy2 + 1, 11, state ? INK : '#fff6dc', 'center', !state);
+        });
+      }
+      /* 落地：準星掃過目標 */
+      if (S.phase === 'land') {
+        var Lm = S.land, bw = 180, bx = CX - bw / 2, by = BTN_Y - 22;
+        R(bx - 1, by - 5, bw + 2, 11, INK); R(bx, by - 4, bw, 9, '#4a3e34');
+        var tz = Lm.tz * bw; R(bx + Lm.c * bw - tz / 2, by - 4, tz, 9, '#86cf62'); R(bx + Lm.c * bw - tz * 0.11, by - 4, tz * 0.22, 9, '#ffd95a');
+        var px = bx + Lm.pos * bw; R(px - 1, by - 8, 3, 17, '#ffffff'); R(px - 2, by - 9, 5, 2, INK); R(px - 2, by + 8, 5, 2, INK);
+      }
+    }
+    function drawWind(T) {
+      if (S.phase !== 'swing' && S.phase !== 'ready') return;
+      var w = S.wind + (S.gust && S.gust.t > 0.9 && S.gust.t < 1.8 ? S.gust.dir * DF.gust : 0), a = clamp(Math.abs(w) / 2.2, 0, 1), dir = w > 0 ? 1 : -1;
+      if (a > 0.12) for (var i = 0; i < 6; i++) { var yy = HUD_H + 14 + i * 22 + (i % 2) * 8, xx = ((T * 70 * dir * (0.6 + a) + i * 61) % (W + 40) + (W + 40)) % (W + 40) - 20; g.globalAlpha = 0.25 + a * 0.45; R(xx, yy, 6 + a * 14, 1, '#ffffff'); g.globalAlpha = 1; }
+      if (st.warnT > 0) { if (Math.floor(T * 8) % 2) { txt(st.gustDir > 0 ? '風來了  ▶▶' : '◀◀  風來了', CX, HUD_H + 28, 22, '#ffe9a0'); } }
+    }
+    function drawParts() { st.parts.forEach(function (q) { g.globalAlpha = clamp(1 - q.age / q.life, 0, 1); g.fillStyle = q.c; g.fillRect(Math.round(q.x), Math.round(q.y), q.s || 1, q.s || 1); g.globalAlpha = 1; }); }
+    function drawPops() { st.pops.forEach(function (p) { var u = p.age / 1.1, y = p.y - u * 22; g.globalAlpha = u > 0.7 ? (1 - u) / 0.3 : 1; txt(p.text, p.x, y, p.big ? 22 : 11, p.col); g.globalAlpha = 1; }); }
+    function drawBanners() { st.banners.forEach(function (b, i) { var u = b.age / b.ttl, a = u < 0.12 ? u / 0.12 : u > 0.8 ? (1 - u) / 0.2 : 1, y = HUD_H + 16 + i * 20; g.globalAlpha = clamp(a, 0, 1); var w = String(b.text).length * 11 + 16; R(W / 2 - w / 2 - 1, y - 9, w + 2, 20, INK); R(W / 2 - w / 2, y - 8, w, 18, 'rgba(36,26,18,.82)'); txt(b.text, W / 2, y, 11, b.col, 'center', false); g.globalAlpha = 1; }); }
+    function drawReady() {
+      if (S.phase !== 'ready') return; var n = Math.ceil(2.4 - S.pt);
+      txt('吊環五仔魚乾', W / 2, HUD_H + 54, 22, '#fff6dc');
+      var w = 176; R(W / 2 - w / 2, HUD_H + 70, w, 54, 'rgba(36,26,18,.72)'); txt('擺盪→十字撐→大迴旋→落地', W / 2, HUD_H + 80, 11, '#ffe9a0', 'center', false); txt('每一段都在把魚曬乾！', W / 2, HUD_H + 96, 11, '#fff6dc', 'center', false); txt('曬乾度達到目標就成功', W / 2, HUD_H + 112, 11, '#fff6dc', 'center', false);
+      if (n >= 1) txt(String(n), W / 2, HUD_H + 150, 33, '#ffd95a');
+    }
+    function drawEnd() {
+      if (!st.ended || !st.reveal) return; var r = S.result; if (!r) return; var win = !!r.win, u = clamp(st.revT / 0.5, 0, 1), px = 14, pw = W - 28, py = HUD_H + 8, ph = win ? 206 : 178, pad = 12;
+      g.fillStyle = win ? 'rgba(255,230,150,' + 0.18 * u + ')' : 'rgba(36,26,18,' + 0.5 * u + ')'; g.fillRect(-OX, HUD_H + 1, WF, H - HUD_H - 1);
+      g.globalAlpha = clamp(st.revT / 0.4, 0, 1);
+      R(px - 1, py - 1, pw + 2, ph + 2, INK); R(px, py, pw, ph, '#fff6dc'); R(px + 2, py + 2, pw - 4, ph - 4, '#3a2a1e'); R(px + 3, py + 3, pw - 6, ph - 6, '#4a3626');
+      txt(win ? '魚乾曬好了！' : '還沒曬乾……', W / 2, py + 17, 22, win ? '#ffd95a' : '#ec9a8a');
+      var ry;
+      if (win) { for (var i = 0; i < 3; i++) { var on = i < r.stars; g.drawImage(on ? I.star : I.starE, Math.round(W / 2 - 33 + i * 24), py + 32 + (on ? Math.round(Math.sin(st.revT * 5 + i) * 1.5) : 0), 18, 20); } ry = py + 66; }
+      else { txt('曬乾度 ' + r.dry + '%　目標 ' + r.thr + '%', W / 2, py + 40, 11, '#fff6dc'); ry = py + 60; }
+      g.font = '11px ' + FONT;
+      [['曬乾度', r.dry + '%', '#ffd95a'], ['穩定', r.judge.stab.toFixed(1), '#ffffff'], ['力量', r.judge.cross.toFixed(1), '#ffffff'], ['節奏', r.judge.beat.toFixed(1), '#ffffff'], ['落地', r.judge.land.toFixed(1), '#ffffff'], ['被海鷗叼', r.steals, r.steals ? '#ec6a5c' : '#9be28a'], ['手滑', r.slips, r.slips ? '#ec6a5c' : '#9be28a']].forEach(function (a2, k) {
+        var y = ry + k * 15, lw = a2[0].length * 11, vs = String(a2[1]), vw = vs.split('').reduce(function (s2, c2) { return s2 + (c2 === '.' ? 3 : 6); }, 0), x0 = px + pad, x1 = px + pw - pad;
+        txt(a2[0], x0, y, 11, '#ffe9a0', 'left'); smallTxt(a2[1], x1, y, a2[2], 'right');
+        for (var dx = x0 + lw + 5; dx < x1 - vw - 5; dx += 3) R(dx, y + 4, 1, 1, 'rgba(255,233,160,.38)');
+      });
+      if (st.best) txt(st.newBest ? '新紀錄！' : '最佳 ' + st.best, W / 2, py + ph - 11, 11, st.newBest ? '#ffd95a' : '#c8b89a');
+      g.globalAlpha = 1;
+    }
+    function drawPause() { if (!st.paused) return; g.fillStyle = 'rgba(36,26,18,.6)'; g.fillRect(-OX, HUD_H + 1, WF, H - HUD_H - 1); txt('暫停', W / 2, H * 0.4, 33, '#ffd95a'); txt('點一下繼續', W / 2, H * 0.4 + 30, 11, '#fff6dc'); }
+    function frameDraw() {
+      var T = st.t; g.save(); g.imageSmoothingEnabled = false;
+      if (st.shake > 0) g.translate(Math.round((Math.random() - 0.5) * 6 * st.shake), Math.round((Math.random() - 0.5) * 6 * st.shake));
+      wide(function () { drawBackdrop(T); });
+      col(function () { drawGround(); drawRig(T); drawGull(T); drawWind(T); drawParts(); drawPops(); });
+      g.restore();
+      col(function () { drawHud(); if (!st.ended) drawControls(T); drawMeters(T); drawBanners(); drawReady(); drawEnd(); drawPause(); });
+      if (st.flash > 0) { g.globalAlpha = clamp(st.flash * 2.5, 0, 0.5); g.fillStyle = st.flashCol; g.fillRect(0, 0, WF, H); g.globalAlpha = 1; }
+    }
+    function loop(now) {
+      if (dead) return; raf = requestAnimationFrame(loop);
+      var dt = Math.max(0, Math.min(0.05, (now - last) / 1000 || 0.016)); last = now;
+      if (!st.paused) { try { update(dt); } catch (e) { if (window.console) console.error(e); } }
+      frameDraw();
+    }
+    function destroy() { dead = true; cancelAnimationFrame(raf); au.destroy(); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); document.removeEventListener('visibilitychange', vis); if (cv.parentNode) cv.parentNode.removeChild(cv); }
+    au.ambient(true); last = performance.now(); raf = requestAnimationFrame(loop);
+    return {
+      destroy: destroy, state: st, sim: sim, canvas: cv, layout: { W: W, WF: WF, OX: OX, H: H, scale: scale, L: L, GY: GY, AY: AY },
+      freeze: function () { if (dead) return; try { frameDraw(); } catch (e) {} dead = true; cancelAnimationFrame(raf); au.destroy(); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', ku); document.removeEventListener('visibilitychange', vis); },
+      step: function (dt) { update(dt); }, draw: frameDraw
+    };
+  }
+  return { create: create };
+})();
+
+/* ---- gym_game.js ---- */
+/* 古厝呷飯・體操午仔魚（橫向闖關）。由 build_gym.py 從 體操午仔魚/闖關試玩.html 產生，不要手改。依賴 RingAssets.fish。
+   用法：var g = GymGame.create({ host, diff:'normal', sound:()=>true, onEnd(res){...} }); g.destroy()／g.freeze() */
+var GymGame = (function () {
+  function create(o) {
+  /* ---------- 魚像素圖 ---------- */
+  var F = RingAssets.fish, FW = F.w, FH = F.h, GX = 37, GY = 29;
+  function rle(d, w, h, pal) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h; var g = c.getContext('2d');
+    var f = d.replace(/(\D)(\d+)/g, function (m, ch, n) { return ch.repeat(+n); });
+    for (var i = 0; i < w * h; i++) { var ch = f[i]; if (ch !== '.' && pal[ch]) { g.fillStyle = pal[ch]; g.fillRect(i % w, (i / w) | 0, 1, 1); } }
+    return c;
+  }
+  var fishImg = rle(F.d, FW, FH, F.pal);
+  (function () {                                       // 手臂重畫：粗一點、圓潤、尖端往下勾（原插圖手尖有握把小棒，擦掉）；左手在 x0–23，右手對稱
+    var q = fishImg.getContext('2d'), P = ['........................','........................','........................','........................','........................','........................','........................','........................','........................','.....................kkk','.................kkkkyyy','...............kkYYYYyyy','............kkkYYyyyyyyy','..........kkyyyyyyyyyyyy','........kkyyyyyyyyyyyyyy','.......kyyyyyyyyyyyyyyyy','......kykkkkkyyyyyyyyyyy','......kk.....kkkkkkkyyyy','......k.............kkkk','.....k..................','........................','........................','........................','........................'], y, x, c;
+    q.clearRect(0, 14, 24, 24); q.clearRect(50, 14, 24, 24);
+    for (y = 0; y < P.length; y++) for (x = 0; x < 24; x++) { c = P[y][x]; if (c === '.' || !F.pal[c]) continue; q.fillStyle = F.pal[c]; q.fillRect(x, 14 + y, 1, 1); q.fillRect(73 - x, 14 + y, 1, 1); }
+  })();
+  var K = 0.55, GDX = 29.5 * K, HO = 10;            // 縮放、兩隻手距離一半、身體中心比手低多少
+
+  /* ---------- 關卡 ---------- */
+  var G = 700, RUN = 100, JUMP = 300, AIRV = 130, TUCK = 0.70, TAU = 0.08, DAMP = 0.12, GRAB = 28, HBW = 14, HBH = 40;
+  /* 關卡＝一串「區」。每區有自己的平台、吊環、動物、主題色；建好後合併成一個 LV。
+     平台 [x, y(上緣), w, 樣式]；吊環 [x, y(手的高度), {kind:'move'|'break', ax, per}]；平台樣式 brick＝磚牆、roof＝屋瓦 */
+  var ZONES = [
+    { name: '魚塭', x0: 0, plats: [[-80, 400, 350, 'brick'], [680, 345, 290, 'brick'], [1305, 305, 280, 'brick']],
+      rings: [[335, 345], [485, 335], [635, 322], [985, 278], [1125, 250], [1265, 222]],
+      ens: [{ k: 'gull', x0: 380, x1: 600, y: 292, spd: 46 }, { k: 'otter', x: 560, per: 2.8, off: 0.6 }, { k: 'cat', x0: 700, x1: 950, plat: 1, spd: 36 },
+        { k: 'gull', x0: 1040, x1: 1200, y: 205, spd: 40 }, { k: 'heron', x: 1195, per: 3.4, off: 1.0 }],
+      theme: { sky: ['#3f86ec', '#5ea6ff', '#8ccaff', '#bfe8ff'], sun: '#ffe34a', halo: '255,240,180', hill1: '#5cc04f', hill2: '#3fa447', cloud: '255,255,255', water: ['#3f8fe0', '#1f56ae'], wave: '#c4e8ff' } },
+    { name: '古厝屋簷', x0: 1600, plats: [[2000, 248, 250, 'roof'], [2600, 175, 240, 'roof'], [3045, 125, 300, 'roof']],
+      rings: [[1665, 255], [1810, 240, { kind: 'move', ax: 32, per: 4.2 }], [1955, 225], [2265, 181], [2410, 165], [2555, 150, { kind: 'break' }], [2855, 110], [3000, 100]],
+      ens: [{ k: 'crow', x0: 1690, x1: 1900, y: 195, spd: 60 }, { k: 'mouse', x0: 2020, x1: 2230, plat: 3, spd: 70 }, { k: 'tile', x: 2340, per: 3.2, off: 0.8, y0: 100 },
+        { k: 'mouse', x0: 2620, x1: 2820, plat: 4, spd: 75 }, { k: 'tile', x: 2930, per: 2.6, off: 1.6, y0: 30 }],
+      theme: { sky: ['#3b4a8c', '#c2607a', '#f2a05a', '#f7c98a'], sun: '#ffd9a0', halo: '255,170,100', hill1: '#a07a92', hill2: '#7f5f7c', cloud: '255,205,190', water: ['#4a6fa0', '#25375f'], wave: '#8fb0d8' } },
+    { name: '水管牆', x0: 3900, plats: [[3880, 330, 1400, 'room'], [4110, 230, 270, 'pipe', 16], [4850, 230, 200, 'pipe', 16]], rings: [[4450, 205], [4610, 195, { kind: 'move', ax: 28, per: 3.6 }], [4750, 205]], ens: [{ k: 'ball8', x0: 5080, x1: 4790, y: 320, per: 4.2, off: 0.5 }],
+      theme: { sky: ['#3f86ec', '#5ea6ff', '#8ccaff', '#bfe8ff'], sun: '#ffe34a', halo: '255,240,180', hill1: '#5cc04f', hill2: '#3fa447', cloud: '255,255,255', water: ['#3f8fe0', '#1f56ae'], wave: '#c4e8ff' } }
+  ];
+  var GOAL = { x: 3250, y: 66, r: 24, beam: -4 };         // 終點吊環架（像旗杆：跑過去一定掛上，跳越高分越多）；y＝沒抓前環的位置、beam＝橫樑高度
+  var QB = { x: 800, y: 262 }, ROOMX = 3800, EXITX = 5200;       // 「？」磚（空翻頂到＝進隱藏室）、隱藏室範圍與出口
+  var ROOM_COINS = [[4250, 298, 50], [4860, 298, 100], [5110, 298, 50], [4200, 198, 50], [4320, 198, 50], [4540, 160, 100], [4690, 156, 100], [4950, 198, 100], [4880, 150, 300, 1]].map(function (c) { return { x: c[0], y: c[1], v: c[2], gold: c[3] | 0, got: false }; });
+  var STEAM = [{ x: 4250, y: 230, per: 3.6, off: 0 }, { x: 4770, y: 330, per: 3.8, off: 1.2 }], TITLE = '水管牆霸主', WHEELS = [{ x: 4095, vy: 445, vx: 40, per: 3.6, off: 0.6 }, { x: 4815, vy: 505, vx: 90, per: 3.6, off: 2.4 }];   // 養殖池打水水車（增氧機）：水花彈射＋增氧加速（額外捷徑）
+  var GEY = { x: 4045, w: 84, per: 3.4, t0: 1.0, t1: 2.5 };                    // 噴水柱：每 3.4 秒噴 1.5 秒（噴前 0.6 秒冒泡）
+  var SLIDE = [[4392, 266], [4470, 266], [4540, 275], [4600, 295], [4650, 320], [4705, 330]], SLEN = [0];   // 水管溜滑梯（腳底座標）
+  for (var sli = 1; sli < SLIDE.length; sli++) SLEN.push(SLEN[sli - 1] + Math.hypot(SLIDE[sli][0] - SLIDE[sli - 1][0], SLIDE[sli][1] - SLIDE[sli - 1][1]));
+  var LV = { w: 5600, waterY: 470, bottom: 620, goalX: 3240, plats: [], rings: [], zones: ZONES };
+  var ENS = [];
+  ZONES.forEach(function (z) {
+    z.plats.forEach(function (q) { LV.plats.push({ x: q[0], y: q[1], w: q[2], st: q[3], h: q[4] || LV.bottom - q[1] }); });
+    z.rings.forEach(function (r) { var o = r[2] || {}; LV.rings.push({ x: r[0], y: r[1], R: 70, kind: o.kind || '', cx: r[0], ax: o.ax || 0, per: o.per || 3, ph: 0 }); });
+    z.ens.forEach(function (e) { ENS.push(e); });
+  });
+  LV.rings.forEach(function (r) { r.px = r.x; r.py = r.y - r.R; });
+  function zoneIdx(x) { var zi = 0; for (var i = 1; i < ZONES.length; i++) if (x >= ZONES[i].x0) zi = i; return zi; }
+
+  /* ---------- 難度：簡單／普通／困難（愛心數、無敵時間、動物速度、判定大小） ---------- */
+  var DFS = {
+    easy: { name: '簡單', hp: 5, inv: 2.0, sp: 0.8, hit: 0.85, fall: 0, reset: 0 },
+    normal: { name: '普通', hp: 3, inv: 1.5, sp: 1.0, hit: 1.0, fall: 1, reset: 0 },
+    hard: { name: '困難', hp: 2, inv: 1.0, sp: 1.3, hit: 1.15, fall: 1, reset: 0 }
+  };
+  var diffKey = DFS[o.diff] ? o.diff : 'normal', LOCK = !!o.diff, dead = false, raf = 0, reported = false, tmr = 0;
+  
+  function DF() { return DFS[diffKey]; }
+  function setDiff(k) { diffKey = k; try { localStorage.setItem('sunnuGymDiff', k); } catch (e) { } }
+  /* ---------- 敵人：海鷗（空中巡邏）、貓（平台巡邏）、水獺（水中跳出）、鷺鷥（水中伸長脖子啄）。空翻中碰到＝擊退 ---------- */
+  function mkEnemies() {
+    return ENS.map(function (sp) {
+      var e = { k: sp.k, s: sp, x: sp.x0 !== undefined ? sp.x0 : sp.x, y: 0, dir: 1, t: sp.off || 0, alive: true, boxes: null, dieT: 0, vy: 0, neck: 14, warn: false };
+      if (sp.k === 'cat') e.y = LV.plats[sp.plat].y - 6; if (sp.k === 'mouse') e.y = LV.plats[sp.plat].y - 4; if (sp.k === 'gull' || sp.k === 'crow' || sp.k === 'ball8') e.y = sp.y; return e;
+    });
+  }
+  function overlap(a, b) { return a[0] < b[0] + b[2] && a[0] + a[2] > b[0] && a[1] < b[1] + b[3] && a[1] + a[3] > b[1]; }
+  function killEnemy(W, e) {
+    e.alive = false; e.dieT = 0; e.vy = -220; W.kills++; W.score += 200; pop(W, e.x, (e.boxes ? e.boxes[0][1] : e.y) - 16, '擊退！+200', '#ffd24a');
+    for (var i = 0; i < 10; i++) W.fx.push({ x: e.x, y: e.y, vx: (Math.random() - .5) * 200, vy: -Math.random() * 160, t: 0, life: 0.5, gold: 1 });
+  }
+  function hurt(W, e) {
+    var p = W.p; var safe = p.x > ROOMX; if (!safe) W.hp--; p.inv = DF().inv; /* 隱藏室只彈開、不扣血 */ var away = p.x >= e.x ? 1 : -1;
+    pop(W, p.x, p.y - 34, safe ? '哎呀！' : '痛！', '#ff8a8a');
+    if (safe) { p.inv = 0.8; return; }
+    if (p.swing) { p.swing = null; p.vx = away * 90; p.vy = -140; p.rel = 0.7; p.on = false; p.jumping = false; }
+    else { p.vy = -220; p.vx = away * 130; p.stun = 0.35; p.on = false; p.jumping = false; }
+    if (W.hp <= 0) { p.dead = 1; W.faints++; W.fl = { n: 0, pts: 0 }; pop(W, p.x, p.y - 50, '被抓走了…', '#ff8a8a'); }
+  }
+  function heronNeck(e) {                                   // 鷺鷥一個週期：休息→縮頸蓄力（警告）→猛啄→停→收回
+    var T = e.s.per, u = e.t % T, MAX = 178, REST = 14, hot = false, warn = false, nk;
+    if (u < 1.8) nk = REST;
+    else if (u < 2.4) { nk = REST + 16 * (u - 1.8) / 0.6; warn = true; }
+    else if (u < 2.65) { var k = (u - 2.4) / 0.25; nk = 30 + (MAX - 30) * (1 - (1 - k) * (1 - k)); hot = true; }
+    else if (u < 3.05) { nk = MAX; hot = true; }
+    else nk = MAX - (MAX - REST) * ((u - 3.05) / (T - 3.05));
+    return { nk: nk, hot: hot && nk > 50, warn: warn };
+  }
+  function updEnemies(W, dt) {
+    var p = W.p, pb = [p.x - 7, p.y - 20, 14, 40];
+    if (p.inv > 0) p.inv -= dt;
+    W.en.forEach(function (e) {
+      var sp = e.s;
+      if (!e.alive) { e.dieT += dt; e.vy += 900 * dt; e.y += e.vy * dt; e.x += e.dir * 30 * dt; e.boxes = null; return; }
+      var spm = DF().sp; e.t += dt * spm;
+      if (e.k === 'gull' || e.k === 'crow') { e.x += e.dir * sp.spd * spm * dt; if (e.x > sp.x1) { e.x = sp.x1; e.dir = -1; } else if (e.x < sp.x0) { e.x = sp.x0; e.dir = 1; } e.y = sp.y + (e.k === 'crow' ? 16 : 10) * Math.sin(e.t * (e.k === 'crow' ? 3.6 : 3)); e.boxes = [[e.x - 8, e.y - 4, 16, 9]]; }
+      else if (e.k === 'cat') { e.x += e.dir * sp.spd * spm * dt; if (e.x > sp.x1) { e.x = sp.x1; e.dir = -1; } else if (e.x < sp.x0) { e.x = sp.x0; e.dir = 1; } e.boxes = [[e.x - 8, e.y - 6, 16, 12]]; }
+      else if (e.k === 'mouse') { e.x += e.dir * sp.spd * spm * dt; if (e.x > sp.x1) { e.x = sp.x1; e.dir = -1; } else if (e.x < sp.x0) { e.x = sp.x0; e.dir = 1; } e.boxes = [[e.x - 6, e.y - 4, 12, 8]]; }
+      else if (e.k === 'tile') {
+        var tu = e.t % sp.per, T0 = sp.per - 0.5; e.x = sp.x; e.boxes = null; e.warn = tu >= T0 - 0.9 && tu < T0; e.falling = false; e.y = sp.y0;
+        if (tu >= T0) { var ty = sp.y0 + 760 * (tu - T0); if (ty < LV.waterY) { e.y = ty; e.falling = true; e.boxes = [[sp.x - 8, ty - 6, 16, 12]]; } }
+      }
+      else if (e.k === 'ball8') { var bu = e.t % sp.per, bd = 3.6; e.boxes = null; if (bu < bd) { e.x = sp.x0 + (sp.x1 - sp.x0) * (bu / bd); e.boxes = [[e.x - 7, e.y - 6, 14, 14]]; } }
+      else if (e.k === 'otter') {
+        var u = e.t % sp.per; e.boxes = null; e.warn = u >= 1.9 && u < 2.3; e.x = sp.x;
+        if (u >= 2.3) { var ls = u - 2.3, yy = LV.waterY - 480 * ls + 350 * ls * ls; if (yy < LV.waterY - 4) { e.y = yy; e.vy = -480 + 700 * ls; e.boxes = [[sp.x - 7, yy - 8, 14, 16]]; } }
+      } else if (e.k === 'heron') {
+        var hn = heronNeck(e), headY = 448 - hn.nk; e.neck = hn.nk; e.warn = hn.warn; e.x = sp.x; e.y = 448;
+        e.boxes = hn.hot ? [[e.x - 4, headY - 3, 8, hn.nk + 3], [e.x - 12, headY - 4, 16, 9]] : [[e.x - 4, headY - 3, 8, 9]];
+      }
+      if (e.boxes && DF().hit !== 1) { var hs = DF().hit; e.boxes = e.boxes.map(function (b) { return [b[0] + b[2] * (1 - hs) / 2, b[1] + b[3] * (1 - hs) / 2, b[2] * hs, b[3] * hs]; }); }
+      if (!e.boxes || p.dead > 0) return;
+      for (var i = 0; i < e.boxes.length; i++) if (overlap(pb, e.boxes[i])) {
+        if (p.spinT > 0 && e.k === 'ball8') { e.t += sp.per - (e.t % sp.per); W.score += 100; W.kills++; pop(W, e.x, e.y - 22, '彈開 8 號球！+100', '#ffd24a'); sfx('kill'); } else if (p.spinT > 0 && e.k !== 'tile') killEnemy(W, e); else if (p.inv <= 0) hurt(W, e);
+        break;
+      }
+    });
+  }
+  /* ---------- 音效（WebAudio 合成，第一次點擊後才有聲音） ---------- */
+  var AC = null;
+  function audioOn() { try { if (o.sound && !o.sound()) return; if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { AC = null; } }
+  function tone(f0, f1, dur, type, vol, delay) {
+    if (!AC || false) return;
+    try {
+      var t = AC.currentTime + (delay || 0), o = AC.createOscillator(), gn = AC.createGain();
+      o.type = type || 'square'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t + dur);
+      gn.gain.setValueAtTime(vol || 0.06, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(gn); gn.connect(AC.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) {}
+  }
+  var SFX = {
+    jump: function () { tone(300, 640, 0.14, 'square', 0.05); },
+    grab: function () { tone(520, 780, 0.08, 'triangle', 0.08); tone(780, 1040, 0.08, 'triangle', 0.06, 0.07); },
+    release: function () { tone(700, 260, 0.2, 'sawtooth', 0.04); },
+    perfect: function () { [880, 1175, 1568].forEach(function (f, i) { tone(f, f * 1.01, 0.12, 'triangle', 0.07, i * 0.07); }); },
+    coin: function () { tone(988, 988, 0.05, 'square', 0.05); tone(1319, 1319, 0.14, 'square', 0.05, 0.05); },
+    warp: function () { tone(500, 120, 0.4, 'triangle', 0.08); tone(120, 700, 0.3, 'sine', 0.06, 0.2); },
+    flip: function () { tone(400, 900, 0.18, 'sine', 0.07); },
+    land: function () { tone(180, 90, 0.08, 'triangle', 0.08); },
+    hurt: function () { tone(300, 70, 0.3, 'sawtooth', 0.08); },
+    kill: function () { tone(500, 1000, 0.1, 'square', 0.06); tone(1000, 1500, 0.12, 'square', 0.05, 0.08); },
+    splash: function () { tone(900, 150, 0.35, 'sawtooth', 0.025); },
+    win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, f, 0.2, 'square', 0.06, i * 0.13); }); }
+  };
+  var NB = null;
+  function noiseBuf() { if (!NB) { NB = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate); var d = NB.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } return NB; }
+  function noise(dur, vol, hpf, delay, t0) {
+    if (!AC || false) return;
+    try {
+      var t = t0 || (AC.currentTime + (delay || 0)), src = AC.createBufferSource(), fl = AC.createBiquadFilter(), gn = AC.createGain();
+      src.buffer = noiseBuf(); fl.type = 'highpass'; fl.frequency.value = hpf || 2000; gn.gain.setValueAtTime(vol || 0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(fl); fl.connect(gn); gn.connect(AC.destination); src.start(t); src.stop(t + dur + 0.02);
+    } catch (e) {}
+  }
+  SFX.step = function () { noise(0.04, 0.012, 1800); };
+  SFX.whoosh = function () { noise(0.22, 0.03, 700); };
+  SFX.hurt = function () { tone(320, 60, 0.32, 'sawtooth', 0.08); noise(0.18, 0.06, 500); };
+  SFX.land = function () { tone(170, 80, 0.09, 'triangle', 0.09); noise(0.05, 0.03, 900); };
+  SFX.save = function () { [660, 880, 1320].forEach(function (f, i) { tone(f, f, 0.1, 'triangle', 0.05, i * 0.06); }); };
+  SFX.zone = function () { [523, 659, 784].forEach(function (f, i) { tone(f, f, 0.18, 'triangle', 0.06, i * 0.1); }); };
+  SFX.low = function () { tone(220, 180, 0.12, 'square', 0.04); tone(220, 180, 0.12, 'square', 0.04, 0.2); };
+  /* 背景音樂：8 小節循環（C－Am－F－G），主旋律＋低音＋鼓；點開始後起播、過關停 */
+  var MUS = { on: true, i: 0, next: 0 };
+  try { if (localStorage.getItem('sunnuGymMusic') === '0') MUS.on = false; } catch (e) { }
+  var CH = [48, 45, 41, 43], MEL = [
+    [72, 0, 76, 79, 76, 0, 72, 76], [69, 0, 72, 76, 72, 0, 69, 72], [69, 0, 72, 77, 72, 0, 69, 72], [71, 0, 74, 79, 74, 0, 71, 67],
+    [79, 76, 72, 76, 79, 0, 84, 0], [76, 72, 69, 72, 76, 0, 81, 0], [77, 74, 69, 74, 77, 0, 81, 0], [79, 74, 71, 74, 79, 77, 76, 74]];
+  function mf(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function mtone(t0, f, dur, type, vol) { try { var o = AC.createOscillator(), gn = AC.createGain(); o.type = type; o.frequency.value = f; gn.gain.setValueAtTime(vol, t0); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); o.connect(gn); gn.connect(AC.destination); o.start(t0); o.stop(t0 + dur + 0.02); } catch (e) { } }
+  function musicStep(t0, q) {
+    if (MUS.room) {                                                  // 水管牆專屬曲：Am-F-G-E 的跳躍低音＋泡泡音
+      var rb = (MUS.i / 8 | 0) % 4, rs = MUS.i % 8, rr = [45, 41, 43, 40][rb], RM = [[81, 0, 84, 81, 0, 76, 0, 79], [77, 0, 81, 77, 0, 72, 0, 76], [79, 0, 83, 79, 0, 74, 0, 77], [76, 0, 80, 76, 83, 80, 76, 0]][rb];
+      if (RM[rs]) mtone(t0, mf(RM[rs]), q * 0.9, 'sine', 0.03); if (rs % 2 === 0) mtone(t0, mf(rr + (rs === 4 ? 12 : 0)), q * 0.8, 'square', 0.03); if (rs === 0 || rs === 3 || rs === 6) mtone(t0, 90, 0.1, 'sine', 0.08);
+      if (rs % 2) noise(0.04, 0.01, 7000, 0, t0); MUS.i++; return;
+    }
+    var bar = (MUS.i / 8 | 0) % 8, st = MUS.i % 8, root = CH[bar % 4], lead = MEL[bar][st];
+    if (lead) mtone(t0, mf(lead + (MUS.tr || 0)), q * 1.6, MUS.tr ? 'sawtooth' : 'square', MUS.tr ? 0.012 : 0.018);
+    mtone(t0, mf((st % 2 ? root + 7 : root) + (MUS.tr || 0)), q * 0.9, 'triangle', 0.05);
+    if (st % 4 === 0) mtone(t0, 110, 0.12, 'sine', 0.07);
+    if (st % 2 === 1) noise(0.05, 0.012, 6000, 0, t0);
+    MUS.i++;
+  }
+  tmr = setInterval(function () {
+    if (!AC || false) return;
+    var ww = window.__jump && window.__jump.W; if (!MUS.on || !ww || !ww.started || ww.done || AC.state !== 'running') { MUS.next = 0; return; }
+    var rm = ww.p && ww.p.x > ROOMX; if (rm !== !!MUS.room) { MUS.room = rm; MUS.i = 0; MUS.next = 0; } var zz = ww.zi || 0; MUS.tr = zz >= 1 ? -2 : 0; var q = 60 / (rm ? 126 : zz >= 1 ? 154 : 140) / 2; if (!MUS.next || MUS.next < AC.currentTime - 0.5) MUS.next = AC.currentTime + 0.05;
+    while (MUS.next < AC.currentTime + 0.25) { musicStep(MUS.next, q); MUS.next += q; }
+  }, 80);
+  function sfx(n) { var f = SFX[n]; if (f) f(); }
+  var POPS = { '空翻！': 'flip', '站穩！': 'land', '完美放手！': 'perfect', '痛！': 'hurt', '噗通！': 'splash', '被抓走了…': 'hurt' };
+  function newWorld() {
+    var cp = { x: 40, y: 380 };
+    return { t: 0, p: { x: cp.x, y: cp.y, vx: 0, vy: 0, face: 1, on: true, coy: 0, jbuf: 0, jumping: false, spinT: 0, stun: 0, swing: null, rel: 0, dead: 0, inv: 0 },
+      rc: ROOM_COINS.map(function (c) { return { x: c.x, y: c.y, v: c.v, gold: c.gold, got: false }; }), rcN: 0, wk: 0, oxy: 0, qUsed: false, ret: null, cp: cp, zi: 0, banner: null, hp: DF().hp, maxHp: DF().hp, kills: 0, faints: 0, en: mkEnemies(), pa: false, pops: [], fx: [], flips: 0, falls: 0, score: 0, perfects: 0, started: false, fl: { n: 0, pts: 0 }, done: false, doneT: 0, clean: true };
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function pop(W, x, y, txt, col) { var sn = POPS[txt] || (txt.indexOf('擊退') === 0 ? 'kill' : txt.indexOf('連續空翻') === 0 ? 'flip' : txt.indexOf('抓到') === 0 ? 'grab' : ''); if (sn) sfx(sn); W.pops.push({ x: x, y: y, t: 0, txt: txt, col: col || '#fff' }); }
+  function ringNear(p, rad) {
+    var hx = p.x, hy = p.y - HO, best = null, bd = rad;
+    for (var i = 0; i < LV.rings.length; i++) { var r = LV.rings[i], d = Math.hypot(hx - r.x, hy - r.y); if (d < bd) { bd = d; best = r; } }
+    return best;
+  }
+  function hit(p, plats) {
+    for (var i = 0; i < plats.length; i++) { var q = plats[i]; if (p.x + HBW / 2 > q.x && p.x - HBW / 2 < q.x + q.w && p.y + HBH / 2 > q.y && p.y - HBH / 2 < q.y + q.h) return q; }
+    return null;
+  }
+  function splash(W, x) { for (var i = 0; i < 14; i++) W.fx.push({ x: x, y: LV.waterY, vx: (Math.random() - .5) * 120, vy: -80 - Math.random() * 140, t: 0, life: 0.7 }); }
+
+  var THROW = 0.85, PERF_BOOST = 1.3, LAUNCH = 215, AMAX = 1.5, PERF_LO = 0.35, PERF_HI = 0.85;       // 自動擺盪的最大盪幅（弧度）、完美放手的角度範圍
+  function swingEnergy(s, Rc) { return 0.5 * s.w * s.w + (G / Rc) * (1 - Math.cos(s.th)); }
+  function perfectNow(s) {                                // 盪幅夠大、正在往斜上方走 → 完美放手
+    var Rc = s.ring.R * s.Lf, emax = (G / s.ring.R) * (1 - Math.cos(AMAX));
+    return swingEnergy(s, Rc) >= 0.8 * emax && s.w * s.th > 0 && Math.abs(s.th) >= PERF_LO && Math.abs(s.th) <= PERF_HI;
+  }
+  function bank(W, p, why) {                              // 把這趟空中的特技分入帳
+    if (W.fl.pts > 0) { W.score += W.fl.pts; pop(W, p.x, p.y - 52, '+' + W.fl.pts + ' 特技', '#ffe38a'); }
+    W.fl = { n: 0, pts: 0 };
+  }
+  function step(W, inp, dt) {
+    var p = W.p; W.t += dt;
+    LV.rings.forEach(function (r) { if (r.kind === 'move') { r.x = r.cx + r.ax * Math.sin(6.283 * W.t / r.per + r.ph); if (!(p.swing && p.swing.ring === r)) r.px = r.x; } });
+    if (W.banner) { W.banner.t += dt; if (W.banner.t > 2.4) W.banner = null; }
+    var aE = (inp.a && !W.pa) || !!inp.press; inp.press = false; W.pa = inp.a;     // press＝按下事件的閂鎖，低幀率下快點也不會漏
+    for (var i = W.pops.length - 1; i >= 0; i--) { W.pops[i].t += dt; if (W.pops[i].t > 1) W.pops.splice(i, 1); }
+    for (i = W.fx.length - 1; i >= 0; i--) { var f = W.fx[i]; f.t += dt; f.vy += 500 * dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.t > f.life) W.fx.splice(i, 1); }
+    if (W.done) { W.doneT += dt; if (W.gbonus && W.doneT < 3.2 && Math.floor(W.doneT * 6) !== W.lastDrop) { W.lastDrop = Math.floor(W.doneT * 6); W.fx.push({ x: p.x + (Math.random() - 0.5) * 16, y: p.y - 6, vx: (Math.random() - 0.5) * 20, vy: -10, t: 0, life: 0.8 }); }
+    if (W.gbonus) { var gu = Math.min(1, W.doneT / 1.1), ge = gu * gu * (3 - 2 * gu), gh = W.gh0 + (W.gFy - 42 - W.gh0) * ge; p.x = GOAL.x; p.y = gh + HO + (gu >= 1 ? Math.sin(W.doneT * 3) * 1.5 : 0); } return; }
+    if (p.dead > 0) { p.dead -= dt; if (p.dead <= 0) { p.x = W.cp.x; p.y = W.cp.y; p.vx = p.vy = 0; p.swing = null; p.on = true; p.spinT = 0; p.stun = 0; if (W.hp <= 0) { W.hp = W.maxHp; if (DF().reset) { W.cp = { x: 40, y: 380 }; p.x = W.cp.x; p.y = W.cp.y; } } p.inv = DF().inv; } return; }
+    var man = (inp.r ? 1 : 0) - (inp.l ? 1 : 0), dir = man || 1;   // 自動前進；電腦鍵盤按 ← → 才手動轉向
+    if (!W.started) { if (aE) W.started = true; return; }
+    if (p.rel > 0) p.rel -= dt;
+    if (p.landT > 0) p.landT -= dt;
+    updEnemies(W, dt);
+    if (p.dead > 0) return;
+    if (W.started && !W.done) {
+      if (p.on && Math.abs(p.vx) > 20) { W.fs = (W.fs || 0) + dt; if (W.fs > 0.24) { W.fs = 0; sfx('step'); } }
+      if (p.swing) { var sw = p.swing; if (sw.pth !== undefined && sw.pth * sw.th < 0 && Math.abs(sw.w) > 1.2) sfx('whoosh'); sw.pth = sw.th; }
+      if (W.hp === 1 && W.maxHp > 1 && !W.lowWarn) { W.lowWarn = true; sfx('low'); } else if (W.hp > 1) W.lowWarn = false;
+    }
+    if (p.stun > 0) p.stun -= dt;
+    var zi = zoneIdx(p.x); if (zi !== W.zi) { if (zi > W.zi) { W.banner = { txt: ZONES[zi].name, t: 0 }; sfx('zone'); } W.zi = zi; }
+
+    if (W.slide) {                                          /* ---- 水管溜滑梯：沿管子自動滑，越滑越快，尾端衝出 ---- */
+      var sl = W.slide; sl.v = Math.min(300, sl.v + 130 * dt); sl.s += sl.v * dt; p.inv = Math.max(p.inv, 0.05);
+      var si = 1; while (si < SLEN.length - 1 && SLEN[si] < sl.s) si++;
+      var su = clamp((sl.s - SLEN[si - 1]) / (SLEN[si] - SLEN[si - 1]), 0, 1), spx = SLIDE[si - 1][0] + (SLIDE[si][0] - SLIDE[si - 1][0]) * su, spy = SLIDE[si - 1][1] + (SLIDE[si][1] - SLIDE[si - 1][1]) * su;
+      p.x = spx; p.y = spy - HBH / 2; p.vx = p.vy = 0; p.face = 1; p.on = false; p.swing = null; p.sl = Math.atan2(SLIDE[si][1] - SLIDE[si - 1][1], SLIDE[si][0] - SLIDE[si - 1][0]);
+      if (sl.s >= SLEN[SLEN.length - 1]) { W.slide = null; p.sl = 0; p.on = true; p.vx = sl.v; p.vy = 0; p.y = 330 - HBH / 2; W.score += 80; pop(W, p.x, p.y - 34, '溜滑梯！+80', '#9fe8ff'); sfx('land'); }
+      return;
+    }
+    if (!p.on && !p.swing && !W.slide && p.vy > 0 && p.x > 4372 && p.x < 4450 && Math.abs(p.y + HBH / 2 - 266) < 12) {   // 從上層水管邊緣「掉進」滑梯口才會滑（跳過去抓吊環就不會）
+      W.slide = { s: 0, v: 150 }; sfx('whoosh'); }
+    var gu = W.t % GEY.per;                                  // 噴水柱：噴出時把午仔魚往上托（冒泡時是預警）
+    if (gu >= GEY.t0 && gu < GEY.t1 && Math.abs(p.x - GEY.x) < GEY.w / 2 && p.y > 150 && !p.swing) { p.on = false; p.jumping = false; p.coy = 0.09; p.vy = Math.max(p.vy - 2600 * dt, -330); if (!W.gj) { W.gj = 1; sfx('flip'); } } else if (gu < GEY.t0) W.gj = 0;
+    if (p.swing) {                                          /* ---- 抓環：自動擺盪，放開按鍵＝放手 ---- */
+      var s = p.swing, r = s.ring, Lo = s.Lf, emax = (G / r.R) * (1 - Math.cos(AMAX));
+      var tgt = (s.w * s.th > 0 && swingEnergy(s, r.R * Lo) < emax) ? TUCK : 1;   // 自動收身：盪幅沒滿就一直推
+      s.Lf += (tgt - s.Lf) * Math.min(1, dt / TAU);
+      s.w *= Math.pow(Lo / s.Lf, 2);
+      var Rc = r.R * s.Lf;
+      s.w += (-(G / Rc) * Math.sin(s.th) - DAMP * s.w + man * 2.5) * dt;
+      s.w = clamp(s.w, -6.5, 6.5); s.th += s.w * dt; s.t += dt;
+      p.x = r.px + Rc * Math.sin(s.th); p.y = r.py + Rc * Math.cos(s.th) + HO;
+      if (man) p.face = man;
+      s.perf = perfectNow(s);
+      if ((!inp.a || (r.kind === 'break' && s.t > 1.8)) && s.t > 0.08) {                           // 放手（斷裂環抓太久會斷）
+        p.vx = Rc * s.w * Math.cos(s.th) * THROW; p.vy = -Rc * s.w * Math.sin(s.th) * THROW;
+        var fw = p.face || 1; p.vx = Math.abs(p.vx) * fw;                       // 一律往前拋：往回擺時放手也是往前飛
+        if (Math.hypot(p.vx, p.vy) < LAUNCH) { p.vx = Math.max(p.vx, fw * LAUNCH * 0.64); p.vy = Math.min(p.vy, -LAUNCH * 0.77); }   // 力道太小（在盪幅頂點放手）也往前上方拋，不會原地掉
+        sfx('release'); if (inp.a) pop(W, p.x, p.y - 40, '斷了！', '#ff9a8a'); if (s.perf) { p.vx *= PERF_BOOST; p.vy *= PERF_BOOST; }                                // 完美放手：最後再加成，距離明顯更遠
+        p.swing = null; p.rel = 0.25; p.on = false; p.coy = 0; p.jumping = false;
+        if (s.perf) { W.fl.pts += 150; W.perfects++; pop(W, p.x, p.y - 30, '完美放手！', '#ffe38a'); for (var k = 0; k < 10; k++) W.fx.push({ x: p.x, y: p.y - 10, vx: (Math.random() - .5) * 160, vy: -Math.random() * 120, t: 0, life: 0.5, gold: 1 }); }
+        if (Math.abs(p.vx) > 40) p.face = p.vx > 0 ? 1 : -1;
+      }
+      return;
+    }
+
+    /* ---- 地面／空中 ---- */
+    if (p.on) p.coy = 0.09; else p.coy -= dt;
+    if (aE) p.jbuf = 0.1; else p.jbuf -= dt;
+    var can = p.stun <= 0, didJump = false;
+    if (p.on) {
+      var tv = can ? dir * RUN : 0, dv = (tv === 0 ? 1400 : 1000) * dt; p.vx += clamp(tv - p.vx, -dv, dv);
+    } else if (can && man) { if (man * p.vx < AIRV) p.vx += man * 420 * dt; }
+    if (dir && can) p.face = dir;
+    if (can && p.jbuf > 0 && p.coy > 0) { p.vy = -JUMP; p.jbuf = 0; p.coy = 0; p.on = false; p.jumping = true; didJump = true; sfx('jump'); }
+    if (p.jumping && !inp.a && p.vy < -110) p.vy = -110;
+    p.vy = Math.min(p.vy + G * dt, 540);
+    p.x += p.vx * dt; var q = hit(p, LV.plats);
+    if (q) { if (p.vx > 0) p.x = q.x - HBW / 2; else if (p.vx < 0) p.x = q.x + q.w + HBW / 2; p.vx = 0; }
+    p.y += p.vy * dt; q = hit(p, LV.plats); var was = p.on; p.on = false;
+    if (q) {
+      if (p.vy > 0) {
+        p.y = q.y - HBH / 2; p.on = true; p.jumping = false; if (!was) p.landT = 0.16;
+        if (!was) {                                          // 剛落地
+          if (p.spinT > 0) {
+            var prog = 1 - p.spinT / 0.5;
+            if (prog > 0.15 && prog < 0.85) { p.stun = 0.55; pop(W, p.x, p.y - 34, '摔倒…', '#ff9a8a'); W.clean = false; W.fl = { n: 0, pts: 0 }; }
+            else { pop(W, p.x, p.y - 34, '站穩！', '#8dff8a'); W.fl.pts += 50 * W.fl.n; bank(W, p); }
+          } else { if (p.vy > 400) pop(W, p.x, p.y - 34, '站穩！', '#8dff8a'); bank(W, p); }
+          p.spinT = 0;
+          if (q !== LV.plats[0] && q.st !== 'room' && q.st !== 'pipe' && W.cpPlat !== q) { W.cpPlat = q; pop(W, p.x, p.y - 52, '存檔！', '#9fe8ff'); sfx('save'); W.cp = { x: clamp(p.x, q.x + 30, q.x + q.w - 30), y: q.y - HBH / 2 }; }
+        }
+        p.vy = 0;
+      } else { p.y = q.y + q.h + HBH / 2; p.vy = 0; }
+    }
+    if (p.spinT > 0) p.spinT -= dt;
+    if (p.y > LV.waterY + 14) { splash(W, p.x); p.dead = 1; W.falls++; W.fl = { n: 0, pts: 0 }; pop(W, p.x, LV.waterY - 20, '噗通！', '#9fe4ff'); if (DF().fall) { W.hp--; if (W.hp <= 0) W.faints++; } return; }
+    if (!p.on) {                                             // 抓環（按住）／空翻（點一下）
+      var nr = inp.a && p.rel <= 0 ? ringNear(p, GRAB) : null;
+      if (nr) {
+        var hx = p.x, hy = p.y - HO, th = Math.atan2(hx - nr.px, hy - nr.py), vt = p.vx * Math.cos(th) - p.vy * Math.sin(th);
+        p.swing = { ring: nr, th: th, w: vt / nr.R + p.face * 0.3, Lf: 1, t: 0, perf: false }; p.vx = p.vy = 0; p.spinT = 0; bank(W, p); pop(W, p.x, p.y - 34, '抓到！', '#ffe38a');
+      } else if (aE && !didJump && p.coy <= 0 && p.spinT <= 0 && p.stun <= 0 && !ringNear(p, GRAB * 1.8)) {
+        p.spinT = 0.5; W.flips++; W.fl.n++; W.fl.pts += 100 * W.fl.n; pop(W, p.x, p.y - 34, W.fl.n > 1 ? '連續空翻 ×' + W.fl.n : '空翻！', '#ffb3f0');
+      }
+    }
+    if (!W.qUsed && p.spinT > 0 && Math.abs(p.x - QB.x) < 18 && p.y - HBH / 2 < QB.y + 18 && p.y + HBH / 2 > QB.y - 8) {      // 空翻頂到「？」磚→水管，進隱藏室
+      W.qUsed = true; W.ret = { x: QB.x + 70, y: p.y }; p.x = 3930; p.y = 330 - HBH / 2 - 1; p.vx = p.vy = 0; p.on = true; p.swing = null; p.spinT = 0; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5; sfx('warp'); W.banner = { txt: '水管牆！', t: 0 }; return;
+    }
+    if (p.x > ROOMX) {
+      W.rc.forEach(function (c) { if (!c.got && Math.abs(p.x - c.x) < (c.gold ? 24 : 15) && Math.abs(p.y - c.y) < (c.gold ? 36 : 26)) { c.got = true; if (c.gold) { W.gold = true; sfx('perfect'); pop(W, c.x, c.y - 16, '金色 8 號球！+' + c.v, '#ffd24a'); } else { W.rcN++; sfx('coin'); pop(W, c.x, c.y - 14, '+' + c.v, '#ffe38a'); } W.score += c.v; } });
+      STEAM.forEach(function (v) { var u = (W.t + v.off) % v.per; if (u >= v.per - 1.7 && u < v.per - 0.8 && Math.floor(u * 8) % 4 === 0 && (W.sh || 0) < W.t - 0.2) { W.sh = W.t; sfx('save'); } if (u >= v.per - 0.8 && p.inv <= 0 && !p.dead && !W.slide && Math.abs(p.x - v.x) < 15 && p.y > v.y - 70 && p.y - HBH < v.y) hurt(W, { x: v.x }); });
+      if (p.x > EXITX) {
+        var all = W.rcN >= W.rc.length - 1; if (all) { W.score += 500; W.maxHp++; } W.hp = Math.min(W.maxHp, W.hp + 1);
+        W.oxy = 0; p.x = W.ret.x; p.y = W.ret.y; p.vx = 0; p.vy = 0; p.on = false; p.swing = null; p.spinT = 0; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5; sfx(all ? 'perfect' : 'save');
+        pop(W, p.x, p.y - 40, all ? '8 球全收！多一顆愛心' : '收了 ' + W.rcN + ' 顆 8 號球', '#ffe38a');
+        if (W.gold) { W.title = TITLE; try { localStorage.setItem('sunnuGymTitle', TITLE); } catch (_) { } W.banner = { txt: '稱號：' + TITLE, t: 0 }; } return;
+      }
+    }
+    if (!W.done && p.x >= GOAL.x - 4 && p.x < ROOMX && !p.dead) {       // 跳起來抓到終點大吊環＝過關，抓越高分越多
+      var fyy = LV.plats[5].y, hgt = clamp(fyy - (p.y - HO), 30, 95), bonus = 100 + Math.round((hgt - 30) / 65 * 500); W.gh0 = p.y - HO; W.gFy = fyy;
+      bank(W, p); W.score += bonus; W.gbonus = bonus; W.done = true; W.doneT = 0; p.swing = null; p.vx = p.vy = 0; p.on = false; p.spinT = 0; sfx('win'); pop(W, GOAL.x, GOAL.y - 30, '大吊環！+' + bonus, '#ffe38a');
+    }
+  }
+
+  /* ---------- 畫面 ---------- */
+  var host = o.host;
+  var cw = host.clientWidth || innerWidth, ch = host.clientHeight || innerHeight, scale = 2;
+  var WF = Math.min(360, Math.ceil(cw / scale)), H = Math.max(312, Math.floor(ch / scale));
+  var cv = document.createElement('canvas'); cv.width = WF; cv.height = H;
+  cv.style.cssText = 'position:absolute;image-rendering:pixelated;touch-action:none;left:' + Math.floor((cw - WF * scale) / 2) + 'px;top:0;width:' + WF * scale + 'px;height:' + H * scale + 'px';
+  host.appendChild(cv); var g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+  var W = newWorld(), inp = { l: false, r: false, a: false }, cam = { x: 0, y: 150 };
+  function txt(t, x, y, sz, col, al) { g.font = 'bold ' + sz + 'px sans-serif'; g.textAlign = al || 'center'; g.textBaseline = 'middle'; g.lineWidth = 3; g.strokeStyle = '#2b2118'; g.strokeText(t, x, y); g.fillStyle = col; g.fillText(t, x, y); }
+  function updCam(dt) {
+    var p = W.p, tx = p.x - WF / 2 + p.face * 24, ty = p.y - H * 0.5;
+    cam.x += (tx - cam.x) * Math.min(1, dt * 5); cam.y += (ty - cam.y) * Math.min(1, dt * 4);
+    cam.x = clamp(cam.x, 0, LV.w - WF); cam.y = clamp(cam.y, -70, LV.bottom - H);
+  }
+  /* 魚分件畫：頭身不動、尾巴（58 列以下）逐列位移擺動、兩隻手繞肩膀轉。st = { tail:振幅, ph:尾相位, aL:左手抬起(弧度), aR:右手抬起 } */
+  var SHL = [24, 28], SHR = [48, 27], TIPL = [7.5, 29.5], TIPR = [66.5, 29];
+  function waveDx(st, r) { var wa = st.wave || 0, wp = st.wp !== undefined ? st.wp : (st.ph || 0); return wa * (0.2 + 0.8 * Math.pow(r / 58, 1.3)) * Math.sin(wp - r * 0.09); }   // 身體 S 形波：頭小、越靠尾巴越大
+  function handLocal(sd, raise, st) {                      // 手尖相對「手點(GX,GY)」的位置（魚像素單位），含身體波、扭、擠壓
+    st = st || {};
+    var sh = sd < 0 ? SHL : SHR, tip = sd < 0 ? TIPL : TIPR, ang = sd < 0 ? raise : -raise, c = Math.cos(ang), sn = Math.sin(ang), vx = tip[0] - sh[0], vy = tip[1] - sh[1];
+    var x = sh[0] - GX + waveDx(st, 28) + vx * c - vy * sn, y = sh[1] - GY + vx * sn + vy * c;
+    if (st.tw) { var hx = 47 - GX, hy = 60 - GY, dx = x - hx, dy = y - hy, ct = Math.cos(st.tw), stn = Math.sin(st.tw); x = hx + dx * ct - dy * stn; y = hy + dx * stn + dy * ct; }
+    if (st.sy) { var fy = FH - GY; x = x / st.sy; y = (y - fy) * st.sy + fy; }
+    return [x, y];
+  }
+  function toWorld(l, x, y, rot, flipX) { var fx = l[0] * K * (flipX < 0 ? -1 : 1), fy = l[1] * K, c = Math.cos(rot), sn = Math.sin(rot); return [x + fx * c - fy * sn, y + fx * sn + fy * c]; }
+  var DRYC = document.createElement('canvas'); DRYC.width = DRYC.height = 160; var DRYG = DRYC.getContext('2d');
+  function drawFish(x, y, rot, flipX, st) {                        // 抓到終點大吊環後 st.dry 0→1：被曬成深色一夜干
+    if (!(st && st.dry > 0)) { drawFish0(x, y, rot, flipX, st); return; }
+    var main = g; g = DRYG; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, 160, 160); drawFish0(80, 80, rot, flipX, st);
+    g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(96,50,16,' + (0.74 * st.dry) + ')'; g.fillRect(0, 0, 160, 160);
+    g.fillStyle = 'rgba(40,18,4,' + (0.22 * st.dry) + ')'; for (var i = 0; i < 9; i++) g.fillRect(60 + i * 5, 60 + (i % 3) * 10, 2, 26);        // 曬出來的皺紋
+    g.globalCompositeOperation = 'source-over'; g = main; g.drawImage(DRYC, Math.round(x) - 80, Math.round(y) - 80);
+  }
+  function drawFish0(x, y, rot, flipX, st) {
+    st = st || {};
+    function bdx(r) { return waveDx(st, r); }
+    g.save(); g.translate(Math.round(x), Math.round(y)); g.rotate(rot); g.scale(K * (flipX < 0 ? -1 : 1), K);
+    if (st.sy) { g.translate(0, FH - GY); g.scale(1 / st.sy, st.sy); g.translate(0, GY - FH); }          // 擠壓／拉伸（以腳底為準）
+    if (st.tw) { g.translate(47 - GX, 60 - GY); g.rotate(st.tw); g.translate(GX - 47, GY - 60); }       // 整隻繞髖部扭／甩
+    for (var r = 0; r < 58; r++) { var rw = (r >= 14 && r < 40) ? 24 : 28; g.drawImage(fishImg, 24, r, rw, 1, 24 - GX + bdx(r), r - GY, rw, 1); }   // 頭＋身體逐列位移
+    g.save(); g.translate(bdx(58), 0);
+    var amp = st.tail || 0, ph = st.ph || 0;
+    if (st.leg !== undefined) {                                                  // 兩片尾鰭當兩隻腳：交替擺動像走路
+      g.drawImage(fishImg, 24, 58, 28, 14, 24 - GX, 58 - GY, 28, 14);            // 尾根（不動）
+      g.save(); g.translate(52 - GX, 66 - GY); g.rotate(st.leg * Math.sin(ph + Math.PI)); g.drawImage(fishImg, 52, 60, 12, 12, 0, -6, 12, 12); g.restore();   // 右側尾鰭
+      g.save(); g.translate(47 - GX, 72 - GY); g.rotate(st.leg * Math.sin(ph)); g.drawImage(fishImg, 40, 72, 16, 11, -7, 0, 16, 11); g.restore();             // 下方尾尖
+    } else for (r = 58; r < FH; r++) { var u = (r - 58) / (FH - 58); g.drawImage(fishImg, 0, r, FW, 1, -GX + amp * u * u * Math.sin(ph - r * 0.13) * 2.2, r - GY, FW, 1); }   // 尾巴逐列擺
+    g.restore();
+    g.save(); g.translate(SHL[0] - GX + bdx(28), SHL[1] - GY); g.rotate(st.aL || 0); g.drawImage(fishImg, 0, 14, 24, 26, -24, -14, 24, 26); g.restore();   // 左手
+    g.save(); g.translate(SHR[0] - GX + bdx(28), SHR[1] - GY); g.rotate(-(st.aR || 0)); g.drawImage(fishImg, 48, 14, 26, 26, 0, -13, 26, 26); g.restore();  // 右手
+    g.restore();
+  }
+  /* ---------- 主題：依畫面中心在哪一區，把天空／遠山／水色在區界慢慢混合 ---------- */
+  function hx2n(h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+  function mixHex(a, b, k) { var A = hx2n(a), B = hx2n(b), o = '#'; for (var i = 0; i < 3; i++) { var v = Math.round(A[i] + (B[i] - A[i]) * k); o += (v < 16 ? '0' : '') + v.toString(16); } return o; }
+  function mixRgb(a, b, k) { var A = a.split(','), B = b.split(','), o = []; for (var i = 0; i < 3; i++) o.push(Math.round(+A[i] + (+B[i] - +A[i]) * k)); return o.join(','); }
+  function themeAt(cx) {
+    var T = JSON.parse(JSON.stringify(ZONES[0].theme));
+    for (var zi = 1; zi < ZONES.length; zi++) {
+      var k = clamp((cx - (ZONES[zi].x0 - 150)) / 300, 0, 1); if (k <= 0) continue; var N = ZONES[zi].theme;
+      T.sky = T.sky.map(function (c, i) { return mixHex(c, N.sky[i], k); }); T.sun = mixHex(T.sun, N.sun, k); T.halo = mixRgb(T.halo, N.halo, k);
+      T.hill1 = mixHex(T.hill1, N.hill1, k); T.hill2 = mixHex(T.hill2, N.hill2, k); T.cloud = mixRgb(T.cloud, N.cloud, k);
+      T.water = T.water.map(function (c, i) { return mixHex(c, N.water[i], k); }); T.wave = mixHex(T.wave, N.wave, k);
+    }
+    return T;
+  }
+  function drawRoof(q) {                                   // 屋瓦平台：交錯瓦片＋屋脊
+    var x, y, row;
+    g.fillStyle = '#1a0c06'; g.fillRect(q.x - 1, q.y - 1, q.w + 2, q.h + 2);
+    g.fillStyle = '#8a3f2c'; g.fillRect(q.x, q.y, q.w, q.h);
+    for (row = 0, y = q.y + 6; y < LV.bottom; y += 9, row++) {
+      var c1 = row % 2 ? '#b2553a' : '#c0643f';
+      for (x = q.x + (row % 2 ? 7 : 0); x < q.x + q.w; x += 14) { g.fillStyle = c1; g.fillRect(x, y, 12, 7); g.fillStyle = '#7a3524'; g.fillRect(x, y + 6, 12, 2); }
+    }
+    g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(q.x + q.w - 4, q.y, 4, q.h);
+    g.fillStyle = '#1a0c06'; g.fillRect(q.x - 4, q.y - 5, q.w + 8, 11); g.fillStyle = '#5e2a22'; g.fillRect(q.x - 3, q.y - 4, q.w + 6, 9); g.fillStyle = '#d98a52'; g.fillRect(q.x - 3, q.y - 4, q.w + 6, 2);
+    g.fillStyle = '#7b3a2c'; for (x = q.x; x < q.x + q.w; x += 10) g.fillRect(x + 1, q.y - 7, 6, 4);
+  }
+  /* ---------- 隱藏室「水管牆」：屏東枋寮東海村養殖戶從海邊拉到魚塭的塑膠管，疊成一整面牆 ---------- */
+  var PIPE_COL = { d: ['#14161c', '#2d323e', '#6b7488'], b: ['#10264a', '#2f6fd0', '#8fb8f5'], c: ['#4a5a68', '#cfe0ee', '#ffffff'], o: ['#5a2a14', '#f08a5a', '#ffd0b0'] }, PIPE_K = 'dddbdcddodbd';
+  var PIPES = []; for (var pi = 0; pi < 22; pi++) { var px0 = 3850 + pi * 62; PIPES.push({ x0: px0, x1: px0 + 380 + (pi * 53) % 300, y0: 95 + (pi * 61) % 210, y1: 70 + (pi * 37) % 250, amp: 14 + (pi * 13) % 22, ph: pi * 1.3, w: 6 + (pi % 3) * 3, k: PIPE_K[pi % PIPE_K.length], clamp: pi % 4 === 1 }); }
+  function pipePts(P) { var pts = [], n = Math.ceil((P.x1 - P.x0) / 10); for (var i = 0; i <= n; i++) { var u = i / n, e = u * u * (3 - 2 * u); pts.push([P.x0 + (P.x1 - P.x0) * u, P.y0 + (P.y1 - P.y0) * e + Math.sin(u * 6.283 * 1.1 + P.ph) * P.amp]); } return pts; }
+  function strokePts(pts, w, col) { g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); pts.forEach(function (q, i) { i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); }
+  function drawPipeWall(t) {
+    var wx0 = 3860, ww = 1280;
+    g.fillStyle = '#6f7a86'; g.fillRect(wx0, 0, ww, LV.bottom); g.fillStyle = '#8a95a0'; g.fillRect(wx0, 0, ww, 14);
+    g.fillStyle = '#5a646f'; for (var x = wx0; x < wx0 + ww; x += 96) g.fillRect(x, 0, 2, LV.bottom); for (var y = 40; y < LV.bottom; y += 70) g.fillRect(wx0, y, ww, 2);
+    g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(wx0, 0, ww, 330);
+    PIPES.forEach(function (P) {
+      var pts = pipePts(P), C = PIPE_COL[P.k];
+      strokePts(pts, P.w + 3, C[0]); strokePts(pts, P.w, C[1]); strokePts(pts.map(function (q) { return [q[0], q[1] - P.w * 0.22]; }), Math.max(1.5, P.w * 0.22), C[2]);
+      if (P.clamp) for (var i = 6; i < pts.length - 2; i += 14) { var q = pts[i]; g.fillStyle = '#1a1a20'; g.fillRect(q[0] - 2, q[1] - P.w / 2 - 3, 5, P.w + 6); g.fillStyle = '#e0a83c'; g.fillRect(q[0] - 1, q[1] - P.w / 2 - 2, 3, P.w + 4); }
+      g.fillStyle = 'rgba(255,255,255,.7)'; for (var fk = 0; fk < 4; fk++) { var fq = pts[Math.floor((t * 9 + fk * pts.length / 4) % pts.length)]; g.fillRect(fq[0] - 1, fq[1] - 1, 3, 2); }
+      var e = pts[pts.length - 1]; g.fillStyle = C[0]; g.fillRect(e[0] - 2, e[1] - P.w / 2 - 1, 4, P.w + 2);
+      var dp = (t * 0.9 + P.ph) % 1; if (P.k === 'd' && P.clamp) { g.fillStyle = '#8fd0f5'; g.fillRect(Math.round(e[0]) + 3, Math.round(e[1] + P.w / 2 + dp * 60), 2, 3); }
+    });
+  }
+  function drawRoomFloor(q) {                                      // 堤防頂：水泥面、伸縮縫，前面躺著幾條水管
+    g.fillStyle = '#1a1a20'; g.fillRect(q.x, q.y - 1, q.w, q.h + 2); g.fillStyle = '#c9c5b8'; g.fillRect(q.x, q.y, q.w, q.h); g.fillStyle = '#e4e0d2'; g.fillRect(q.x, q.y, q.w, 5); g.fillStyle = '#a8a496'; g.fillRect(q.x, q.y + 5, q.w, 2);
+    for (var x = q.x + 60; x < q.x + q.w; x += 150) { g.fillStyle = '#8f8b7e'; g.fillRect(x, q.y + 7, 2, 60); }
+    for (var k = 0; k < 3; k++) { var pts = []; for (var i = 0; i <= 124; i++) pts.push([q.x + i * 10, q.y + 26 + k * 17 + Math.sin(i * 0.25 + k * 2) * 3]); strokePts(pts, 10, '#14161c'); strokePts(pts, 7, k === 1 ? '#2f6fd0' : '#2d323e'); strokePts(pts.map(function (a) { return [a[0], a[1] - 2]; }), 2, k === 1 ? '#8fb8f5' : '#6b7488'); }
+  }
+  function ball8(x, y, r) {
+    g.fillStyle = '#e8f0f8'; g.beginPath(); g.arc(x, y, r + 1.5, 0, 7); g.fill(); g.fillStyle = '#16233a'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+    g.fillStyle = '#3a5373'; for (var i = 0; i < 7; i++) g.fillRect(Math.round(x - r * 0.7 + (i * 5) % (r * 1.4)), Math.round(y - r * 0.7 + ((i * 7) % (r * 1.4))), 1, 1);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, r * 0.5, 0, 7); g.fill(); g.fillStyle = '#16233a'; g.font = 'bold 5px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('8', x, y + 0.5);
+  }
+  function drawBench(x, y, t) {                                   // 藍色啞鈴長凳＋兩朵黃花＋橘色腳
+    g.strokeStyle = '#f08a5a'; g.lineWidth = 4; g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x - 14, y + 14); g.moveTo(x + 6, y); g.lineTo(x + 14, y + 14); g.stroke();
+    g.fillStyle = '#2d63c4'; g.fillRect(x - 3, y - 18, 6, 20); g.fillRect(x - 22, y - 2, 44, 3); g.fillStyle = '#5a8be0'; g.fillRect(x - 3, y - 18, 2, 20);
+    [-26, 26].forEach(function (dx) { var fx = x + dx, fy = y - 2; g.strokeStyle = '#f7d94a'; g.lineWidth = 2; for (var i = 0; i < 8; i++) { var a = i * 0.785 + t * 0.6; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + Math.cos(a) * 7, fy + Math.sin(a) * 7); g.stroke(); } g.fillStyle = '#fff4a8'; g.fillRect(fx - 1, fy - 1, 3, 3); });
+  }
+  function drawStripeFish(x, y, t, sc) { if (!sc) { stripeFishRaw(x, y, t); return; } g.save(); g.translate(x, y); g.scale(sc, sc); g.translate(-x, -y); stripeFishRaw(x, y, t, 1); g.restore(); }
+  function stripeFishRaw(x, y, t, still) {                         // 藍白條紋午仔魚＋黃色點點尾
+    var by = y + (still ? 0 : Math.sin(t * 2) * 3); g.save(); g.beginPath(); g.ellipse(x, by, 24, 10, 0, 0, 7); g.clip(); g.fillStyle = '#f2f6fa'; g.fillRect(x - 26, by - 11, 52, 22); g.fillStyle = '#1d5fa8'; for (var i = -26; i < 26; i += 5) g.fillRect(x + i, by - 11, 2.5, 22); g.restore();
+    g.strokeStyle = '#16233a'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(x, by, 24, 10, 0, 0, 7); g.stroke();
+    g.fillStyle = '#f7d94a'; g.beginPath(); g.moveTo(x + 22, by); g.lineTo(x + 36, by - 10); g.lineTo(x + 36, by + 10); g.fill(); g.fillStyle = '#c9a41e'; for (i = 0; i < 6; i++) g.fillRect(x + 27 + (i % 2) * 5, by - 6 + i * 2, 1.5, 1.5); g.fillStyle = '#16233a'; g.fillRect(x - 17, by - 3, 2, 2);
+  }
+  function drawQBlock(t) {
+    var used = W.qUsed, bob = used ? 0 : Math.max(0, Math.sin(t * 6)) * -1.5, x = QB.x - 8, y = QB.y - 8 + bob;
+    g.fillStyle = '#2a1204'; g.fillRect(x - 1, y - 1, 18, 18); g.fillStyle = used ? '#8a5a38' : '#fcb83c'; g.fillRect(x, y, 16, 16); g.fillStyle = used ? '#6a4228' : '#e88a10'; g.fillRect(x + 1, y + 13, 14, 2); g.fillRect(x + 13, y + 1, 2, 14);
+    g.fillStyle = used ? '#6a4228' : '#fff0b0'; g.fillRect(x + 1, y + 1, 2, 2); g.fillRect(x + 13, y + 1, 2, 2); g.fillRect(x + 1, y + 13, 2, 2); g.fillRect(x + 13, y + 13, 2, 2);
+    if (!used) { g.fillStyle = '#7a2a00'; g.fillRect(x + 6, y + 3, 4, 2); g.fillRect(x + 9, y + 5, 2, 3); g.fillRect(x + 7, y + 8, 3, 2); g.fillRect(x + 7, y + 11, 2, 2); }
+  }
+  function drawPipePlat(q) {                                       // 上層：灰色大水管當平台
+    g.fillStyle = '#1a1a20'; g.fillRect(q.x - 3, q.y - 1, q.w + 6, q.h + 2); g.fillStyle = '#8a929c'; g.fillRect(q.x, q.y, q.w, q.h); g.fillStyle = '#d0d6de'; g.fillRect(q.x, q.y, q.w, 3); g.fillStyle = '#5e656e'; g.fillRect(q.x, q.y + q.h - 3, q.w, 3);
+    for (var x = q.x + 6; x < q.x + q.w - 4; x += 70) { g.fillStyle = '#1a1a20'; g.fillRect(x - 1, q.y - 3, 8, q.h + 6); g.fillStyle = '#6b7488'; g.fillRect(x, q.y - 2, 6, q.h + 4); g.fillStyle = '#d0d6de'; g.fillRect(x + 1, q.y - 1, 2, 2); g.fillRect(x + 1, q.y + q.h - 3, 2, 2); }
+  }
+  function drawValve(r, t) {                                       // 閥門輪吊環：紅色閥門輪裝在灰水管上
+    var a = r.kind === 'move' ? r.ax : 0; g.fillStyle = '#1a1a20'; g.fillRect(r.cx - a - 12, r.py - 4, (a + 12) * 2, 8); g.fillStyle = '#8a929c'; g.fillRect(r.cx - a - 11, r.py - 3, (a + 11) * 2, 6); g.fillStyle = '#d0d6de'; g.fillRect(r.cx - a - 11, r.py - 3, (a + 11) * 2, 2);
+    var ang = t * (r.kind === 'move' ? 1.6 : 0.3); g.fillStyle = '#1a1a20'; g.beginPath(); g.arc(r.px, r.py, 9, 0, 7); g.fill(); g.fillStyle = '#d8402a'; g.beginPath(); g.arc(r.px, r.py, 7.5, 0, 7); g.fill();
+    g.strokeStyle = '#7a1c10'; g.lineWidth = 2; for (var i = 0; i < 4; i++) { g.beginPath(); g.moveTo(r.px, r.py); g.lineTo(r.px + Math.cos(ang + i * 1.571) * 7, r.py + Math.sin(ang + i * 1.571) * 7); g.stroke(); } g.fillStyle = '#ffb4a0'; g.fillRect(r.px - 1, r.py - 1, 3, 3);
+  }
+  function drawGeyser(t) {
+    var gu = W.t % GEY.per, mx = GEY.x, fy2 = 330; g.fillStyle = '#1a1a20'; g.fillRect(mx - 17, fy2 - 11, 34, 12); g.fillStyle = '#8a929c'; g.fillRect(mx - 15, fy2 - 9, 30, 9); g.fillStyle = '#d0d6de'; g.fillRect(mx - 15, fy2 - 9, 30, 2); g.fillStyle = '#6b7488'; g.fillRect(mx - 19, fy2 - 13, 38, 4);
+    if (gu >= GEY.t0 - 0.6 && gu < GEY.t0) { g.fillStyle = 'rgba(210,240,255,.85)'; for (var i = 0; i < 5; i++) { var bb = ((t * 1.6 + i * 0.21) % 1); g.beginPath(); g.arc(mx + Math.sin(i * 2.3 + t * 5) * 10, fy2 - 14 - bb * 34, 2 + (i % 2), 0, 7); g.fill(); } }
+    else if (gu >= GEY.t0 && gu < GEY.t1) {
+      var ft = Math.min(1, (gu - GEY.t0) / 0.2), top = fy2 - 12 - 160 * ft, hw = GEY.w / 2 * 0.62; g.fillStyle = 'rgba(150,215,250,.55)'; g.fillRect(mx - hw, top, hw * 2, fy2 - 12 - top); g.fillStyle = 'rgba(235,248,255,.6)'; g.fillRect(mx - hw * 0.45, top, hw * 0.9, fy2 - 12 - top);
+      for (i = 0; i < 12; i++) { var dy = ((t * 2.2 + i * 0.083) % 1); g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(mx - hw + ((i * 37) % (hw * 2)), fy2 - 14 - dy * 160 * ft, 2, 3); }
+      g.fillStyle = 'rgba(235,248,255,.8)'; for (i = -2; i <= 2; i++) g.fillRect(mx + i * 10 - 3, top - 3 - (i % 2 ? 3 : 0), 7, 3);
+    }
+  }
+  function drawWheelFx(w, t) {                                      // 水車：打水前水面起泡（預警）→ 水花沖起（彈射＋增氧）
+    var uu = (W.t + w.off) % w.per, x = w.x, fy = 328, h = w.vy / 3.6;
+    if (uu >= w.per - 1.6 && uu < w.per - 0.5) { g.fillStyle = 'rgba(210,240,255,.85)'; for (var i = 0; i < 5; i++) { var b = (t * 1.8 + i * 0.2) % 1; g.beginPath(); g.arc(x + Math.sin(i * 2.7 + t * 5) * 22, fy - b * 26, 2 + (i % 2), 0, 7); g.fill(); } g.fillStyle = 'rgba(160,215,250,.45)'; g.fillRect(x - 28, fy - 2, 56, 3); }
+    else if (uu >= w.per - 0.5) { var k = Math.min(1, (uu - (w.per - 0.5)) / 0.14), hh = h * k; g.fillStyle = 'rgba(150,215,250,.5)'; g.beginPath(); g.moveTo(x - 24, fy); g.lineTo(x - 9, fy - hh); g.lineTo(x + 9, fy - hh); g.lineTo(x + 24, fy); g.fill(); g.fillStyle = 'rgba(235,248,255,.7)'; g.fillRect(x - 4, fy - hh, 8, hh);
+      for (i = 0; i < 12; i++) { var d = (t * 2.6 + i * 0.083) % 1; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillRect(x - 20 + ((i * 37) % 40), fy - d * hh, 3, 3); } }
+  }
+  function drawSteam(t) {                                           // 蒸氣漏水口：嘶嘶冒白煙（警告）→ 噴出高溫蒸氣（受傷）
+    STEAM.forEach(function (v) {
+      var u = (W.t + v.off) % v.per, x = v.x, y = v.y; g.fillStyle = '#1a1a20'; g.fillRect(x - 9, y - 7, 18, 8); g.fillStyle = '#b8802a'; g.fillRect(x - 8, y - 6, 16, 6); g.fillStyle = '#ffd89a'; g.fillRect(x - 8, y - 6, 16, 2); g.fillStyle = '#6b7488'; g.fillRect(x - 11, y - 9, 22, 3);
+      if (u >= v.per - 1.7 && u < v.per - 0.8) { g.fillStyle = 'rgba(255,255,255,.7)'; for (var i = 0; i < 4; i++) { var b = (t * 1.4 + i * 0.25) % 1; g.beginPath(); g.arc(x + Math.sin(i * 3 + t * 6) * 5, y - 10 - b * 22, 2 + b * 3, 0, 7); g.fill(); } }
+      else if (u >= v.per - 0.8) { var k = Math.min(1, (u - (v.per - 0.8)) / 0.12), h = 66 * k; g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(x - 11, y - 8 - h, 22, h); g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(x - 5, y - 8 - h, 10, h); for (i = 0; i < 5; i++) { var q = (t * 2.4 + i * 0.2) % 1; g.fillStyle = 'rgba(255,255,255,.8)'; g.beginPath(); g.arc(x + Math.sin(i * 2 + t * 9) * 9, y - 8 - q * h, 4 + q * 3, 0, 7); g.fill(); } }
+    });
+  }
+  function drawSlide(t) {
+    strokePts(SLIDE, 20, '#1a1a20'); strokePts(SLIDE, 16, '#8a929c'); strokePts(SLIDE.map(function (a) { return [a[0], a[1] - 5]; }), 3, '#d0d6de'); strokePts(SLIDE.map(function (a) { return [a[0], a[1] + 5]; }), 3, '#5e656e');
+    g.fillStyle = '#1a1a20'; g.fillRect(SLIDE[0][0] - 8, SLIDE[0][1] - 11, 8, 22); g.fillStyle = '#6b7488'; g.fillRect(SLIDE[0][0] - 7, SLIDE[0][1] - 10, 6, 20);
+    g.fillStyle = '#ffe34a'; for (var i = 0; i < 3; i++) { var ax = SLIDE[0][0] + 14 + i * 12 + ((t * 20) % 12), ay = SLIDE[0][1] - 18 + i * 3; g.fillRect(ax, ay, 5, 2); g.fillRect(ax + 3, ay - 2, 2, 6); }
+  }
+  function drawGlassPipe(t) {                                      // 背景玻璃管：條紋午仔魚在管子裡游
+    var y0 = 100, x0 = ROOMX + 100, x1 = 5400; g.fillStyle = '#1a1a20'; g.fillRect(x0, y0 - 17, x1 - x0, 34); g.fillStyle = 'rgba(160,215,245,.9)'; g.fillRect(x0, y0 - 15, x1 - x0, 30); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x0, y0 - 13, x1 - x0, 4);
+    g.fillStyle = '#6b7488'; for (var x = x0 + 20; x < x1; x += 160) { g.fillRect(x, y0 - 19, 8, 38); g.fillStyle = '#d0d6de'; g.fillRect(x + 1, y0 - 18, 2, 36); g.fillStyle = '#6b7488'; }
+    for (var k = 0; k < 3; k++) { var fx = x0 + ((t * (24 + k * 9) + k * 380) % (x1 - x0 - 80)) + 30; drawStripeFish(fx, y0 + Math.sin(t * 2 + k) * 3, t + k, 0.42); }
+    g.fillStyle = 'rgba(255,255,255,.8)'; for (var b = 0; b < 14; b++) { var bx = x0 + ((t * 30 + b * 97) % (x1 - x0)); g.fillRect(bx, y0 - 10 + ((b * 7) % 18) - ((t * 6 + b) % 3), 2, 2); }
+  }
+  function drawRoomProps(t) {
+    drawGlassPipe(t); drawGeyser(t); drawSlide(t);
+    drawBench(4260, 316, t); drawBench(5140, 316, t + 1);
+    W.rc.forEach(function (c) { if (c.got) return; var by = c.y + Math.sin(t * 3 + c.x) * 2; if (c.gold) { g.fillStyle = 'rgba(255,220,90,' + (0.25 + 0.15 * Math.sin(t * 6)) + ')'; g.beginPath(); g.arc(c.x, by, 15, 0, 7); g.fill(); g.fillStyle = '#7a5a10'; g.beginPath(); g.arc(c.x, by, 9, 0, 7); g.fill(); g.fillStyle = '#ffd24a'; g.beginPath(); g.arc(c.x, by, 8, 0, 7); g.fill(); g.fillStyle = '#fff3b0'; g.fillRect(c.x - 5, by - 5, 3, 2); g.fillStyle = '#7a5a10'; g.beginPath(); g.arc(c.x, by, 3.5, 0, 7); g.fill(); g.fillStyle = '#ffd24a'; g.fillRect(c.x - 1, by - 2, 2, 4); } else ball8(c.x, by, 7); });
+    drawSteam(t);
+    var ex = EXITX, ey = 330;                                       // 綠色水管出口
+    g.fillStyle = '#1a1a20'; g.fillRect(ex - 18, ey - 52, 36, 53); g.fillStyle = '#8a929c'; g.fillRect(ex - 16, ey - 38, 32, 38); g.fillStyle = '#d0d6de'; g.fillRect(ex - 14, ey - 38, 5, 38); g.fillStyle = '#5e656e'; g.fillRect(ex + 8, ey - 38, 6, 38);
+    g.fillStyle = '#1a1a20'; g.fillRect(ex - 20, ey - 54, 40, 18); g.fillStyle = '#8a929c'; g.fillRect(ex - 18, ey - 52, 36, 14); g.fillStyle = '#d0d6de'; g.fillRect(ex - 16, ey - 52, 5, 14); g.fillStyle = '#5e656e'; g.fillRect(ex + 10, ey - 52, 6, 14);
+    g.fillStyle = '#fff'; g.font = 'bold 9px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('出口', ex, ey - 64);
+  }
+  var DBTN = { y0: 104, dy: 34, w: 150, h: 28, x: function () { return Math.round(WF / 2 - 75); } };
+  var DEV = true;                                                  // 測試按鈕：直達終點／直達隱藏室（地圖版只有 ?debug 才有）
+  var TBTN = [{ k: 'goal', t: '直達終點', x: function () { return Math.round(WF / 2 - 104); } }, { k: 'room', t: '直達隱藏室', x: function () { return Math.round(WF / 2 + 4); } }], TB_Y = 250, TB_W = 100, TB_H = 24;
+  function warpTest(k) {
+    W = newWorld(); var p = W.p; W.started = true;
+    if (k === 'goal') { var C = LV.plats[5]; p.x = 3040; p.y = C.y - HBH / 2; W.cpPlat = C; W.zi = 1; W.cp = { x: 3070, y: C.y - HBH / 2 }; }
+    else { W.qUsed = true; W.ret = { x: QB.x + 70, y: 310 }; p.x = 3930; p.y = 330 - HBH / 2 - 1; W.zi = 2; W.banner = { txt: '水管牆！', t: 0 }; }
+    p.vx = 0; p.on = true; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5;
+  }
+  var MBTN = { w: 22, h: 14, x: function () { return WF - 28; }, y: 26 };
+  function draw() {
+    var p = W.p, t = W.t;
+    var TH = themeAt(cam.x + WF / 2);
+    (function () { var NB = 12, y0 = 0; for (var bi = 0; bi < NB; bi++) { var u = bi / (NB - 1), c = u < 0.45 ? mixHex(TH.sky[0], TH.sky[1], u / 0.45) : u < 0.78 ? mixHex(TH.sky[1], TH.sky[2], (u - 0.45) / 0.33) : mixHex(TH.sky[2], TH.sky[3], (u - 0.78) / 0.22); g.fillStyle = c; var y1 = Math.round((bi + 1) * H / NB); g.fillRect(0, y0, WF, y1 - y0 + 1); y0 = y1; } })();
+    var sx = WF - 56 - cam.x * 0.02, sy = 54 - cam.y * 0.05;
+    g.fillStyle = '#7a4a10'; g.beginPath(); g.arc(sx, sy, 16, 0, 7); g.fill(); g.fillStyle = TH.sun; g.beginPath(); g.arc(sx, sy, 14, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(sx - 7, sy - 8, 5, 3);
+    // 雲（慢慢飄、視差）
+    [[30, 70, 1], [190, 110, 0.8], [340, 52, 1.1], [500, 96, 0.9]].forEach(function (c, ci) {
+      var cx = ((c[0] + W.t * (3 + ci) - cam.x * 0.12) % (WF + 160) + WF + 160) % (WF + 160) - 80, cy = c[1] - cam.y * 0.04, k = c[2];
+      var bumps = [[-16, 0, 8], [-6, -6, 10], [7, -4, 9], [17, 1, 7]], oc = TH.sky[0] === '#3f86ec' ? '#2a5fbf' : '#6a4a7a';
+      [1, 0].forEach(function (pass) { bumps.forEach(function (bm) { g.fillStyle = pass ? oc : 'rgb(' + TH.cloud + ')'; g.beginPath(); g.arc(cx + bm[0] * k, cy + bm[1] * k, (bm[2] + (pass ? 1.5 : 0)) * k, 0, 7); g.fill(); }); g.fillStyle = pass ? oc : 'rgb(' + TH.cloud + ')'; g.fillRect(cx - 17 * k, cy - 1 * k, 34 * k, (8 + (pass ? 1.5 : 0)) * k); });
+      g.fillStyle = 'rgba(120,170,235,.55)'; g.fillRect(cx - 15 * k, cy + 5 * k, 31 * k, 2 * k);
+    });
+    // 遠山兩層（視差）＋ 遠處的魚塭竹竿
+    var base = H - 150 - cam.y * 0.1;
+    function hill(hx, w, hh, col, dark, eyes) { g.fillStyle = dark; g.beginPath(); g.ellipse(hx + w / 2, base + 60, w / 2 + 2, hh + 2, 0, Math.PI, 0); g.fill(); g.fillStyle = col; g.beginPath(); g.ellipse(hx + w / 2, base + 60, w / 2, hh, 0, Math.PI, 0); g.fill(); g.fillStyle = 'rgba(0,0,0,.16)'; g.fillRect(hx + w * 0.62, base + 60 - hh * 0.8, w * 0.1, hh * 0.8); g.fillRect(hx + w * 0.78, base + 60 - hh * 0.55, w * 0.08, hh * 0.55); if (eyes) { g.fillStyle = '#16301a'; g.fillRect(hx + w / 2 - 7, base + 60 - hh * 0.55, 4, 9); g.fillRect(hx + w / 2 + 3, base + 60 - hh * 0.55, 4, 9); g.fillStyle = '#fff'; g.fillRect(hx + w / 2 - 6, base + 60 - hh * 0.55 + 1, 2, 3); g.fillRect(hx + w / 2 + 4, base + 60 - hh * 0.55 + 1, 2, 3); } }
+    var i, hx, hh;
+    for (i = -1; i < 7; i++) { hx = i * 150 - ((cam.x * 0.12) % 150); hh = 46 + ((i + 9) % 3) * 14; hill(hx, 150, hh, TH.hill2, '#1d4a2a', (i + 9) % 3 === 1); }
+    for (i = -1; i < 6; i++) { hx = i * 120 - ((cam.x * 0.25) % 120); hh = 28 + ((i + 5) % 3) * 12; hill(hx, 120, hh, TH.hill1, '#1d4a2a', (i + 5) % 3 === 0); }
+    var zb = clamp((cam.x + WF / 2 - (ZONES[1].x0 - 150)) / 300, 0, 1);                       // 區 2：遠處古厝屋頂剪影與亮窗
+    if (zb > 0) { g.globalAlpha = zb * 0.85; for (i = -1; i < 6; i++) { var rx = i * 96 - ((cam.x * 0.3) % 96), rh = 20 + ((i + 7) % 3) * 8; g.fillStyle = '#4a2c4a'; g.fillRect(rx + 10, base + 46 - rh, 66, rh + 20); g.beginPath(); g.moveTo(rx + 2, base + 46 - rh); g.lineTo(rx + 43, base + 30 - rh); g.lineTo(rx + 84, base + 46 - rh); g.fill(); g.fillStyle = '#ffd27a'; g.fillRect(rx + 24, base + 50 - rh, 5, 6); g.fillRect(rx + 50, base + 50 - rh, 5, 6); } g.globalAlpha = 1; }
+    g.fillStyle = '#7f6a4d'; if (zb < 1) for (i = 0; i < 9; i++) { var bx = i * 70 - ((cam.x * 0.4) % 70); g.fillRect(bx, base + 44, 2, 14); }
+    g.save(); g.translate(-Math.round(cam.x), -Math.round(cam.y));
+    var wy = LV.waterY, wg = g.createLinearGradient(0, wy, 0, LV.bottom + 40); wg.addColorStop(0, TH.water[0]); wg.addColorStop(1, TH.water[1]); g.fillStyle = wg; g.fillRect(cam.x, wy, WF, LV.bottom - wy + 40);
+    g.fillStyle = TH.wave; for (i = -1; i < WF / 6 + 2; i++) { var wx = Math.floor(cam.x / 6) * 6 + i * 6; g.fillRect(wx, wy - 1 + Math.round(Math.sin(wx * 0.09 + t * 2.2) * 1.5), 6, 2); }
+    g.fillStyle = 'rgba(255,255,255,.28)'; for (i = 0; i < 14; i++) g.fillRect(Math.floor(cam.x / 50) * 50 + i * 50 + ((t * 12) % 50), wy + 8 + (i % 3) * 12, 18, 2);
+    // 吊環架（移動環有橫軌）
+    LV.rings.forEach(function (r) {
+      if (r.cx > ROOMX) { drawValve(r, t); return; }
+      var a = r.kind === 'move' ? r.ax : 0; g.fillStyle = '#6e4c2c'; g.fillRect(r.cx - a - GDX - 8, r.py - 2, (a + GDX + 8) * 2, 4);
+      [-1, 1].forEach(function (sd) { g.fillRect(r.cx + sd * (a + GDX + 6) - 1, r.py, 3, wy + 30 - r.py); });
+      if (r.kind === 'move') { g.fillStyle = '#d9a441'; g.fillRect(r.px - 3, r.py - 4, 6, 8); }
+    });
+    if (cam.x + WF > ROOMX - 100) drawPipeWall(t);
+    // 平台
+    LV.plats.forEach(function (q) {
+      if (q.st === 'roof') { drawRoof(q); return; }
+      if (q.st === 'room') { drawRoomFloor(q); return; }
+      if (q.st === 'pipe') { drawPipePlat(q); return; }
+      var T = 16, xx, yy, rr;
+      g.fillStyle = '#1a0c06'; g.fillRect(q.x - 1, q.y - 1, q.w + 2, q.h + 2);
+      g.fillStyle = '#c84c0c'; g.fillRect(q.x, q.y, q.w, q.h);
+      for (yy = q.y + 8, rr = 0; yy < LV.bottom; yy += 8, rr++) { g.fillStyle = '#5a1e08'; g.fillRect(q.x, yy, q.w, 1); for (xx = q.x + (rr % 2 ? 0 : 8); xx < q.x + q.w; xx += T) g.fillRect(xx, yy - 8 + 1 > q.y ? yy - 7 : q.y, 1, 8); }
+      g.fillStyle = '#fc9838'; for (yy = q.y + 8; yy < Math.min(LV.bottom, q.y + 96); yy += 8) for (xx = q.x + 1; xx < q.x + q.w - 1; xx += T) g.fillRect(xx + ((yy - q.y) / 8 % 2 ? 8 : 0) % T, yy + 1, 5, 1);
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(q.x + q.w - 4, q.y, 4, q.h);
+      g.fillStyle = '#005800'; g.fillRect(q.x - 3, q.y - 6, q.w + 6, 12);
+      g.fillStyle = '#00a800'; g.fillRect(q.x - 2, q.y - 5, q.w + 4, 9);
+      g.fillStyle = '#80d010'; g.fillRect(q.x - 2, q.y - 5, q.w + 4, 3);
+      g.fillStyle = '#005800'; for (xx = q.x - 2; xx < q.x + q.w + 2; xx += 8) { g.fillRect(xx + 2, q.y + 3, 3, 4); g.fillRect(xx + 5, q.y + 4, 1, 3); }
+      g.fillStyle = '#00a800'; for (xx = q.x; xx < q.x + q.w; xx += 24) { g.fillRect(xx + 3, q.y - 9, 3, 4); g.fillRect(xx + 7, q.y - 11, 3, 6); g.fillRect(xx + 11, q.y - 8, 3, 3); }
+    });
+    drawQBlock(t); if (cam.x + WF > ROOMX - 100) drawRoomProps(t);
+    // 終點：跟前面一模一樣的吊環（細繩＋小環＋木架），只是掛上去之後拿來曬乾
+    var fy = LV.plats[5].y, gx = GOAL.x, gy = GOAL.y, bmY = GOAL.beam, gp = W.done && W.gbonus ? 1 : 0;
+    g.fillStyle = '#6e4c2c'; g.fillRect(gx - GDX - 8, bmY - 2, (GDX + 8) * 2, 4); [-1, 1].forEach(function (sd) { g.fillRect(gx + sd * (GDX + 6) - 1, bmY, 3, fy - bmY); });
+    if (!gp) {
+      g.strokeStyle = '#d8d2e8'; g.lineWidth = 1;
+      [-1, 1].forEach(function (sd) { g.beginPath(); g.moveTo(gx + sd * GDX, bmY); g.lineTo(gx + sd * GDX, gy); g.stroke(); g.strokeStyle = '#e6e1f2'; g.beginPath(); g.arc(gx + sd * GDX, gy + 2, 3.5, 0, 7); g.stroke(); g.strokeStyle = '#d8d2e8'; });
+      g.strokeStyle = 'rgba(255,240,150,' + (0.4 + 0.4 * Math.sin(t * 4)) + ')'; g.beginPath(); g.arc(gx, gy, GRAB, 0, 7); g.stroke();
+    }
+    for (var fi = 0; fi < 4; fi++) { var fx = gx - 54 + fi * 8 + (fi > 1 ? 68 : 0), sw = Math.sin(t * 2 + fi) * 1.5; g.fillStyle = '#9fb0c8'; g.fillRect(fx + sw, fy - 40, 4, 12); g.fillStyle = '#d9e2ef'; g.fillRect(fx + sw + 1, fy - 38, 2, 7); }
+    // 吊環（沒被抓的）
+    LV.rings.forEach(function (r) {
+      if (p.swing && p.swing.ring === r) return;
+      var rc = r.kind === 'break' ? '#f0a07a' : '#d8d2e8'; g.strokeStyle = rc; g.lineWidth = 1;
+      [-1, 1].forEach(function (sd) { g.beginPath(); g.moveTo(r.px + sd * GDX, r.py); g.lineTo(r.x + sd * GDX, r.y); g.stroke(); g.strokeStyle = r.kind === 'break' ? '#ffc09a' : '#e6e1f2'; g.beginPath(); g.arc(r.x + sd * GDX, r.y + 2, 3.5, 0, 7); g.stroke(); g.strokeStyle = rc; });
+      var near = !p.swing && !p.dead && Math.hypot(p.x - r.x, p.y - HO - r.y) < 70; if (near) { g.strokeStyle = 'rgba(255,240,150,.8)'; g.beginPath(); g.arc(r.x, r.y, GRAB, 0, 7); g.stroke(); }
+    });
+    // 敵人（矩形組成，先畫一圈深色外框再上色；第 6 欄 1＝細節不描邊）
+    W.en.forEach(function (e) {
+      var f = Math.floor(t * 8) % 2, dx = e.dir, x = Math.round(e.x), y = Math.round(e.y), OL = '#2f2638';
+      function shp(list, ox, oy, fl) {
+        var k, q, rx;
+        for (k = 0; k < list.length; k++) { q = list[k]; if (q[5]) continue; rx = fl ? -q[0] - q[2] : q[0]; g.fillStyle = OL; g.fillRect(ox + rx - 1, oy + q[1] - 1, q[2] + 2, q[3] + 2); }
+        for (k = 0; k < list.length; k++) { q = list[k]; rx = fl ? -q[0] - q[2] : q[0]; g.fillStyle = q[4]; g.fillRect(ox + rx, oy + q[1], q[2], q[3]); }
+      }
+      if (!e.alive) { if (e.dieT > 1) return; g.save(); g.translate(x, y); g.rotate(e.dieT * 10); g.globalAlpha = 1 - e.dieT; g.translate(-x, -y); }
+      var fl = dx < 0;
+      if (e.k === 'crow') {
+        var cw = f ? [[-6, -12, 9, 8, '#2a2d3a'], [-5, -9, 7, 2, '#444a5e'], [-9, -14, 4, 4, '#14161f']] : [[-6, 3, 9, 8, '#2a2d3a'], [-5, 5, 7, 2, '#444a5e'], [-9, 9, 4, 4, '#14161f']];
+        shp([[-12, -1, 5, 4, '#1f212c'], [-8, -3, 14, 8, '#2a2d3a'], [-7, 2, 12, 3, '#3a3e4e'], [4, -7, 8, 7, '#2a2d3a'], [11, -4, 6, 3, '#d2a63a']].concat(cw), x, y, fl);
+        g.fillStyle = '#ff5a3a'; g.fillRect(fl ? x - 10 : x + 9, y - 6, 2, 2);
+      } else if (e.k === 'mouse') {
+        var ml = Math.floor(t * 14) % 2, tl2 = Math.round(Math.sin(t * 10) * 1);
+        shp([[-12, -1 + tl2, 6, 1, '#e8a0b0', 1], [-7, -4, 11, 7, '#a9a39a'], [-5, 0, 8, 3, '#d6d0c6', 1], [3, -5, 7, 6, '#b8b2a8'], [4, -8, 3, 3, '#e8a0b0'], [9, -2, 3, 2, '#e8a0b0'], [-5 + ml * 2, 3, 2, 2, '#a9a39a'], [1 - ml * 2, 3, 2, 2, '#a9a39a']], x, y - 1, fl);
+        g.fillStyle = '#1d1a22'; g.fillRect(fl ? x - 8 : x + 7, y - 5, 1, 2);
+      } else if (e.k === 'tile') {
+        var tx = x + (e.warn ? Math.round(Math.sin(t * 60) * 1.5) : 0);
+        if (e.warn || e.falling) {
+          g.save(); g.translate(tx, y); g.rotate(e.falling ? t * 9 : 0);
+          shp([[-8, -5, 16, 10, '#c0643f'], [-8, -5, 16, 3, '#d98a52'], [-6, 1, 12, 2, '#7a3524']], 0, 0, false); g.restore();
+          if (e.warn) { g.fillStyle = 'rgba(255,90,90,.9)'; g.fillRect(x - 1, y + 10, 2, 4); g.fillRect(x - 1, y + 16, 2, 2); }
+          if (e.falling) { g.fillStyle = 'rgba(255,230,200,.5)'; g.fillRect(x - 1, y - 20, 2, 14); }
+        }
+      } else if (e.k === 'gull') {
+        var wing = f ? [[-6, -12, 9, 8, '#ffffff'], [-5, -9, 7, 2, '#cfd9e2'], [-9, -14, 4, 4, '#5b6472']] : [[-6, 3, 9, 8, '#ffffff'], [-5, 5, 7, 2, '#cfd9e2'], [-9, 9, 4, 4, '#5b6472']];
+        shp([[-12, -1, 5, 4, '#b8c4d0'], [-8, -3, 14, 8, '#ffffff'], [-7, 2, 12, 3, '#d7e0e8'], [4, -7, 8, 7, '#ffffff'], [11, -4, 5, 2, '#f4a62a'], [11, -2, 4, 1, '#d9811a'], [8, -6, 2, 2, '#1d1a22', 1]].concat(wing), x, y, fl);
+        g.fillStyle = '#fff'; if (!fl) g.fillRect(x + 9, y - 6, 1, 1); else g.fillRect(x - 10, y - 6, 1, 1);
+      } else if (e.k === 'cat') {
+        var lg = f ? 2 : 0, tl = Math.round(Math.sin(t * 6) * 2);
+        shp([[-12, -11 + tl, 3, 10, '#e8923a'], [-8, -5, 14, 9, '#f0a24a'], [-5, -5, 2, 5, '#c26a22', 1], [-1, -5, 2, 6, '#c26a22', 1], [-6, 1, 11, 3, '#f7dcae', 1],
+          [3, -10, 10, 9, '#f0a24a'], [3, -13, 3, 4, '#f0a24a'], [10, -13, 3, 4, '#f0a24a'], [4, -12, 1, 2, '#f08aa0', 1], [11, -12, 1, 2, '#f08aa0', 1],
+          [9, -5, 5, 4, '#f7dcae'], [-7 + lg, 4, 3, 3, '#e8923a'], [-1 - lg, 4, 3, 3, '#e8923a'], [4 + lg, 4, 3, 3, '#f0a24a'], [9 - lg, 4, 3, 3, '#f0a24a']], x, y - 1, fl);
+        var ex = fl ? -6 : 6, nx = fl ? -12 : 12; g.fillStyle = '#1d1a22'; g.fillRect(x + (fl ? -8 : 7), y - 8, 1, 2); g.fillRect(x + (fl ? -12 : 11), y - 8, 1, 2); g.fillStyle = '#f06a8a'; g.fillRect(x + (fl ? -14 : 13), y - 5, 1, 1);
+        g.fillStyle = '#fff'; g.fillRect(x + (fl ? -8 : 7), y - 8, 1, 1);
+      } else if (e.k === 'otter') {
+        var wx = e.s.x, wyy = LV.waterY;
+        if (e.warn) {
+          g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 1; var rr = 6 + (t * 14) % 9; g.beginPath(); g.ellipse(wx, wyy + 2, rr, rr * 0.3, 0, 0, 7); g.stroke();
+          shp([[-5, -9, 10, 9, '#8a5a34'], [-3, -4, 6, 4, '#d8b58a'], [-5, -12, 3, 4, '#8a5a34'], [2, -12, 3, 4, '#8a5a34'], [-3, -7, 1, 2, '#1d1a22', 1], [2, -7, 1, 2, '#1d1a22', 1], [-1, -4, 2, 2, '#2a2020', 1]], wx, wyy + 1, false);
+          g.fillStyle = '#5ab0cc'; g.fillRect(wx - 8, wyy, 16, 4);
+        }
+        if (e.boxes) {
+          g.save(); g.translate(x, e.boxes[0][1] + 8); g.rotate(clamp(e.vy / 700, -1, 1) * 0.7 * (fl ? -1 : 1));
+          shp([[-2, 8, 4, 9, '#6e4528'], [-5, -6, 10, 16, '#8a5a34'], [-3, -1, 6, 10, '#d8b58a'], [-6, -2, 3, 5, '#7a4e2c'], [3, -2, 3, 5, '#7a4e2c'], [-5, -15, 10, 9, '#8a5a34'], [-4, -11, 8, 5, '#d8b58a'], [-5, -18, 3, 4, '#8a5a34'], [2, -18, 3, 4, '#8a5a34'], [-3, -13, 1, 2, '#1d1a22', 1], [2, -13, 1, 2, '#1d1a22', 1], [-1, -10, 2, 2, '#2a2020', 1], [-8, -9, 3, 1, '#f3e4cb', 1], [5, -9, 3, 1, '#f3e4cb', 1]], 0, 0, false);
+          g.restore();
+        }
+      } else if (e.k === 'ball8') {
+        if (e.boxes) { g.save(); g.translate(x, y); g.rotate(-x * 0.09); ball8(0, 0, 10); g.restore(); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(x - 9, y + 10, 18, 2); }
+      } else if (e.k === 'heron') {
+        var hy = 448 - e.neck;
+        if (e.warn) { g.fillStyle = 'rgba(255,90,90,.9)'; g.fillRect(x - 2, hy - 15, 4, 7); g.fillRect(x - 2, hy - 6, 4, 3); }
+        g.fillStyle = '#e8c23a'; g.fillRect(x - 4, 449, 2, 21); g.fillRect(x + 2, 449, 2, 21);             // 腳
+        shp([[-13, 441, 6, 5, '#ffffff'], [-9, 436, 19, 14, '#ffffff'], [-8, 441, 13, 8, '#b9c6d4'], [-2, hy, 4, e.neck, '#f2f5f8'], [-4, hy - 4, 9, 8, '#ffffff'],
+          [-1, hy - 8, 7, 4, '#2a2d38'], [4, hy - 8, 6, 2, '#2a2d38'], [-15, hy - 1, 11, 2, '#f0b43a'], [-3, hy - 2, 2, 2, '#e0402a', 1]], x, 0, false);
+        g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(x - 12, LV.waterY - 1, 24, 2);
+      }
+      if (!e.alive) g.restore();
+    });
+    // 魚
+    if (p.dead <= 0 && !(p.inv > 0 && Math.floor(t * 14) % 2)) {
+      if (W.done && W.gbonus) {
+        var dry = clamp((W.doneT - 0.5) / 3, 0, 1), sw2 = Math.sin(W.doneT * 2.4) * (1 - dry * 0.6);
+        var hst = { aL: 0.75, aR: 0.75, tail: 1.1, ph: W.doneT * 3, wave: 0.8, wp: W.doneT * 2, tw: sw2 * 0.05, sy: 1 - 0.1 * dry, dry: dry }, hx3 = p.x, hy3 = p.y - HO, hps = [-1, 1].map(function (sd) { return toWorld(handLocal(sd, 0.75, hst), hx3, hy3, sw2 * 0.05, p.face); });
+        g.strokeStyle = '#d8d2e8'; g.lineWidth = 1;
+        hps.forEach(function (hp, i) { g.beginPath(); g.moveTo(GOAL.x + (i ? 1 : -1) * GDX, GOAL.beam); g.lineTo(hp[0], hp[1]); g.stroke(); g.beginPath(); g.arc(hp[0], hp[1] + 2, 3.5, 0, 7); g.stroke(); });
+        drawFish(hx3, hy3, sw2 * 0.05, p.face, hst);
+        g.strokeStyle = 'rgba(255,240,170,' + (0.5 * (1 - dry)) + ')'; g.lineWidth = 1; for (var hr = 0; hr < 3; hr++) { g.beginPath(); g.moveTo(p.x - 14 + hr * 14, p.y - 40); g.lineTo(p.x - 10 + hr * 14, p.y - 52 - Math.sin(W.doneT * 5 + hr) * 3); g.stroke(); }
+      } else if (p.swing) {
+        var s = p.swing, rot = -s.th, hx2 = p.x, hy2 = p.y - HO, pull = clamp((1 - s.Lf) / (1 - TUCK), 0, 1);
+        var raise = 0.1 + 0.32 * pull + 0.05 * Math.sin(t * 9), st = { aL: raise, aR: raise, tail: 1.6 + 0.8 * Math.abs(s.w), ph: t * 7, wave: 1 + 0.5 * Math.abs(s.w), wp: t * 6, tw: clamp(-s.w * 0.05, -0.22, 0.22), sy: 1 + 0.06 * pull };
+        g.strokeStyle = '#d8d2e8'; g.lineWidth = 1;
+        [-1, 1].forEach(function (sd) { var hp = toWorld(handLocal(sd, raise, st), hx2, hy2, rot, p.face); g.beginPath(); g.moveTo(s.ring.px + sd * GDX, s.ring.py); g.lineTo(hp[0], hp[1]); g.stroke(); g.beginPath(); g.arc(hp[0], hp[1] + 2, 3.5, 0, 7); g.stroke(); });
+        drawFish(hx2, hy2, rot, p.face, st);
+        if (s.perf) { g.strokeStyle = 'rgba(255,230,120,' + (0.6 + 0.4 * Math.sin(t * 24)) + ')'; g.lineWidth = 2; g.beginPath(); g.arc(hx2, hy2 + 6, 22, 0, 7); g.stroke(); }
+      } else {
+        var rot2 = 0, bob = 0, st2 = { leg: 0.12, ph: t * 3, aL: 0.12, aR: 0.12, wave: 0.5, wp: t * 3 };
+        if (p.on && Math.abs(p.vx) > 20) { var wk = Math.sin(t * 16); rot2 = wk * 0.06; bob = -Math.abs(wk) * 2; st2 = { leg: 0.6, ph: t * 16, tw: 0.1 * wk, aL: 0.45 * wk, aR: -0.45 * wk, wave: 1.8, wp: t * 16, sy: 1 + 0.03 * Math.cos(t * 32) }; }   // 走路：兩片尾鰭交替踏步、身體扭、雙手前後甩
+        else if (!p.on) { rot2 = clamp(p.vy / 900, -0.3, 0.35) * p.face; st2 = { leg: 0.5, ph: t * 12, aL: 0.5, aR: 0.5, wave: 1.5, wp: t * 10, sy: 1 + clamp(-p.vy / 330, -1, 1) * 0.09, tw: clamp(-p.vx * 0.0006, -0.1, 0.1) }; }   // 空中：上升拉長、下落壓扁   // 空中：雙手舉起、尾巴快擺
+        if (p.on && p.landT > 0) st2.sy = 1 - 0.14 * p.landT / 0.16;                 // 落地壓扁一下
+        if (p.spinT > 0) rot2 = (1 - p.spinT / 0.5) * Math.PI * 2 * p.face;
+        if (W.slide) { rot2 = (p.sl || 0) * 0.9; st2 = { leg: 0.2, ph: t * 8, aL: 0.9, aR: 0.9, wave: 1.2, wp: t * 12, tw: -0.12 }; }
+        if (p.stun > 0) rot2 = Math.sin(t * 30) * 0.15;
+        // 轉動中以身體中心為軸
+        g.save(); g.translate(p.x, p.y); g.rotate(rot2); g.translate(-p.x, -p.y); drawFish(p.x, p.y - HO + bob, 0, p.face, st2); g.restore();
+      }
+    }
+    W.fx.forEach(function (f) { g.fillStyle = (f.gold ? 'rgba(255,225,110,' : 'rgba(200,235,255,') + (1 - f.t / f.life) + ')'; g.fillRect(f.x, f.y, 2, 2); });
+    W.pops.forEach(function (o) { txt(o.txt, o.x, o.y - o.t * 22, 11, o.col); });
+    g.restore();
+    // HUD
+    g.fillStyle = 'rgba(58,44,32,.82)'; g.fillRect(0, 0, WF, 22);
+    g.fillStyle = '#cdbfa8'; g.fillRect(8, 8, WF - 130, 6); g.fillStyle = '#f4b942'; g.fillRect(8, 8, (WF - 130) * clamp(p.x / LV.goalX, 0, 1), 6);
+    g.fillStyle = MUS.on ? 'rgba(244,194,74,.9)' : 'rgba(120,110,100,.9)'; g.fillRect(MBTN.x(), MBTN.y, 22, 14); txt(MUS.on ? '♪' : '✕', MBTN.x() + 11, MBTN.y + 7, 11, '#3a2c20');
+    var hsp = W.maxHp > 3 ? 12 : 14; for (var hi = 0; hi < W.maxHp; hi++) { var hx = 8 + hi * hsp; g.fillStyle = hi < W.hp ? '#ee4455' : '#5a4a44'; g.fillRect(hx + 1, 26, 3, 3); g.fillRect(hx + 6, 26, 3, 3); g.fillRect(hx, 27, 10, 3); g.fillRect(hx + 1, 30, 8, 2); g.fillRect(hx + 3, 32, 4, 2); g.fillRect(hx + 4, 34, 2, 1); if (hi < W.hp) { g.fillStyle = '#ff9aa5'; g.fillRect(hx + 2, 27, 1, 1); } }
+    txt('特技 ' + (W.score + W.fl.pts) + '　擊退 ' + W.kills, WF - 8, 11, 10, '#fff', 'right');
+    var near = !p.on && !p.swing && ringNear(p, 60), al = p.swing ? '放開＝放手' : (p.on ? '點＝跳' : (near ? '按住＝抓環' : '點＝空翻'));
+    g.fillStyle = (inp.a ? 'rgba(244,194,74,.9)' : 'rgba(58,44,32,.6)'); g.fillRect(0, H - 40, WF, 40);
+    txt(al, WF / 2, H - 20, 16, '#fff');
+    if (W.banner) { var bt = W.banner.t, ba = bt < 0.3 ? bt / 0.3 : bt > 2 ? (2.4 - bt) / 0.4 : 1; g.globalAlpha = Math.max(0, ba); g.fillStyle = 'rgba(30,20,40,.62)'; g.fillRect(0, 96, WF, 36); txt(W.banner.txt, WF / 2, 114, 18, '#ffe38a'); g.globalAlpha = 1; }
+    if (p.swing && p.swing.ring.kind === 'break' && p.swing.t > 1) txt('快放手！環要斷了', WF / 2, 70, 11, '#ff9a8a'); else if (p.swing && p.swing.perf) txt('現在放手＝完美！', WF / 2, 70, 11, '#ffe38a');
+    else if (p.swing) txt('◀▶ 偏向一邊　放開按鈕放手', WF / 2, 70, 9, '#fff');
+    else if (!W.started) {
+      txt(LOCK ? '點一下開始（' + DF().name + '）' : '選難度，再點空白處開始', WF / 2, 86, 11, '#fff');
+      if (!LOCK) ['easy', 'normal', 'hard'].forEach(function (k, bi) { var d = DFS[k], by = DBTN.y0 + bi * DBTN.dy, on = k === diffKey; g.fillStyle = on ? '#f4c24a' : 'rgba(58,44,32,.78)'; g.fillRect(DBTN.x(), by, DBTN.w, DBTN.h); g.fillStyle = on ? '#7a5532' : 'rgba(255,255,255,.25)'; g.fillRect(DBTN.x(), by + DBTN.h - 3, DBTN.w, 3); txt(d.name + '　' + d.hp + ' 愛心', WF / 2, by + 12, 12, '#fff'); });
+      txt('點＝跳　空中靠近吊環按住＝抓', WF / 2, DBTN.y0 + 3 * DBTN.dy + 8, 9, '#fff');
+      if (DEV) TBTN.forEach(function (b) { g.fillStyle = '#3aa86a'; g.fillRect(b.x(), TB_Y, TB_W, TB_H); g.fillStyle = '#1f6a40'; g.fillRect(b.x(), TB_Y + TB_H - 3, TB_W, 3); txt(b.t, b.x() + TB_W / 2, TB_Y + 11, 11, '#fff'); });
+      txt(diffKey === 'easy' ? '落水不扣愛心・平台自動存檔' : diffKey === 'normal' ? '落水扣 1 顆・平台自動存檔' : '落水扣 1 顆・過三個吊環會存檔', WF / 2, DBTN.y0 + 3 * DBTN.dy + 24, 9, '#ffe38a');
+    }
+    else if (W.t < 10 && !W.done) txt('自動往前跑　點螢幕跳、靠近吊環按住抓', WF / 2, 70, 10, '#fff');
+    if (W.done && W.gbonus && W.doneT <= 3.2) txt(W.doneT < 1.2 ? '抓到大吊環！+' + W.gbonus : '曬太陽中……', WF / 2, 86, 14, '#ffe38a');
+    if (W.done && W.doneT > 3.2) { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, H - 118, WF, 84); txt('午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, H - 100, 14, '#f4dd7a'); txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips + '　擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, H - 78, 9, '#fff'); txt('點一下再玩（或按 R）' + (W.title ? '　稱號：' + W.title : ''), WF / 2, H - 56, 10, W.title ? '#ffd24a' : '#cdbfa8'); }
+    if (p.dead > 0) { g.fillStyle = 'rgba(30,60,80,' + Math.min(0.5, p.dead) + ')'; g.fillRect(0, 0, WF, H); }
+  }
+
+  /* ---------- 輸入 ---------- */
+  var ptrs = {};
+  function recalc() { var s = { l: 0, r: 0, a: 0 }; for (var id in ptrs) if (ptrs[id]) s[ptrs[id]] = 1; var was = inp.a; for (var k in s) inp[k] = !!(s[k] || keys[k]); if (inp.a && !was) inp.press = true; }
+  var keys = { l: 0, r: 0, a: 0 };
+  cv.addEventListener('pointerdown', function (e) { e.preventDefault(); audioOn();
+    var rc = cv.getBoundingClientRect(), qx = (e.clientX - rc.left) / (rc.width / WF), qy = (e.clientY - rc.top) / (rc.height / H);
+    if (qx >= MBTN.x() - 4 && qx <= MBTN.x() + 26 && qy >= MBTN.y - 4 && qy <= MBTN.y + 18) { MUS.on = !MUS.on; try { localStorage.setItem('sunnuGymMusic', MUS.on ? '1' : '0'); } catch (_) { } return; }
+    if (!W.started && DEV) { for (var ti = 0; ti < TBTN.length; ti++) if (qx >= TBTN[ti].x() && qx <= TBTN[ti].x() + TB_W && qy >= TB_Y && qy <= TB_Y + TB_H) { warpTest(TBTN[ti].k); return; } }
+    if (!W.started && !LOCK) { var hit = false; ['easy', 'normal', 'hard'].forEach(function (k, bi) { var by = DBTN.y0 + bi * DBTN.dy; if (qx >= DBTN.x() && qx <= DBTN.x() + DBTN.w && qy >= by && qy <= by + DBTN.h) { setDiff(k); W = newWorld(); hit = true; } }); if (hit) return; }
+    if (W.done && W.doneT > 3.4 && !o.onEnd) { W = newWorld(); return; } try { cv.setPointerCapture(e.pointerId); } catch (_) { } ptrs[e.pointerId] = 'a'; recalc(); });
+  function pup(e) { delete ptrs[e.pointerId]; recalc(); }
+  cv.addEventListener('pointerup', pup); cv.addEventListener('pointercancel', pup); cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  var KM = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', Space: 'a', KeyZ: 'a', ArrowUp: 'a', KeyW: 'a', KeyX: 'a', KeyK: 'a', ShiftLeft: 'a', ShiftRight: 'a', ArrowDown: 'a' };
+  function kd(e) { audioOn(); var k = KM[e.code]; if (k) { e.preventDefault(); keys[k] = 1; recalc(); } }
+  function ku(e) { var k = KM[e.code]; if (k) { keys[k] = 0; recalc(); } }
+  addEventListener('keydown', kd); addEventListener('keyup', ku);
+
+  var last = performance.now();
+  function loop(now) {
+    if (dead) return; var dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
+    if (!false) { var n = Math.max(1, Math.ceil(dt / (1 / 120))); for (var i = 0; i < n; i++) step(W, inp, dt / n); }
+    updCam(dt); draw();
+    if (W.done && W.doneT > 4.2 && !reported && o.onEnd) { reported = true; o.onEnd({ win: true, challenge: W.faints === 0 && W.falls === 0, score: W.score, flips: W.flips, perfects: W.perfects, kills: W.kills, falls: W.falls, faints: W.faints }); }
+    raf = requestAnimationFrame(loop);
+  }
+  function destroy() { dead = true; cancelAnimationFrame(raf); clearInterval(tmr); removeEventListener('keydown', kd); removeEventListener('keyup', ku); try { if (AC) AC.close(); } catch (e) { } AC = null; if (cv.parentNode) cv.parentNode.removeChild(cv); }
+  function freeze() { if (dead) return; try { draw(); } catch (e) { } destroy(); }
+  last = performance.now(); raf = requestAnimationFrame(loop);
+  return { destroy: destroy, freeze: freeze, canvas: cv, get W() { return W; }, step: function (dt) { step(W, inp, dt); }, draw: draw, LV: LV, inp: inp, cam: cam };
+  }
+  return { create: create };
+})();
+
+  /* 列車庫：路線專屬列車（EMU500、柴聯車、阿里山小火車）一開始就依路線自動換；高級列車用金幣買；賽博列車＝全部車站在普通以上拿過 3 星 */
   const TRAIN_SHOP = [['puyuma', '普悠瑪', 350, '8 節編組的過彎快車，時速 130 的東部幹線主力。'], ['emu3000', 'EMU3000', 350, '12 節超大容量新自強號，時速 130 穩穩跑。'], ['n700', '高鐵 700T', 600, '12 節編組的西部走廊霸主，以時速 300 貫穿南北。'], ['n700st', '高鐵 N700ST', 800, '次世代高鐵新星，極速 300 搭配全遊戲最強起步爆發力。'], ['steam', '蒸汽火車', 500, '復古鳴笛配陣陣白煙，用慢步調感受老鐵道的浪漫。']];
   const TRAIN_NAMES = { puyuma: '普悠瑪', emu3000: 'EMU3000', n700: '高鐵 700T', n700st: '高鐵 N700ST', gold: '賽博列車', steam: '蒸汽火車', funny: '孫女夾褲列車' };
   const trainsOwn = () => { const sh = gameState.shop; if (!Array.isArray(sh.trains)) sh.trains = []; return sh.trains; };
-  const trainHas = k => !!k && (k === 'funny' || trainsOwn().includes(k));   /* 孫女夾褲列車免費，一開始就能出車 */
+  const trainHas = k => !!k && (k === 'funny' ? ((ST().trainFailAll || 0) >= 10 || (ST().trainFunnyFail || 0) > 0) : trainsOwn().includes(k));   /* 孫女夾褲列車：任何列車停車失敗累積 10 次解鎖 */
   const TRAIN_FULLS = () => { const r = TrainRoutes.find(x => x.id === 'all'); return r ? r.stations.map(x => x.full) : []; };
   const trainStarMap = () => { const st = ST(); if (!st.trainStars || typeof st.trainStars !== 'object') st.trainStars = {}; return st.trainStars; };
   const trainStarN = () => { const m = trainStarMap(); return TRAIN_FULLS().filter(f => m[f] >= 3).length; };
@@ -5297,8 +7436,44 @@ var TrainGame = (function () {
     if (rt) arenaOpen({ ...TRAIN_ENC, route: rt, trainKind: trainPick() }); else arenaOpen({ ...TRAIN_ENC, station: stn, trainKind: trainPick() });
   }
   function trainPick() { const v = gameState.shop.trainPick || ''; return trainHas(v) ? v : ''; }
-  const JEEP_PLACE = /集集特技村/, TRAIN_PLACE = /頂埔火車站|石城車站|龜山車站|牡丹火車站|武塔車站|龍港車站|南勢車站|談文車站|大山車站|日南車站|龍井車站|大里車站|石龜車站|拔林火車站|石榴火車站|泰安火車站|榮華車站|橫山車站|九讚頭車站|合興車站|富貴火車站|上員車站|海端車站|景美車站|大富車站|鎮安車站|東海車站|龍泉車站|望古火車站|泰安車站 \(舊山線\)|竹崎車站|木履寮車站|梨園寮火車站|交力平車站|鹿麻產車站|^(?:暖暖|四腳亭|三貂嶺|大華|猴硐|八斗子|新埔|嘉義)$/, TRAIN_SCENE = { '頂埔火車站': 'city', '石城車站': 'coast', '龜山車站': 'coast', '牡丹火車站': 'mountain', '武塔車站': 'mountain', '龍港車站': 'coast', '南勢車站': 'mountain', '談文車站': 'coast', '大山車站': 'coast', '日南車站': 'coast', '龍井車站': 'coast', '大里車站': 'coast', '石龜車站': 'field', '拔林火車站': 'field', '石榴火車站': 'field', '泰安火車站': 'mountain', '暖暖': 'mountain', '四腳亭': 'mountain', '三貂嶺': 'mountain', '大華': 'mountain', '猴硐': 'mountain', '榮華車站': 'field', '橫山車站': 'mountain', '九讚頭車站': 'mountain', '合興車站': 'mountain', '富貴火車站': 'mountain', '上員車站': 'mountain', '海端車站': 'mountain', '景美車站': 'mountain', '大富車站': 'field', '鎮安車站': 'field', '東海車站': 'field', '龍泉車站': 'mountain', '望古火車站': 'mountain', '八斗子': 'coast', '新埔': 'coast', '泰安車站 (舊山線)': 'mountain', '竹崎車站': 'forest', '木履寮車站': 'forest', '梨園寮火車站': 'forest', '交力平車站': 'forest', '鹿麻產車站': 'forest', '嘉義': 'city' }, trainStn = p => ({ id: p.id, full: String(p.name), scene: TRAIN_SCENE[p.name] || 'field', name: String(p.name).replace(/火車站$/, '車站').replace(/^([^站]+)$/, '$1車站') });
+  const DOFU_PLACE = /福春豆花伯/, JEEP_PLACE = /集集特技村/, TRAIN_PLACE = /頂埔火車站|石城車站|龜山車站|牡丹火車站|武塔車站|龍港車站|南勢車站|談文車站|大山車站|日南車站|龍井車站|大里車站|石龜車站|拔林火車站|石榴火車站|泰安火車站|榮華車站|橫山車站|九讚頭車站|合興車站|富貴火車站|上員車站|海端車站|景美車站|大富車站|鎮安車站|東海車站|龍泉車站|望古火車站|泰安車站 \(舊山線\)|竹崎車站|木履寮車站|梨園寮火車站|交力平車站|鹿麻產車站|^(?:暖暖|四腳亭|三貂嶺|大華|猴硐|八斗子|新埔|嘉義)$/, TRAIN_SCENE = { '頂埔火車站': 'city', '石城車站': 'coast', '龜山車站': 'coast', '牡丹火車站': 'mountain', '武塔車站': 'mountain', '龍港車站': 'coast', '南勢車站': 'mountain', '談文車站': 'coast', '大山車站': 'coast', '日南車站': 'coast', '龍井車站': 'coast', '大里車站': 'coast', '石龜車站': 'field', '拔林火車站': 'field', '石榴火車站': 'field', '泰安火車站': 'mountain', '暖暖': 'mountain', '四腳亭': 'mountain', '三貂嶺': 'mountain', '大華': 'mountain', '猴硐': 'mountain', '榮華車站': 'field', '橫山車站': 'mountain', '九讚頭車站': 'mountain', '合興車站': 'mountain', '富貴火車站': 'mountain', '上員車站': 'mountain', '海端車站': 'mountain', '景美車站': 'mountain', '大富車站': 'field', '鎮安車站': 'field', '東海車站': 'field', '龍泉車站': 'mountain', '望古火車站': 'mountain', '八斗子': 'coast', '新埔': 'coast', '泰安車站 (舊山線)': 'mountain', '竹崎車站': 'forest', '木履寮車站': 'forest', '梨園寮火車站': 'forest', '交力平車站': 'forest', '鹿麻產車站': 'forest', '嘉義': 'city' }, trainStn = p => ({ id: p.id, full: String(p.name), scene: TRAIN_SCENE[p.name] || 'field', name: String(p.name).replace(/火車站$/, '車站').replace(/^([^站]+)$/, '$1車站') });
   const TRAIN_ENC = { solo: true, t: 'mon', n: '冷門列車駕駛', s: 'steamtrain', g: '冷門列車駕駛', d: 3, w: 0, at: [], i: ['站長：司機員，準備進站！', '記得在停車線前停下來。'], win: ['站長：漂亮！準點進站！', '阿公阿嬤都鼓掌了。'], lose: ['停得不太準，再進站一次吧。', '站長：沒關係，下一班車更好。'], xp: 0 };
+  const DOFU_ENC = { solo: true, t: 'mon', n: '連吃五碗豆花', s: 'tofu', ic: 'my_1', g: '連吃五碗豆花', d: 3, w: 0, at: [], i: ['豆花伯：來，慢慢吃，不趕。', '五碗豆花，用力狂吃！太快會噎到，記得喝水。'], win: ['豆花伯：哇，五碗都吃完了！', '海風一吹，肚子剛剛好。'], lose: ['吃不下了……先喝口水休息一下。', '豆花伯：沒關係，下次再來。'], xp: 0 };
+  V2_GAMES['連吃五碗豆花'] = { tip: '狂點「狂吃」把豆花吃完，每碗有時間。點太快會噎到，嗆到要停手，快噎住就按「喝水」。', run(c) {
+    setupV2(c); sound = true; soundLabel(); GS.tap(); c.st.innerHTML = '';
+    const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
+    try { document.fonts && document.fonts.load && document.fonts.load('10px Cubic11', '連吃五碗豆花福春豆花伯狂吃喝水嗆到哇加料完食'); } catch (e) {}
+    { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }
+    const dg = DofuGame.create({ host, diff: c.df.k, chars: { ceo: sprite('boss_corgi') }, shopUrl: () => { const L = ['https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E7%9A%84%E5%B3%B6%E7%81%B0%E5%88%BA%E7%B9%A1%E8%80%81%E5%B8%BD-1-1', 'https://www.sunnu.co/products/%E4%BA%94%E7%A2%97%E5%B3%B6%E7%81%B0%E7%9F%AD%E8%A2%96%E4%B8%8A%E8%A1%A3', 'https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E8%B6%85%E5%A4%9A%E7%A2%97%E5%B3%B6%E7%81%B0%E7%B7%B9%E8%8A%B1%E4%B8%AD%E7%AD%92%E8%A5%AA']; return L[Math.floor(Math.random() * L.length)]; }, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    if (/[?&]debug/.test(location.search)) window.__dofu = dg;
+    c.ivs.push(setInterval(() => { if (c.dead) { try { dg.freeze(); } catch (e) {} } }, 300));
+  } };
+  Object.assign(GAMES, { '連吃五碗豆花': V2_GAMES['連吃五碗豆花'] });
+  HOW['連吃五碗豆花'] = { goal: '在時間內連吃五碗豆花', how: V2_GAMES['連吃五碗豆花'].tip, tip: '越吃越飽，吃得越慢；豆花伯加料時一點算兩口。', gest: 'tap', demo: '狂點吃 → 噎滿前喝水' };
+  const RING_PLACE = /古厝呷飯/;
+  const RING_ENC = { solo: true, t: 'mon', n: '吊環五仔魚乾', s: 'ringfish', ic: 'star', g: '吊環五仔魚乾', d: 3, w: 0, at: [], i: ['古厝呷飯：太陽剛剛好，來曬魚乾！', '魚抓緊吊環，擺盪、撐住、迴旋、落地！'], win: ['魚乾曬得金黃酥脆！', '評審全部舉牌：十分！'], lose: ['魚還是濕的……再曬一次。', '太陽下山了，明天再來。'], xp: 0 };
+  V2_GAMES['吊環五仔魚乾'] = { tip: '壓住左右把魚穩在中間曬太陽；十字撐按住出力、放開休息；三拍大迴旋跟著拍子點；最後落地。', run(c) {
+    setupV2(c); sound = true; soundLabel(); GS.tap(); c.st.innerHTML = '';
+    const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
+    try { document.fonts && document.fonts.load && document.fonts.load('10px Cubic11', '吊環五仔魚乾古厝呷飯擺盪十字撐大迴旋落地曬乾目標'); } catch (e) {}
+    { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }
+    const rg = RingGame.create({ host, diff: c.df.k, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    if (/[?&]debug/.test(location.search)) window.__ring = rg;
+    c.ivs.push(setInterval(() => { if (c.dead) { try { rg.freeze(); } catch (e) {} } }, 300));
+  } };
+  Object.assign(GAMES, { '吊環五仔魚乾': V2_GAMES['吊環五仔魚乾'] });
+  HOW['吊環五仔魚乾'] = { goal: '把五仔魚曬乾到目標曬乾度', how: V2_GAMES['吊環五仔魚乾'].tip, tip: '風會一陣一陣吹，海鷗會來叼魚，點牠趕走。', gest: 'tap', demo: '壓住左右 → 撐住 → 跟拍 → 落地' };
+  const GYM_ENC = { solo: true, t: 'mon', n: '體操午仔魚', s: 'gymfish', ic: 'star', g: '體操午仔魚', d: 3, w: 0, at: [], i: ['古厝呷飯：午仔魚要闖關啦！', '自動往前跑，點一下跳、靠近吊環按住抓！'], win: ['午仔魚穩穩站上終點！', '阿姨：這個空翻我給十分！'], lose: ['午仔魚掉進魚塭了……再闖一次。', '阿姨：沒關係，再來！'], xp: 0 };
+  V2_GAMES['體操午仔魚'] = { tip: '點一下跳；空中靠近吊環按住＝抓環、放開＝放手；空中再點一下＝空翻，空翻可以撞開動物。', run(c) {
+    setupV2(c); sound = true; soundLabel(); GS.tap(); c.st.innerHTML = '';
+    const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
+    { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }
+    const gg = GymGame.create({ host, diff: c.df.k, dev: /[?&]debug/.test(location.search), sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    if (/[?&]debug/.test(location.search)) window.__gym = gg;
+    c.ivs.push(setInterval(() => { if (c.dead) { try { gg.freeze(); } catch (e) {} } }, 300));
+  } };
+  Object.assign(GAMES, { '體操午仔魚': V2_GAMES['體操午仔魚'] });
+  HOW['體操午仔魚'] = { goal: '自動往前跑，抓吊環盪過魚塭與屋簷，站穩到終點', how: V2_GAMES['體操午仔魚'].tip, tip: '放手時機抓在盪到斜上方＝完美放手；貓、海鷗、烏鴉被空翻撞到會被擊退，掉下來的瓦片不能打。', gest: 'tap', demo: '點＝跳 → 按住抓環 → 放手 → 空翻' };
   const JEEP_ENC = { solo: true, t: 'mon', n: '吉普車翹翹板', s: 'my_17', g: '吉普車翹翹板', d: 3, w: 0, at: [], i: ['吉普阿諾：上板！撐住別翻車！', '翹翹板在晃，小鳥和輪胎要來了！'], win: ['吉普阿諾：穩！這技術可以去表演！', '觀眾全部起立鼓掌！'], lose: ['翻車啦！下次推車要更早喔。', '吉普阿諾：沒關係，再上去一次。'], xp: 0 };
   V2_GAMES['吉普車翹翹板'] = { tip: '按住左右推車，撐住翹翹板。輪胎要跳過去，小鳥別跳，木箱要推開。', run(c) {
     setupV2(c); sound = true; soundLabel(); GS.tap(); c.st.innerHTML = '';
@@ -5342,7 +7517,7 @@ var TrainGame = (function () {
     const stn = c.e.station || {}, sk = stn.id && iconsCfg[stn.id], skA = gk('girl_a'), skB = gk('girl_b');
     try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); barkLoad(audio); } catch (e) {}   /* 先解碼夾褲的狗叫錄音，孫女夾褲列車的汪汪叫要用 */
     { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }   /* 提示列、記分板與遊戲內資訊重複，整個拿掉，讓畫面只有一套排版 */
-    const rtc = c.e.route, tg = TrainGame.create({ host, bark: (p, v) => bark(p, v, 1), diff: c.df.k, trainKind: c.e.trainKind || null, onFail: kind => { if (kind === 'funny') { ST().trainFunnyFail = (ST().trainFunnyFail || 0) + 1; saveGameState(); setTimeout(() => { try { achCheck(); } catch (e) {} }, 50); } }, onStop: (full, stars, err, kmh, kind) => { if (kind === 'funny') { ST().trainFunny = (ST().trainFunny || 0) + 1; } if (kind === 'gold' && stars >= 3 && c.df.k !== 'easy' && kmh >= 240) { ST().trainThunder = 1; saveGameState(); } trainStar(full, stars, c.df.k, err); setTimeout(() => { try { achCheck(); } catch (e) {} }, 50); }, fastStart: true, route: rtc ? { id: rtc.id, stations: rtc.stations.map(s => ({ full: s.full, scene: s.scene, km: s.km, line: s.line, img: '' })) } : null, station: { name: stn.name || '', full: stn.full || '', scene: stn.scene || 'field', img: sk && hasSprite(sk) ? sprite(sk) : '' }, chars: { a: sprite(skA), b: skB !== skA ? sprite(skB) : '', ceo: sprite('boss_corgi'), bike: sprite('veh_bike') }, sound: () => sound,
+    const rtc = c.e.route, tg = TrainGame.create({ host, bark: (p, v) => bark(p, v, 1), diff: c.df.k, trainKind: c.e.trainKind || null, onFail: kind => { { const s0 = ST(), was = (s0.trainFailAll || 0) < 10; s0.trainFailAll = (s0.trainFailAll || 0) + 1; if (was && s0.trainFailAll >= 10) toast('🐕 解鎖「孫女夾褲列車」！到列車庫使用'); saveGameState(); } if (kind === 'funny') { ST().trainFunnyFail = (ST().trainFunnyFail || 0) + 1; saveGameState(); setTimeout(() => { try { achCheck(); } catch (e) {} }, 50); } }, onStop: (full, stars, err, kmh, kind) => { if (kind === 'funny') { ST().trainFunny = (ST().trainFunny || 0) + 1; } if (kind === 'gold' && stars >= 3 && c.df.k !== 'easy' && kmh >= 240) { ST().trainThunder = 1; saveGameState(); } trainStar(full, stars, c.df.k, err); setTimeout(() => { try { achCheck(); } catch (e) {} }, 50); }, fastStart: true, route: rtc ? { id: rtc.id, stations: rtc.stations.map(s => ({ full: s.full, scene: s.scene, km: s.km, line: s.line, img: '' })) } : null, station: { name: stn.name || '', full: stn.full || '', scene: stn.scene || 'field', img: sk && hasSprite(sk) ? sprite(sk) : '' }, chars: { a: sprite(skA), b: skB !== skA ? sprite(skB) : '', ceo: sprite('boss_corgi'), bike: sprite('veh_bike') }, sound: () => sound,
       onEnd: r => { if (c.dead || c.finishing) return; if (r.route && r.last) trainTravel = r.last; if (r.win) { const s = ST(); s.trainWins = (s.trainWins || 0) + (r.route ? r.stops : 1); if (r.absErr <= 1) s.trainGod = 1; if (r.route) { s.trainRoutes = (s.trainRoutes || 0) + (r.stops >= 8 && r.fails === 0 ? 1 : 0); if (r.stops >= 42 && r.fails === 0) s.trainAll = 1; const extra = Math.round(Math.max(0, Math.min(r.stops, 30) - 1) * 8 * (c.df.coin || 1));   /* 一趟最多算 30 站的路線獎金，免得一直開下去變成刷錢機 */ if (extra > 0) { addCoins(extra); toast('🚆 路線獎金 +' + extra); } } } c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); },
       onRetry: () => { trainTravel = ''; arenaClose(); setTimeout(() => arenaOpen({ ...TRAIN_ENC, station: c.e.station, route: c.e.route, trainKind: c.e.trainKind }), 250); }, onExit: () => arenaClose() });
     if (/[?&]debug/.test(location.search)) window.__train = tg;
@@ -6029,6 +8204,8 @@ var TrainGame = (function () {
     clearInterval(typeTimer);
     const box = $('smv3-detail');
     if (TRAIN_PLACE.test(p.name) && here && here.id === p.id) { const acts = box.querySelector('.smv3-actions'); if (acts && !acts.querySelector('[data-traingo]')) { const rt0 = trainRouteFrom((trainStn({ id: p.id, name: p.name }) || {}).full || ''), short = n => String(n || '').replace(/火車站$|車站$/, '').replace(/ \(.*\)$/, ''), nx = rt0 && rt0.stations[1] ? short(rt0.stations[1].full) : '下一站'; acts.insertAdjacentHTML('beforeend', '<div class="smv3-trainbox"><button type="button" class="smv3-gobtn tk" data-traingo data-tid="' + esc(p.id) + '" data-tname="' + esc(p.name) + '"><span class="tk-hd">冷門列車駕駛</span><span class="tk-st"><b>' + esc(short(p.name)) + '</b><em class="tk-ar"><s>▸</s><s>▸</s><s>▸</s></em><b>' + esc(nx) + '</b></span><span class="tk-bd"><span class="tk-trk"><span class="tk-tr">' + trainIco((() => { try { return TrainGame.kindOf((trainStn({ id: p.id, name: p.name }) || {}).full || ''); } catch (e) { return 'emu'; } })()) + '</span></span><span class="tk-go">發車</span></span>' + '</button>' + (/^八斗子/.test((trainStn({ id: p.id, name: p.name }) || {}).full || p.name) ? '' : '<div class="tk-dir" role="group" aria-label="行駛方向">' + [['s', '南下 ↓'], ['n', '北上 ↑']].map(([k, n]) => '<button type="button" data-traindir="' + k + '" aria-pressed="' + (trainNS() === k) + '">' + n + '</button>').join('') + '</div>') + '</div>'); }  }
+    if (DOFU_PLACE.test(p.name) && here && here.id === p.id) { const acts = box.querySelector('.smv3-actions'); if (acts && !acts.querySelector('[data-dofu]')) acts.insertAdjacentHTML('beforeend', '<button type="button" class="smv3-jeepbtn" data-dofu data-ic="' + esc(sprOf(p)) + '"><img src="' + sprite(sprOf(p)) + '" alt="">連吃五碗豆花・來挑戰！</button>'); }
+    if (RING_PLACE.test(p.name) && here && here.id === p.id) { const acts = box.querySelector('.smv3-actions'); if (acts && !acts.querySelector('[data-ring]')) acts.insertAdjacentHTML('beforeend', '<button type="button" class="smv3-jeepbtn" data-ring data-ic="' + esc(sprOf(p)) + '"><img src="' + sprite(sprOf(p)) + '" alt="">體操午仔魚・來闖關！</button>'); }
     if (JEEP_PLACE.test(p.name) && here && here.id === p.id) { const acts = box.querySelector('.smv3-actions'); if (acts && !acts.querySelector('[data-jeep]')) acts.insertAdjacentHTML('beforeend', '<button type="button" class="smv3-jeepbtn" data-jeep><img src="' + sprite('my_17') + '" alt="">吉普車翹翹板・來挑戰！</button>'); }
     const tags = box.querySelector('.smv3-tags');
     if (tags) tags.insertAdjacentHTML('afterbegin', '<span class="smv3-icon"><img src="' + sprite(sprOf(p)) + '" alt=""></span>' + (freshId === p.id ? '<span class="smv3-new">★ 新發現！</span>' : ''));
