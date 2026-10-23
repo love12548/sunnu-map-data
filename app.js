@@ -7356,12 +7356,21 @@ var GymGame = (function () {
     }
     else if (W.t < 10 && !W.done) txt('自動往前跑　點螢幕跳、靠近吊環按住抓', WF / 2, 70, 10, '#fff');
     if (W.done && W.gbonus && W.doneT <= 3.2) txt(W.doneT < 1.2 ? '抓到大吊環！+' + W.gbonus : '曬太陽中……', WF / 2, 86, 14, '#ffe38a');
-    if (W.done && W.doneT > 3.2) { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, H - 118, WF, 84); txt('午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, H - 100, 14, '#f4dd7a'); txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips + '　擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, H - 78, 9, '#fff'); txt('點一下再玩（或按 R）' + (W.title ? '　稱號：' + W.title : ''), WF / 2, H - 56, 10, W.title ? '#ffd24a' : '#cdbfa8'); }
+    if (W.done && W.doneT > 3.2) {
+      g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, H - 118, WF, 114); txt('午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, H - 102, 14, '#f4dd7a');
+      txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips + '　擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, H - 82, 9, '#fff');
+      txt('點空白處再玩（或按 R）' + (W.title ? '　稱號：' + W.title : ''), WF / 2, H - 66, 9, W.title ? '#ffd24a' : '#cdbfa8');
+      var bw = Math.min(WF - 24, 300), bx = (WF - bw) / 2, by = H - 52, bh = 40, pu = Math.floor(W.doneT * 2.5) % 2; SHOPBAND = { x: bx, y: by, w: bw, h: bh };       // 黃色橫幅＝去賣場買周邊（成功／失敗都有）
+      g.fillStyle = '#2a1c10'; g.fillRect(bx, by, bw, bh); g.fillStyle = pu ? '#ffe27a' : '#ffd95a'; g.fillRect(bx + 1, by + 1, bw - 2, bh - 2); g.fillStyle = '#ffeb9a'; g.fillRect(bx + 1, by + 1, bw - 2, 2); g.fillStyle = '#e0a92a'; g.fillRect(bx + 1, by + bh - 4, bw - 2, 3);
+      txt('想要午仔魚一夜干嗎？', WF / 2, by + 13, 12, '#fff'); txt('到賣場選購午仔魚周邊商品吧～', WF / 2, by + 28, 10, '#fff');
+    } else SHOPBAND = null;
     if (p.dead > 0) { g.fillStyle = 'rgba(30,60,80,' + Math.min(0.5, p.dead) + ')'; g.fillRect(0, 0, WF, H); }
   }
 
   /* ---------- 輸入 ---------- */
   var ptrs = {};
+  var SHOPBAND = null, SHOP_URL = 'https://www.sunnu.co/products/%E5%8D%88%E4%BB%94%E5%88%BA%E7%B9%A1%E7%9F%ADt';
+  function openShop() { var u = SHOP_URL; try { if (typeof o !== 'undefined' && o && o.shopUrl) u = typeof o.shopUrl === 'function' ? o.shopUrl() : o.shopUrl; } catch (_) { } if (!/^https?:\/\//i.test(u || '')) return; sfx('perfect'); try { window.open(u, '_blank', 'noopener'); } catch (_) { } }
   function recalc() { var s = { l: 0, r: 0, a: 0 }; for (var id in ptrs) if (ptrs[id]) s[ptrs[id]] = 1; var was = inp.a; for (var k in s) inp[k] = !!(s[k] || keys[k]); if (inp.a && !was) inp.press = true; }
   var keys = { l: 0, r: 0, a: 0 };
   cv.addEventListener('pointerdown', function (e) { e.preventDefault(); audioOn();
@@ -7369,6 +7378,7 @@ var GymGame = (function () {
     if (qx >= MBTN.x() - 4 && qx <= MBTN.x() + 26 && qy >= MBTN.y - 4 && qy <= MBTN.y + 18) { MUS.on = !MUS.on; try { localStorage.setItem('sunnuGymMusic', MUS.on ? '1' : '0'); } catch (_) { } return; }
     if (!W.started && DEV) { for (var ti = 0; ti < TBTN.length; ti++) if (qx >= TBTN[ti].x() && qx <= TBTN[ti].x() + TB_W && qy >= TB_Y && qy <= TB_Y + TB_H) { warpTest(TBTN[ti].k); return; } }
     if (!W.started && !LOCK) { var hit = false; ['easy', 'normal', 'hard'].forEach(function (k, bi) { var by = DBTN.y0 + bi * DBTN.dy; if (qx >= DBTN.x() && qx <= DBTN.x() + DBTN.w && qy >= by && qy <= by + DBTN.h) { setDiff(k); W = newWorld(); hit = true; } }); if (hit) return; }
+    if (W.done && W.doneT > 3.2 && SHOPBAND && qx >= SHOPBAND.x && qx <= SHOPBAND.x + SHOPBAND.w && qy >= SHOPBAND.y && qy <= SHOPBAND.y + SHOPBAND.h) { openShop(); return; }
     if (W.done && W.doneT > 3.4 && !o.onEnd) { W = newWorld(); return; } try { cv.setPointerCapture(e.pointerId); } catch (_) { } ptrs[e.pointerId] = 'a'; recalc(); });
   function pup(e) { delete ptrs[e.pointerId]; recalc(); }
   cv.addEventListener('pointerup', pup); cv.addEventListener('pointercancel', pup); cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
