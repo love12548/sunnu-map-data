@@ -902,9 +902,41 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     dexShow();
   }
   let memLoaded = false;
-  const SAVE_SKIP = /^(sunnu(MapData|MonsterMaster|MonsterSwitches|Sound|Vid|Game|Fav|Dex|Xp|EncLast|MutouLast|MutouSk|Quests|GameStateV1Backup|Loss)$|sunnuMem|sunnuNick_)/;
+  const SAVE_SKIP = /^(sunnu(MapData|MonsterMaster|MonsterSwitches|Sound|Vid|Game|Fav|Dex|Xp|EncLast|MutouLast|MutouSk|Quests|GameStateV1Backup|Loss|Dev|Bak|LoginHint)$|sunnuMem|sunnuNick_)/;
   function saveKeys() { const ks = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^sunnu/.test(k) && !SAVE_SKIP.test(k)) ks.push(k); } } catch (e) {} return ks; }
-  function saveBlob() { const o = {}; saveKeys().forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; }); let s = JSON.stringify(o); if (s.length > 45000) { delete o.sunnuBoxTut; s = JSON.stringify(o); } return s.length > 45000 ? '' : s; }
+  /* 雲端存檔單格上限 45000 字：超過時先丟體積最大的次要資料（遊戲主存檔 sunnuGameStateV2 一定保留），並提醒一次，不再靜默放棄 */
+  const SAVE_MAX = 45000; let saveWarned = false;
+  function saveBlob() {
+    const o = {}; saveKeys().forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; });
+    let s = JSON.stringify(o), dropped = [];
+    if (s.length > SAVE_MAX) {
+      const ks = Object.keys(o).filter(k => k !== GAME_STATE_KEY).sort((a, b) => o[b].length - o[a].length);
+      for (const k of ks) { if (s.length <= SAVE_MAX) break; delete o[k]; dropped.push(k); s = JSON.stringify(o); }
+    }
+    window.__saveInfo = { size: s.length, max: SAVE_MAX, dropped };
+    if (s.length > SAVE_MAX) return '';   /* 整包放不下就只靠分區存檔（saveParts），不再提醒 */
+    if (dropped.length && !saveWarned) { saveWarned = true; console.warn('雲端存檔太大，已略過：', dropped.join(',')); }
+    return s;
+  }
+  /* 分區存檔：一個 localStorage 鍵一個分區各自上傳（每個 ≤ 45000 字），遊戲再多也不會被單格上限卡住；只有單一分區本身就超過上限才提醒 */
+  function saveParts() {
+    const o = {}, big = []; saveKeys().forEach(k => { const v = localStorage.getItem(k); if (v === null) return; if (v.length > SAVE_MAX) big.push(k); else o[k] = v; });
+    if (big.length && !saveWarned) { saveWarned = true; try { toast('有一項存檔太大無法上傳雲端，請到圖鑑「成就」下方匯出存檔備份', 6000); } catch (e) {} }
+    window.__saveInfo = { parts: Object.keys(o).length, big }; return o;
+  }
+  /* 本機自動備份：每天最多一次，保留最近 3 份遊戲主存檔（不上傳，只在這台裝置，出問題可回復） */
+  function autoBackup() {
+    try {
+      const raw = localStorage.getItem(GAME_STATE_KEY); if (!raw) return; const j = JSON.parse(raw); if (!j || j.version !== 2) return;
+      let arr = []; try { arr = JSON.parse(localStorage.getItem('sunnuBak') || '[]'); } catch (e) {} if (!Array.isArray(arr)) arr = [];
+      const day = new Date().toISOString().slice(0, 10); if (arr.length && arr[0].d === day) return;
+      arr.unshift({ d: day, raw }); localStorage.setItem('sunnuBak', JSON.stringify(arr.slice(0, 3)));
+    } catch (e) {}
+  }
+  /* 金幣記帳：每台裝置各記自己賺／花的數字（cd），總數＝起始值 cb ＋所有裝置加總；兩台裝置同時玩合併後不會少算 */
+  function devId() { let d = ''; try { d = localStorage.getItem('sunnuDev') || ''; if (!d) { d = Math.random().toString(16).slice(2, 10).padEnd(8, '0'); localStorage.setItem('sunnuDev', d); } } catch (e) { d = 'x'; } return d; }
+  function coinLog(k, n) { const p = gameState.player; if (!p.cb) return; const c = p.cd || (p.cd = {}), d = devId(), r = c[d] || (c[d] = { e: 0, s: 0 }); r[k] += n; }
+  function coinRecalc(gs) { const p = gs && gs.player; if (!p || !p.cb) return; let e = countV2(p.cb.e), sp = countV2(p.cb.s); Object.values(objectV2(p.cd)).forEach(r => { e += countV2(r && r.e); sp += countV2(r && r.s); }); p.coinsEarned = Math.max(countV2(p.coinsEarned), e); p.coinsSpent = Math.max(countV2(p.coinsSpent), sp); }
   function mergeV(l, r) {
     if (l === undefined || l === null) return r;
     if (r === undefined || r === null) return l;
@@ -922,6 +954,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       if (!/^sunnu/.test(k) || SAVE_SKIP.test(k) || typeof rem[k] !== 'string') return;
       const lv = localStorage.getItem(k); let nv = rem[k];
       if (lv !== null) { try { nv = JSON.stringify(mergeV(JSON.parse(lv), JSON.parse(rem[k]))); } catch (e) { nv = lv; } }
+      if (k === GAME_STATE_KEY) { try { const g = JSON.parse(nv); coinRecalc(g); nv = JSON.stringify(g); } catch (e) {} }
       if (nv !== lv) { try { localStorage.setItem(k, nv); changed = true; } catch (e) {} }
     });
     if (changed) { try { gameState = loadGameState(); } catch (e) {} }
@@ -929,7 +962,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   }
   function memPost() {
     if (!mem.id) return;
-    try { fetch(SOURCE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ act: 'save', id: mem.id, nick: mem.nick, xp: xpNow(), dex: [...dex].slice(0, 400) }, memLoaded ? { favs: favs.slice(0, 400), save: saveBlob() } : {})) }).catch(() => {}); } catch (e) {}
+    try { fetch(SOURCE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ act: 'save', id: mem.id, nick: mem.nick, xp: xpNow(), dex: [...dex].slice(0, 400) }, memLoaded ? { favs: favs.slice(0, 400), save: saveBlob(), parts: saveParts() } : {})) }).catch(() => {}); } catch (e) {}
   }
   let memT = 0; const memSave = () => { if (!mem.id) return; clearTimeout(memT); memT = setTimeout(memPost, 2500); };
   try { const _si = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { _si.call(this, k, v); if (this === localStorage && /^sunnu/.test(k) && !SAVE_SKIP.test(k)) memSave(); }; } catch (e) {}
@@ -949,6 +982,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
         (Array.isArray(d.dex) ? d.dex : []).forEach(id => { if (typeof id === 'string' && (places.some(p => p.id === id) || /^tr_[\w-]{1,36}$/.test(id))) dex.add(id); }); store('sunnuDex', JSON.stringify([...dex]));
       }
       if (d && typeof d.save === 'string' && d.save) applyRemoteSave(d.save);
+      if (d && d.parts && typeof d.parts === 'object' && Object.keys(d.parts).length) applyRemoteSave(JSON.stringify(d.parts));
       memLoaded = true;
       if (Array.isArray(d && d.favs)) { let ch = false; d.favs.forEach(id => { if (typeof id === 'string' && !favs.includes(id) && places.some(p => p.id === id)) { favs.push(id); ch = true; } }); if (ch) store('sunnuFav', JSON.stringify(favs)); }
       memUi(); render(); paintMarkers(); if (!mem.nick && game) memAskNick(); memSave();
@@ -1029,7 +1063,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   /* ===== 遊戲幣・商店・成就 ===== */
   const ST = () => gameState.stats;
   const NPC_ON = false; /* 家龍釣魚 NPC 暫停（未來更新再開） */
-  function addCoins(n) { n = Math.max(0, Math.round(n)); if (!n) return 0; gameState.player.coinsEarned += n; saveGameState(); try { dexShow(); } catch (e) {} return n; }
+  function addCoins(n) { n = Math.max(0, Math.round(n)); if (!n) return 0; gameState.player.coinsEarned += n; coinLog('e', n); saveGameState(); try { dexShow(); } catch (e) {} return n; }
   const ymd = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
   function statsDay() {
     const s = ST(), t = today(); if (s.lastDay === t) return;
@@ -1095,19 +1129,35 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     [9, '深深著迷了怎麼辦', '用「困難」難度吃完五碗豆花', 1, () => ((ST().clears['連吃五碗豆花'] || {}).hard || 0) > 0 ? 1 : 0, null, { c: 120, t: '五碗豆花王' }],
     [9, '你沒吃午餐哦？', '連吃五碗豆花通關，而且第 1 碗 10 秒內吃完', 1, () => ST().dofuFast || 0, null, { c: 50, t: '沒吃午餐' }]
   ].map(a => ({ cat: a[0], name: a[1], desc: a[2], rw: a[6], get max() { return typeof a[3] === 'function' ? a[3]() : a[3]; }, get: a[4], show: a[5] }));
+  /* 沒登入時，拿到成就或買東西後提醒（一天最多一次）：登入才會存到雲端 */
+  function loginHint() { try { const d = new Date().toISOString().slice(0, 10); if (localStorage.getItem('sunnuLoginHint') === d) return; localStorage.setItem('sunnuLoginHint', d); setTimeout(() => toast('登入會員，成就和金幣才會存到雲端，換手機也不會不見', 4200), 2600); } catch (e) {} }
   function achCheck() {
     const got = []; ACH.forEach(a => { if (!hasAch(a.name) && a.get() >= a.max && (!a.show || a.show())) {
       gameState.achievements.push(a.name); let ex = '';
       if (a.rw) { if (a.rw.c) { addCoins(a.rw.c); ex += '　+' + a.rw.c + ' 幣'; } if (a.rw.t) { const ts = ST().titles || (ST().titles = []); if (!ts.includes(a.rw.t)) ts.push(a.rw.t); if (!ST().titleEq) ST().titleEq = a.rw.t; ex += '　稱號「' + a.rw.t + '」'; } }
       got.push([a.name, ex]);
     } });
+    if (got.length && !mem.id) loginHint();
     if (got.length) { saveGameState(); reward(got.map(([n, ex]) => '<img src="' + sprite('trophy') + '" alt="">成就解鎖：<em>' + esc(n) + '</em>' + esc(ex))); }
   }
+  /* 存檔備份：匯出／匯入是「合併」，只會增加、不會把進度蓋回舊的 */
+  const backupHtml = () => '<section><h4>💾 存檔備份</h4><p style="margin:4px 0 8px;font-size:12px;line-height:1.6;opacity:.85">' + (mem.id ? '你已登入會員，進度會自動存到雲端。也可以另外存一份在自己手上。' : '目前只存在這支手機／電腦的瀏覽器。<a href="/users/sign_in">登入會員</a>後會自動存到雲端，換手機也不會不見。') + '</p><button type="button" data-bkexp>匯出存檔</button> <button type="button" data-bkimp>匯入存檔</button><input type="file" id="smv3-bkfile" accept="application/json,.json" hidden></section>';
+  function bkExport() {
+    const o = {}; saveKeys().forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; });
+    const a = document.createElement('a'), u = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' }));
+    a.href = u; a.download = 'sunnu-save-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 3000); toast('已匯出存檔，請收好這個檔案', 2600);
+  }
+  function bkImport(file) {
+    const r = new FileReader(); r.onload = () => { let ok = false; try { const j = JSON.parse(String(r.result)); ok = j && typeof j === 'object' && Object.keys(j).some(k => /^sunnu/.test(k)); } catch (e) {}
+      if (!ok) return toast('這個檔案不是孫女地圖的存檔', 2600); autoBackup(); const ch = applyRemoteSave(String(r.result)); try { gameState = loadGameState(); } catch (e) {} saveGameState(); dexShow(); dexOpen(); toast(ch ? '匯入完成，已和目前進度合併' : '匯入完成，沒有比目前更新的進度', 2800); };
+    r.readAsText(file);
+  }
+  document.addEventListener('change', e => { if (e.target && e.target.id === 'smv3-bkfile' && e.target.files && e.target.files[0]) bkImport(e.target.files[0]); });
   function achHtml() {
     const list = ACH_CATS.map((cat, ci) => { const items = ACH.filter(a => a.cat === ci); const done = items.filter(a => hasAch(a.name)).length;
       return '<section><h4>' + cat + '<small>' + done + '/' + items.length + '</small></h4><ul class="smv3-ach">' + items.map(a => { const ok = hasAch(a.name), v = Math.min(a.max, Math.max(0, Math.floor(a.get()))); return '<li class="' + (ok ? 'ok' : '') + '"><b>' + (ok ? '🏆 ' : '🔒 ') + esc(a.name) + '</b><span>' + esc(a.desc) + (a.rw ? '　🎁 ' + (a.rw.c ? a.rw.c + ' 幣' : '') + (a.rw.t ? '　稱號「' + esc(a.rw.t) + '」' : '') : '') + '</span>' + (ok && a.rw && a.rw.t ? '<button type="button" data-title="' + esc(a.rw.t) + '" aria-pressed="' + (ST().titleEq === a.rw.t) + '">' + (ST().titleEq === a.rw.t ? '稱號使用中' : '戴上稱號') + '</button>' : '') + '<i role="progressbar" aria-label="' + esc(a.name) + '" aria-valuemin="0" aria-valuemax="' + a.max + '" aria-valuenow="' + (ok ? a.max : v) + '"><em style="width:' + (ok ? 100 : Math.round(v / a.max * 100)) + '%"></em></i><small>' + (ok ? '已達成' : v + '/' + a.max) + '</small></li>'; }).join('') + '</ul></section>'; }).join('');
     const old = OLD_ACH.filter(([n]) => n !== '夾褲CEO終結者' || true); const od = old.filter(([n]) => hasAch(n)).length;
-    return list + '<section><h4>🔓 越獄與魔王<small>' + od + '/' + old.length + '</small></h4><ul class="smv3-ach">' + old.map(([n, d]) => { const ok = hasAch(n); return '<li class="' + (ok ? 'ok' : '') + '"><b>' + (ok ? '🏆 ' : '🔒 ') + esc(n) + '</b><span>' + esc(d) + '</span><small>' + (ok ? '已達成' : '未達成') + '</small></li>'; }).join('') + '</ul></section>';
+    return list + '<section><h4>🔓 越獄與魔王<small>' + od + '/' + old.length + '</small></h4><ul class="smv3-ach">' + old.map(([n, d]) => { const ok = hasAch(n); return '<li class="' + (ok ? 'ok' : '') + '"><b>' + (ok ? '🏆 ' : '🔒 ') + esc(n) + '</b><span>' + esc(d) + '</span><small>' + (ok ? '已達成' : '未達成') + '</small></li>'; }).join('') + '</ul></section>' + backupHtml();
   }
   /* 夾褲 CEO 造型：除了花錢買，也可以打贏夾褲 CEO 三次（整場三連戰通關）免費解鎖 */
   const CEO_SKIN = 'CEO夾褲', CEO_NEED = 5, CEO_PRICE = 888;
@@ -1134,9 +1184,9 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     else if (key.startsWith('veh:')) price = (SHOP_VEH.find(v => v[0] === key.slice(4)) || [0, 0, 0])[2]; else if (key.startsWith('skin:')) price = skinPrice(key.slice(5)); else if (key.startsWith('train:')) { price = (TRAIN_SHOP.find(t => t[0] === key.slice(6)) || [0, 0, 0])[2]; if (trainHas(key.slice(6))) return; } else return;
     if (!price || (!key.startsWith('train:') && (sh.veh.includes(key.slice(4)) || sh.skin.includes(key.slice(5))))) return;
     if (bal < price) { beep([220], .12); return toast('零用錢不夠，再去贏幾場', 1800); }
-    gameState.player.coinsSpent += price;
+    gameState.player.coinsSpent += price; coinLog('s', price);
     if (key === 'ticket') gameState.player.tickets = (gameState.player.tickets || 0) + 1; else if (key.startsWith('veh:')) { sh.veh.push(key.slice(4)); vehSel().push(key.slice(4)); } else if (key.startsWith('train:')) { trainsOwn().push(key.slice(6)); sh.trainPick = key.slice(6); } else { sh.skin.push(key.slice(5)); skinSel().push(key.slice(5)); }
-    saveGameState(); SFX.fanfare(); dexShow(); dexOpen();
+    saveGameState(); SFX.fanfare(); dexShow(); dexOpen(); if (!mem.id) loginHint();
   }
   function shopEquip(key) {
     const sh = gameState.shop;
@@ -1274,7 +1324,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     if (ceo.trophy) achievements.add('tr_ceo'); achievements.delete('狂熱人生');
     return Object.assign({}, saved, { version: 2,
       encounter: Object.assign({}, encounter, { pityStep: Math.min(4, countV2(encounter.pityStep)), lastMonsterId: encounter.lastMonsterId || store('sunnuEncLast') || '', battleStreak: countV2(encounter.battleStreak) }),
-      player: Object.assign({}, player, { suspicion: Math.min(5, countV2(player.suspicion)), coinsEarned: countV2(player.coinsEarned), coinsSpent: countV2(player.coinsSpent), tickets: Math.min(5, countV2(player.tickets)) }),
+      player: Object.assign({}, player, { suspicion: Math.min(5, countV2(player.suspicion)), coinsEarned: countV2(player.coinsEarned), coinsSpent: countV2(player.coinsSpent), cb: player.cb && typeof player.cb === 'object' ? { e: countV2(player.cb.e), s: countV2(player.cb.s) } : { e: countV2(player.coinsEarned), s: countV2(player.coinsSpent) }, cd: objectV2(player.cd), tickets: Math.min(5, countV2(player.tickets)) }),
       monsterStats: stats,
       npc: Object.assign({}, npc, { jialong: longV2 }),
       boss: Object.assign({}, boss, { jiaku: Object.assign({}, jiaku, { encounterCounter: countV2(jiaku.encounterCounter === undefined ? Number(store('sunnuBoss')) : jiaku.encounterCounter), defeats: Math.max(countV2(jiaku.defeats), countV2(ceo.win), ceo.trophy ? 1 : 0), currentStage: countV2(jiaku.currentStage), achievements: [...new Set([...(Array.isArray(jiaku.achievements) ? jiaku.achievements : []), ...(achievements.has('tr_ceo') ? ['tr_ceo'] : [])])] }) }),
@@ -1283,7 +1333,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       shop: Object.assign({ veh: [], skin: [], eqVeh: '', eqVehs: [], eqSkin: '', eqSkins: [], bikeGift: false }, objectV2(saved.shop)),
       achievements: [...achievements] });
   }
-  let gameState = loadGameState();
+  let gameState = loadGameState(); autoBackup();
   function saveGameState() {
     if (!gameStateWritable) return false;
     try { localStorage.setItem(GAME_STATE_KEY, JSON.stringify(gameState)); return true; }
@@ -1615,7 +1665,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
       if (S.done) return; S.done = true; S.st = 'end'; stop();
       jailRun = { noiseMax: S.noiseMax || 0, strikes: S.strikes, mice: S.mice || 0, coins: S.coins, hits: C.hits, feverCnt: C.feverCnt, bossClean: C.bossSeen && !C.bossHit };
       say.textContent = msg; acts.innerHTML = '';
-      if (win) { const bonus = S.coins * 4; if (bonus) { gameState.player.coinsEarned += bonus; say.textContent += '　💰 +' + bonus; } SFX.fanfare(); } else PS.caught();
+      if (win) { const bonus = S.coins * 4; if (bonus) { gameState.player.coinsEarned += bonus; coinLog('e', bonus); say.textContent += '　💰 +' + bonus; } SFX.fanfare(); } else PS.caught();
       { const hits = typeof C !== 'undefined' ? C.hits : 3, stars = win ? 1 + (hits === 0 ? 1 : 0) + (S.coins >= 12 ? 1 : 0) : 0;
         const ov = mk('<div style="font-size:30px;animation:prbounce .5s cubic-bezier(.3,1.9,.5,1)">' + (win ? '逃獄成功！' : '被抓回去了…') + '</div>' + (win ? '<div style="font-size:44px;letter-spacing:6px;display:flex;gap:6px">' + [0, 1, 2].map(k => '<span style="color:' + (k < stars ? '#ffe45e' : '#6a6a6a') + ';animation:prstar .45s ' + (.35 + k * .28) + 's both cubic-bezier(.3,1.9,.5,1)">★</span>').join('') + '</div>' : '') + '<div style="font-size:15px">🪙 ' + S.coins + (win ? '　撞到 ' + hits + ' 次' : '') + '</div>', '', 'position:absolute;inset:0;z-index:14;background:rgba(20,12,30,.62);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff3a0;-webkit-text-stroke:4px #3b2a1e;paint-order:stroke fill;text-shadow:0 4px 0 #3b2a1e');
         stage.appendChild(ov);
@@ -2118,7 +2168,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     acts.className='acts col';acts.innerHTML=(gameState.player.tickets>0?'<button type="button" data-ticket class="main">🎫 使用保釋券（剩 '+gameState.player.tickets+' 張）</button>':'')+'<button type="button" data-bail'+(bal<fee?' class="dim"':'')+'>💰 保釋 −'+fee+'（目前 '+bal+'）</button><button type="button" data-leave>🚪 認罪服刑（3 分鐘不遇怪）</button><button type="button" data-dig class="main">🥄 湯匙越獄</button>';
     acts.onclick=ev=>{
       if(ev.target.closest('[data-ticket]')){if(!(gameState.player.tickets>0))return;gameState.player.tickets--;ST().bails++;ST().bailStreak++;prisonRelease(false,'bail');return;}
-      if(ev.target.closest('[data-bail]')){if(bal<fee){say.textContent='零用錢不夠…多贏幾場再來保釋，或選別條路。';beep([220],.12);return;}if(bal===fee)ST().exact=1;ST().bails++;ST().bailStreak++;gameState.player.coinsSpent+=fee;prisonRelease(false,'bail');}
+      if(ev.target.closest('[data-bail]')){if(bal<fee){say.textContent='零用錢不夠…多贏幾場再來保釋，或選別條路。';beep([220],.12);return;}if(bal===fee)ST().exact=1;ST().bails++;ST().bailStreak++;gameState.player.coinsSpent+=fee;coinLog('s',fee);prisonRelease(false,'bail');}
       else if(ev.target.closest('[data-leave]')){if(bal<fee)ST().brokeServes++;ST().bailStreak=0;p.lockUntil=Date.now()+180000;p.phase='serve';p.deadline=Date.now()+4800;saveGameState();prisonOpen();}
       else if(ev.target.closest('[data-dig]')){ST().bailStreak=0;p.escapeAttempts++;p.phase='escape';saveGameState();prisonOpen();}
     };
@@ -7820,7 +7870,7 @@ var GymGame = (function () {
   let bossForced = false;
   const bossSpr = b => hasSprite(b.s) ? b.s : hasSprite('人物-' + b.s) ? '人物-' + b.s : ((b.s && extras.skin.find(k => k.n && (k.n.includes(b.s) || b.s.includes(k.n)))) || extras.skin.find(k => k.n && b.n.includes(k.n)) || {}).a || 'npc_long';
   function bossEnc(b, si) { const s = b.st[si]; return { t: 'mon', n: b.n, s: bossSpr(b), g: GAMES[s.g] ? s.g : '連點', d: Math.max(1, Math.min(5, Math.ceil(s.d / 20))), D: s.d, w: 0, at: [], i: [b.code === 'ceo' ? (si === 0 ? ceoEvLine() + '（' + CEO_LORE.stage[0] + '）' : CEO_LORE.stage[si] || s.say) : (s.say || pick(b.i.length ? b.i : [b.n + ' 出現了！']))], win: b.code === 'ceo' ? CEO_LORE.win : b.win, lose: b.code === 'ceo' ? CEO_LORE.lose : b.lose, xp: 0, boss: b, si, mul: [1, 1.25, 1.5][si] || 1.5, faces: 2 }; }
-  if (/[?&]debug/.test(location.search)) { window.__arena = e => arenaOpen(e); window.__A = () => A; window.__ach = () => ({ ACH, achCheck, shopBuy, ST }); window.__bossEnc = (b, si) => bossEnc(b, si); window.__bossIntro = (code) => { const b = bosses.find(x => x.code === (code || 'ceo')); if (b) bossIntro(b, () => { const bx = $('smv3-arena'); bx.innerHTML = ''; bx.hidden = true; }); }; window.__bossShow = (code, p) => { const b = bosses.find(x => x.code === (code || 'ceo')); if (b) bossShow(b, p || here || places[0]); }; window.__lore = () => ({ CEO_LORE, ceoFileHtml, storyCard, bossRamp }); Object.defineProperty(window, '__encs', { get: () => encs }); window.__jail = () => { gameState.prison.phase = ''; prisonArrest(); prisonOpen(); }; window.__gs = () => gameState;
+  if (/[?&]debug/.test(location.search)) { window.__save = { applyRemoteSave, saveBlob, saveParts, coinLog, devId, bkExport }; window.__arena = e => arenaOpen(e); window.__A = () => A; window.__ach = () => ({ ACH, achCheck, shopBuy, ST }); window.__bossEnc = (b, si) => bossEnc(b, si); window.__bossIntro = (code) => { const b = bosses.find(x => x.code === (code || 'ceo')); if (b) bossIntro(b, () => { const bx = $('smv3-arena'); bx.innerHTML = ''; bx.hidden = true; }); }; window.__bossShow = (code, p) => { const b = bosses.find(x => x.code === (code || 'ceo')); if (b) bossShow(b, p || here || places[0]); }; window.__lore = () => ({ CEO_LORE, ceoFileHtml, storyCard, bossRamp }); Object.defineProperty(window, '__encs', { get: () => encs }); window.__jail = () => { gameState.prison.phase = ''; prisonArrest(); prisonOpen(); }; window.__gs = () => gameState;
     if (/[?&]coins/.test(location.search)) { gameState.player.coinsEarned = Math.max(gameState.player.coinsEarned, gameState.player.coinsSpent + 120); saveGameState(); }
     if (/[?&]jail/.test(location.search)) setTimeout(() => window.__jail(), 3500);
     if (/[?&]bosstest/.test(location.search)) { const iv = setInterval(() => { if (!bosses.length && !encs.length) return; clearInterval(iv); const bar = document.createElement('div'); bar.style.cssText = 'position:fixed;left:8px;top:8px;z-index:2147483000;background:#fff4da;border:3px solid #3b2a1e;border-radius:10px;padding:8px;font:700 13px sans-serif;width:270px;max-height:78vh;overflow:auto;box-shadow:0 3px 0 #3b2a1e'; const head = document.createElement('div'); head.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px;position:sticky;top:-8px;background:#fff4da;padding:2px 0'; head.innerHTML = '<span style="flex:1">🧪 選關測試</span>'; const q = document.createElement('input'); q.placeholder = '搜尋名稱/遊戲'; q.style.cssText = 'width:110px;padding:3px 6px;border:2px solid #3b2a1e;border-radius:6px;font:13px sans-serif'; const tg = document.createElement('button'); tg.type = 'button'; tg.textContent = '收'; tg.style.cssText = 'border:2px solid #3b2a1e;border-radius:6px;background:#f0c24a;font:700 12px sans-serif'; head.append(q, tg); bar.appendChild(head); const list = document.createElement('div'); bar.appendChild(list); const items = []; const add = (label, key, fn, col) => { const x = document.createElement('button'); x.type = 'button'; x.textContent = label; x.style.cssText = 'display:block;width:100%;margin:3px 0;padding:5px 8px;border:2px solid #3b2a1e;border-radius:8px;background:' + col + ';font:700 13px sans-serif;text-align:left;cursor:pointer'; x.onclick = () => { tbCol(true); try { fn(); } catch (e) { alert('開啟失敗：' + e.message); } }; list.appendChild(x); items.push([x, key]); }; const sec = t => { const d = document.createElement('div'); d.textContent = t; d.style.cssText = 'margin:8px 0 2px;color:#8a5a2a'; list.appendChild(d); }; sec('景點專屬遊戲'); add('🚙 吉普車翹翹板（集集特技村）', '吉普車翹翹板 集集特技村 吉普阿諾', () => arenaOpen({ ...JEEP_ENC }), '#ffe28a'); ['頂埔火車站', '石城車站', '龜山車站', '牡丹火車站', '武塔車站', '龍港車站', '南勢車站', '談文車站', '大山車站', '日南車站', '龍井車站', '大里車站', '石龜車站', '拔林火車站', '石榴火車站', '泰安火車站', '暖暖', '四腳亭', '三貂嶺', '大華', '猴硐', '榮華車站', '橫山車站', '九讚頭車站', '合興車站', '富貴火車站', '上員車站', '海端車站', '景美車站', '大富車站', '鎮安車站', '東海車站', '龍泉車站', '望古火車站', '八斗子', '新埔', '泰安車站 (舊山線)', '竹崎車站', '木履寮車站', '梨園寮火車站', '交力平車站', '鹿麻產車站', '嘉義'].forEach(nm => add('🚆 冷門列車駕駛（' + nm + '）', '冷門列車駕駛 列車 ' + nm, () => { const pp = places.find(x => x.name === nm); arenaOpen({ ...TRAIN_ENC, station: pp ? trainStn(pp) : { name: nm }, trainKind: trainPick() }); }, '#cfeaff')); TrainRoutes.forEach(rt => add('🚆 路線模式：' + rt.name + '（連續開）', '冷門列車駕駛 路線 連續 ' + rt.name, () => arenaOpen({ ...TRAIN_ENC, route: rt, trainKind: trainPick() }), '#ffe28a')); sec('夾褲故事預覽（遊戲模式要開著）'); add('👑 夾褲出場動畫＋第一次故事卡', '夾褲出場', () => { if (!game) { alert('先開啟「遊戲模式」再按'); return; } const g = gameState.boss.jiaku; g.story1 = false; g.defeats = Math.max(0, g.defeats); encClear(); bossShow(bosses.find(b => b.code === 'ceo'), here || places[0]); }, '#ffd0d0'); const ceoWin = dm => () => { arenaOpen({ ...bossEnc(bosses.find(b => b.code === 'ceo'), 2), dm }); setTimeout(() => { const g0 = document.querySelector('.smv3-arena .main'); if (g0) g0.click(); }, 500); setTimeout(() => { if (A) A.end(true, {}); }, 3200); }; add('🥉 夾褲 簡單・勝利畫面', '夾褲簡單勝利', ceoWin('easy'), '#ffe0c0'); add('🥈 夾褲 普通・勝利畫面', '夾褲普通勝利', ceoWin('normal'), '#e6e6ee'); add('🥇 夾褲 困難・勝利畫面', '夾褲困難勝利', ceoWin('hard'), '#fff0a0'); add('😴 夾褲打贏後睡著的畫面', '夾褲睡著', () => { arenaOpen(bossEnc(bosses.find(b => b.code === 'ceo'), 2)); setTimeout(() => { const g0 = document.querySelector('.smv3-arena .main'); if (g0) g0.click(); }, 500); setTimeout(() => { if (A) A.end(true, {}); }, 3200); }, '#ffd0d0'); add('🐕 夾褲圖鑑檔案（看文字）', '夾褲檔案', () => { gameState.player.businessCard = true; dexTab = 'dex'; dexOpen(); ceoPop(); }, '#ffd0d0'); sec('翻翻樂預覽'); add('🗿 抽象雕像怪・翻翻樂（可選難度）', '翻翻樂雕像怪', () => arenaOpen({ t: 'mon', n: '抽象雕像怪', s: 'enc_statue', g: '翻翻樂', d: 3, w: 4, at: ['奇怪景點'], i: ['我是誰？我是……藝術。', '你看得懂我嗎？'], win: ['雕像碎成幾塊，居然更好看了。', '館方：這是新作品。'], lose: ['你看不懂藝術。', '雕像紋風不動。'], xp: 0 }), '#e0d4f5'); sec('大魔王'); bosses.forEach(b => b.st.forEach((st, si) => add(b.n + ' 第' + (si + 1) + '關・' + st.g, b.n + st.g, () => arenaOpen(bossEnc(b, si)), '#f0c24a'))); sec('一般怪物／NPC（共 ' + encs.length + '）'); encs.forEach(e => add((e.t === 'npc' ? '👤 ' : '👾 ') + e.n + '・' + e.g, e.n + e.g, () => arenaOpen(e), e.t === 'npc' ? '#cfeaff' : '#ffe0b0')); sec('監獄系列'); const jailGo = how => { gameState.prison.phase = ''; prisonArrest(); if (how) gameState.prison.phase = 'escape'; prisonOpen(); if (how === 'chase') setTimeout(() => { if (window.__dig && window.__dig.startChase) window.__dig.startChase(); }, 700); }; add('🚔 被抓：保釋／認罪／越獄選擇', '監獄選擇', () => jailGo(''), '#e8d0f0'); add('🥄 湯匙越獄：挖牆', '越獄挖牆', () => jailGo('dig'), '#e8d0f0'); add('🏃 越獄追逐戰（跑酷）', '越獄追逐戰', () => jailGo('chase'), '#e8d0f0'); q.oninput = () => items.forEach(([x, k]) => { x.style.display = !q.value || k.includes(q.value) ? '' : 'none'; }); const tbCol = c => { bar.style.left = c ? '2px' : '8px'; bar.style.top = c ? '46%' : '8px'; list.style.display = c ? 'none' : ''; q.style.display = c ? 'none' : ''; head.firstChild.style.display = c ? 'none' : ''; tg.textContent = c ? '🧪' : '收'; bar.style.width = c ? 'auto' : '270px'; bar.style.padding = c ? '1px' : '8px'; bar.style.borderWidth = c ? '2px' : '3px'; bar.style.opacity = c ? '.6' : '1'; bar.style.maxHeight = c ? 'none' : '78vh'; bar.style.overflow = c ? 'visible' : 'auto'; head.style.margin = c ? '0' : '0 0 6px'; head.style.position = c ? 'static' : 'sticky'; head.style.padding = c ? '0' : '2px 0'; tg.style.padding = c ? '0 4px' : ''; }; tg.onclick = () => tbCol(list.style.display !== 'none'); tbCol(true); document.body.appendChild(bar); }, 500); } }
@@ -8479,6 +8529,8 @@ var GymGame = (function () {
     const cfp = e.target.closest('[data-cfclose]'); if (cfp) { const o = $('smv3-dexpanel').querySelector('.cf-pop'); if (o) o.remove(); return; }
     if (e.target.closest('[data-ceofile]')) { ceoPop(); return; }
     const tb = e.target.closest('[data-tab]'); if (tb) { dexTab = tb.dataset.tab; dexOpen(); return; }
+    if (e.target.closest('[data-bkexp]')) { bkExport(); return; }
+    if (e.target.closest('[data-bkimp]')) { const f = $('smv3-bkfile'); if (f) f.click(); return; }
     const by = e.target.closest('[data-buy]'); if (by) { shopBuy(by.dataset.buy); return; }
     const eq = e.target.closest('[data-eq]'); if (eq) { shopEquip(eq.dataset.eq); return; }
     const tt = e.target.closest('[data-title]'); if (tt) { const s2 = ST(); s2.titleEq = s2.titleEq === tt.dataset.title ? '' : tt.dataset.title; saveGameState(); dexShow(); dexOpen(); return; }
