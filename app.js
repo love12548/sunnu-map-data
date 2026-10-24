@@ -1046,7 +1046,8 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
   const cupKeys = () => [...encs.filter(x => x.t !== 'npc').map(x => x.n), 'ceo'];
   const cupDone = d => cupKeys().filter(k => ((ST().clears[k] || {})[d] || 0) > 0).length;
   const cupTotal = () => DK.reduce((a, d) => a + cupDone(d), 0);
-  const ACH_CATS = ['💰 遊戲幣與保釋', '⚔️ 戰鬥', '✈️ 飛機射擊', '👑 大魔王', '🚔 監獄', '🗺️ 探索與日常', '🏅 難度挑戰', '🚆 列車駕駛'];
+  const ACH_CATS = ['💰 遊戲幣與保釋', '⚔️ 戰鬥', '✈️ 飛機射擊', '👑 大魔王', '🚔 監獄', '🗺️ 探索與日常', '🏅 難度挑戰', '🚆 列車駕駛', '🐟 體操午仔魚', '🍧 連吃五碗豆花'];
+  const GYMW = () => (ST().monWins || {})['體操午仔魚'] || 0, DOFUW = () => (ST().monWins || {})['連吃五碗豆花'] || 0, CHALW = n => (ST().chal || {})[n] || 0;
   const ACH = [
     [0, '零用錢新手', '累積賺到 100 幣', 100, () => gameState.player.coinsEarned], [0, '錢包鼓鼓', '累積賺到 1000 幣', 1000, () => gameState.player.coinsEarned], [0, '小富婆', '累積賺到 5000 幣', 5000, () => gameState.player.coinsEarned],
     [0, '保釋達人', '成功保釋 3 次', 3, () => ST().bails], [0, '保釋常客', '成功保釋 10 次', 10, () => ST().bails],
@@ -1080,7 +1081,19 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
     [7, '列車收藏家', '買齊 5 款高級列車', 5, () => TRAIN_SHOP.filter(t => trainHas(t[0])).length, null, { c: 100, t: '列車收藏家' }],
     [7, '人力列車', '用孫女夾褲列車成功停車 10 次', 10, () => ST().trainFunny || 0, null, { c: 80, t: '人力列車長' }],
     [7, '煞車失靈', '用孫女夾褲列車停車失敗累積 10 次', 10, () => ST().trainFunnyFail || 0, null, { c: 30, t: '煞車失靈' }],
-    [7, '雷神駕到', '賽博列車衝到 240 km/h（超載模式），然後在普通以上穩穩停出 3 星', 1, () => ST().trainThunder || 0, null, { c: 300, t: '雷神' }]
+    [7, '雷神駕到', '賽博列車衝到 240 km/h（超載模式），然後在普通以上穩穩停出 3 星', 1, () => ST().trainThunder || 0, null, { c: 300, t: '雷神' }],
+    /* 🐟 體操午仔魚／🍧 連吃五碗豆花：金幣與稱號。一次過關約 15–50 幣，所以成就獎勵跟列車同級 */
+    [8, '體操午仔', '體操午仔魚過關 1 次', 1, () => GYMW(), null, { c: 10 }],
+    [8, '魚肉喝甲某', '體操午仔魚過關 10 次', 10, () => GYMW(), null, { c: 60, t: '魚肉喝甲某' }],
+    [8, '翻滾吧午仔魚', '體操午仔魚完成挑戰（沒昏倒、沒落水）5 次', 5, () => CHALW('體操午仔魚'), null, { c: 80, t: '翻滾吧午仔魚' }],
+    [8, '水管牆霸主', '在水管牆隱藏室拿到金色 8 號球', 1, () => (ST().gymTitles || {})['水管牆霸主'] ? 1 : 0, null, { c: 40, t: '水管牆霸主' }],
+    [8, '雲端飛午', '在雲上吊環隱藏室拿到金色收集物', 1, () => (ST().gymTitles || {})['雲端飛午'] ? 1 : 0, null, { c: 40, t: '雲端飛午' }],
+    [8, '倉庫大盜', '在魚乾倉庫隱藏室拿到金木箱的寶物', 1, () => (ST().gymTitles || {})['倉庫大盜'] ? 1 : 0, null, { c: 40, t: '倉庫大盜' }],
+    [9, '豆花好綿哦', '連吃五碗豆花吃完 1 次', 1, () => DOFUW(), null, { c: 10 }],
+    [9, '第一次吃豆花吃到續碗', '連吃五碗豆花吃完 10 次', 10, () => DOFUW(), null, { c: 60, t: '續碗達人' }],
+    [9, '刷～就這樣在你口中融化', '連吃五碗豆花完成挑戰（沒嗆到、沒冰頭）3 次', 3, () => CHALW('連吃五碗豆花'), null, { c: 80, t: '入口即化' }],
+    [9, '深深著迷了怎麼辦', '用「困難」難度吃完五碗豆花', 1, () => ((ST().clears['連吃五碗豆花'] || {}).hard || 0) > 0 ? 1 : 0, null, { c: 120, t: '五碗豆花王' }],
+    [9, '你沒吃午餐哦？', '連吃五碗豆花通關，而且第 1 碗 10 秒內吃完', 1, () => ST().dofuFast || 0, null, { c: 50, t: '沒吃午餐' }]
   ].map(a => ({ cat: a[0], name: a[1], desc: a[2], rw: a[6], get max() { return typeof a[3] === 'function' ? a[3]() : a[3]; }, get: a[4], show: a[5] }));
   function achCheck() {
     const got = []; ACH.forEach(a => { if (!hasAch(a.name) && a.get() >= a.max && (!a.show || a.show())) {
@@ -2220,7 +2233,7 @@ if(!window.__sunnuApp){window.__sunnuApp=1;var host=document.getElementById('sun
         if (s.lastMon === e.n) s.sameCnt++; else { s.lastMon = e.n; s.sameCnt = 1; }
         if (win) {
           s.wins++; s.runW++; s.bestRun = Math.max(s.bestRun, s.runW); s.monWins[e.n] = (s.monWins[e.n] || 0) + 1;
-          if (info.challenge) s.challengeWins++; if (prevLoss >= 3) s.comeback++; if (new Date().getHours() < 5) s.nightWins++;
+          if (info.challenge) { s.challengeWins++; (s.chal = s.chal || {})[e.n] = (s.chal[e.n] || 0) + 1; } if (prevLoss >= 3) s.comeback++; if (new Date().getHours() < 5) s.nightWins++;
           cn = 4 + 2 * (e.d || 3) + Math.min(3, Math.max(0, s.runW - 1)); if (info.challenge) cn = Math.round(cn * 1.3);
           if (s.sameCnt >= 3) cn = Math.round(cn / 2); if (firstWin) cn += 10; if (s.firstWinDay !== today()) { cn += 10; s.firstWinDay = today(); }
         } else { s.losses++; s.runW = 0; cn = 1 + (info.bonus | 0); }
@@ -5309,7 +5322,7 @@ var DofuSim = (function () {
     function fails() { return s.chokes + s.freezes; }
     function finish(ok) {
       var f = fails(), stars = ok ? (f === 0 ? 3 : f <= 3 ? 2 : 1) : 0;
-      return { win: ok, stars: stars, score: Math.round(s.score), challenge: ok && f === 0, chokes: s.chokes, freezes: s.freezes, fails: f, cups: s.cups, taps: s.taps, bowls: s.bowlsDone, spare: s.spare, stolen: s.stolen, shooed: s.shooed };
+      return { win: ok, stars: stars, score: Math.round(s.score), challenge: ok && f === 0, chokes: s.chokes, freezes: s.freezes, fails: f, cups: s.cups, taps: s.taps, bowls: s.bowlsDone, spare: s.spare, stolen: s.stolen, shooed: s.shooed, firstT: s.firstT };
     }
     function lose() { if (s.phase === 'win' || s.phase === 'lose') return; s.phase = 'lose'; s.result = finish(false); s.ev.push({ t: 'lose', result: s.result }); }
     function doChoke() {
@@ -5317,7 +5330,7 @@ var DofuSim = (function () {
       s.ev.push({ t: 'choke', n: s.chokes });
     }
     function clearBowl() {
-      s.bowlsDone++; s.spare += s.tl / s.tmax; s.score += Math.round(s.tl * 18 + (fails() === 0 ? 40 : 0)); s.full = Math.max(0, s.full - 6); s.ice.on = false; s.gull = null; s.beads = []; s.charging = 0;
+      if (s.i === 0) s.firstT = s.tmax - s.tl; s.bowlsDone++; s.spare += s.tl / s.tmax; s.score += Math.round(s.tl * 18 + (fails() === 0 ? 40 : 0)); s.full = Math.max(0, s.full - 6); s.ice.on = false; s.gull = null; s.beads = []; s.charging = 0;
       s.ev.push({ t: 'clear', i: s.i, bowls: s.bowlsDone, tl: s.tl });
       if (s.i >= NB - 1) { s.phase = 'win'; s.result = finish(true); s.ev.push({ t: 'win', result: s.result }); }
       else { s.phase = 'swap'; s.swapT = SWAP; s.boost = 0; }
@@ -6699,13 +6712,14 @@ var GymGame = (function () {
   var BOXES = [{ x: 7830, y: 262 }, { x: 7930, y: 262 }, { x: 8830, y: 262 }, { x: 8960, y: 262 }, { x: 9180, y: 195, gold: 1 }];   // 魚乾倉庫的木箱：空翻頂到就掉出魚乾（金色木箱在高處，要抓軌道吊環盪上去）
   var QBS = [{ x: 800, y: 262, room: 0 }, { x: 2490, y: 100, room: 1, ret: { x: 2630, y: 155 } }, { x: 2720, y: 92, room: 2 }];   // 四個「？」磚，各通往一間隱藏室
   var RXS = [3800, 5700, 7600, 9400, 11300], ENT = [3930, 6050, 7740, 9520], ENTY = [309, 279, 309, 309], EXS = [5200, 7270, 9330, 11000], EXY = [330, 235, 330, 330];   // 各室範圍、入口、出口
-  var ROOM_NAMES = ['水管牆！', '雲上吊環！', '魚乾倉庫！'], COIN_NAME = ['8 號球', '雲朵星', '魚乾'], GOLD_NAME = ['金色 8 號球', '金色雲朵星', '金色魚乾'], TITLES = ['水管牆霸主', '雲端飛魚', '倉庫大盜'];
+  var ROOM_NAMES = ['水管牆！', '雲上吊環！', '魚乾倉庫！'], COIN_NAME = ['8 號球', '雲朵星', '魚乾'], GOLD_NAME = ['金色 8 號球', '金色雲朵星', '金色魚乾'], TITLES = ['水管牆霸主', '雲端飛午', '倉庫大盜'];
   function roomIdx(x) { if (x <= ROOMX) return -1; for (var i = 3; i >= 0; i--) if (x >= RXS[i]) return i; return 0; }       // 「？」磚（空翻頂到＝進隱藏室）、隱藏室範圍與出口
   var ROOM_COINS = [[4250, 298, 50], [4860, 298, 100], [5110, 298, 50], [4200, 198, 50], [4320, 198, 50], [4540, 160, 100], [4690, 156, 100], [4950, 198, 100], [4880, 150, 300, 1]].map(function (c) { return { x: c[0], y: c[1], v: c[2], gold: c[3] | 0, r: 0, got: false }; });
   [[1, [[6275, 185, 50], [6395, 190, 50], [6565, 225, 50], [6705, 150, 100], [6825, 155, 50], [6945, 160, 50], [7110, 205, 100], [7230, 205, 100], [6455, 185, 300, 1]]],
    [2, [[7760, 300, 50], [7880, 300, 50], [8000, 300, 50], [8165, 232, 50], [8285, 232, 50], [8405, 232, 50], [8780, 300, 50], [9180, 300, 50], [7830, 296, 100, 0, 0], [7930, 296, 100, 0, 1], [8830, 296, 100, 0, 2], [8960, 296, 100, 0, 3], [9180, 228, 300, 1, 4]]]].forEach(function (rr) { rr[1].forEach(function (c) { ROOM_COINS.push({ x: c[0], y: c[1], v: c[2], gold: c[3] | 0, r: rr[0], b: c[4], got: false }); }); });
   var STEAM = [{ x: 4250, y: 230, per: 3.6, off: 0 }, { x: 4770, y: 330, per: 3.8, off: 1.2 }], WHEELS = [{ x: 4095, vy: 445, vx: 40, per: 3.6, off: 0.6 }, { x: 4815, vy: 505, vx: 90, per: 3.6, off: 2.4 }];   // 養殖池打水水車（增氧機）：水花彈射＋增氧加速（額外捷徑）
-  var GEY = { x: 4045, w: 84, per: 3.4, t0: 1.0, t1: 2.5 };                    // 噴水柱：每 3.4 秒噴 1.5 秒（噴前 0.6 秒冒泡）
+  var GEY = { x: 4045, w: 84, per: 3.4, t0: 1.0, t1: 2.5 };
+  function geyU() { return (((W.t - (W.gs || 0)) % GEY.per) + GEY.per) % GEY.per; }   // 噴水柱的週期從「進水管牆／回到上一段」那一刻對齊，走到柱子時剛好噴                    // 噴水柱：每 3.4 秒噴 1.5 秒（噴前 0.6 秒冒泡）
   var SLIDE = [[4392, 266], [4470, 266], [4540, 275], [4600, 295], [4650, 320], [4705, 330]], SLEN = [0];   // 水管溜滑梯（腳底座標）
   for (var sli = 1; sli < SLIDE.length; sli++) SLEN.push(SLEN[sli - 1] + Math.hypot(SLIDE[sli][0] - SLIDE[sli - 1][0], SLIDE[sli][1] - SLIDE[sli - 1][1]));
   var LV = { w: 9400, waterY: 470, bottom: 620, goalX: 3240, plats: [], rings: [], zones: ZONES };
@@ -6929,7 +6943,7 @@ var GymGame = (function () {
     }
     if (!p.on && !p.swing && !W.slide && p.vy > 0 && p.x > 4372 && p.x < 4450 && Math.abs(p.y + HBH / 2 - 266) < 12) {   // 從上層水管邊緣「掉進」滑梯口才會滑（跳過去抓吊環就不會）
       W.slide = { s: 0, v: 150 }; sfx('whoosh'); }
-    var gu = W.t % GEY.per;                                  // 噴水柱：噴出時把午仔魚往上托（冒泡時是預警）
+    var gu = geyU();                                  // 噴水柱：噴出時把午仔魚往上托（冒泡時是預警）
     if (gu >= GEY.t0 && gu < GEY.t1 && Math.abs(p.x - GEY.x) < GEY.w / 2 && p.y > 150 && !p.swing) { p.on = false; p.jumping = false; p.coy = 0.09; p.vy = Math.max(p.vy - 2600 * dt, -330); if (!W.gj) { W.gj = 1; sfx('flip'); } } else if (gu < GEY.t0) W.gj = 0;
     if (p.swing) {                                          /* ---- 抓環：自動擺盪，放開按鍵＝放手 ---- */
       var s = p.swing, r = s.ring, Lo = s.Lf, emax = (G / r.R) * (1 - Math.cos(AMAX));
@@ -6954,12 +6968,13 @@ var GymGame = (function () {
       return;
     }
 
+    if (W.hold && aE) { W.hold = false; aE = false; }     // 離開隱藏室後魚先站著等，點一下才繼續往前跑（不會一出來就衝出平台掉水）
     /* ---- 地面／空中 ---- */
     if (p.on) p.coy = 0.09; else p.coy -= dt;
     if (aE) p.jbuf = 0.1; else p.jbuf -= dt;
     var can = p.stun <= 0, didJump = false;
     if (p.on) {
-      var tv = can ? dir * RUN : 0, dv = (tv === 0 ? 1400 : 1000) * dt; p.vx += clamp(tv - p.vx, -dv, dv);
+      var tv = can && !W.hold ? dir * RUN : 0, dv = (tv === 0 ? 1400 : 1000) * dt; p.vx += clamp(tv - p.vx, -dv, dv);
     } else if (can && man) { if (man * p.vx < AIRV) p.vx += man * 420 * dt; }
     if (dir && can) p.face = dir;
     if (can && p.jbuf > 0 && p.coy > 0) { p.vy = -JUMP; p.jbuf = 0; p.coy = 0; p.on = false; p.jumping = true; didJump = true; sfx('jump'); }
@@ -6984,7 +6999,7 @@ var GymGame = (function () {
       } else { p.y = q.y + q.h + HBH / 2; p.vy = 0; }
     }
     if (p.spinT > 0) p.spinT -= dt;
-    if (ri >= 1 && p.y > LV.waterY - 40) { var rs = W.rsp || { x: ENT[ri], y: ENTY[ri] }; p.x = rs.x; p.y = rs.y - 4; p.vx = 0; p.vy = 0; p.on = false; p.swing = null; p.spinT = 0; p.inv = 2.0; pop(W, p.x, p.y - 30, '回到上一段！', '#9fe4ff'); sfx('save'); return; }
+    if (ri >= 1 && p.y > LV.waterY - 40) { var rs = W.rsp || { x: ENT[ri], y: ENTY[ri] }; if (ri === 0) W.gs = W.t - 0.55; p.x = rs.x; p.y = rs.y - 4; p.vx = 0; p.vy = 0; p.on = false; p.swing = null; p.spinT = 0; p.inv = 2.0; pop(W, p.x, p.y - 30, '回到上一段！', '#9fe4ff'); sfx('save'); return; }
     if (p.y > LV.waterY + 14) { splash(W, p.x); p.dead = 1; W.falls++; W.fl = { n: 0, pts: 0 }; pop(W, p.x, LV.waterY - 20, '噗通！', '#9fe4ff'); if (DF().fall) { W.hp--; if (W.hp <= 0) W.faints++; } return; }
     if (!p.on) {                                             // 抓環（按住）／空翻（點一下）
       var nr = inp.a && p.rel <= 0 ? ringNear(p, GRAB) : null;
@@ -6995,26 +7010,26 @@ var GymGame = (function () {
         p.spinT = 0.5; W.flips++; W.fl.n++; W.fl.pts += 100 * W.fl.n; pop(W, p.x, p.y - 34, W.fl.n > 1 ? '連續空翻 ×' + W.fl.n : '空翻！', '#ffb3f0');
       }
     }
-    if (ri === 2) BOXES.forEach(function (b, bi) { if (!W.bx[bi] && (p.spinT > 0 || !p.on) && Math.abs(p.x - b.x) < 34 && p.y - HBH / 2 < b.y + 24 && p.y + HBH / 2 > b.y - 18) { W.bx[bi] = true; W.score += 20; sfx('perfect'); pop(W, b.x, b.y - 22, '魚乾掉出來！', '#ffe38a'); for (var k = 0; k < 8; k++) W.fx.push({ x: b.x, y: b.y, vx: (Math.random() - .5) * 120, vy: -Math.random() * 120, t: 0, life: 0.5, gold: 1 }); } });
+    if (ri === 2) BOXES.forEach(function (b, bi) { if (!W.bx[bi] && (p.spinT > 0 || !p.on) && Math.abs(p.x - b.x) < 24 && p.y - HBH / 2 < b.y + 20 && p.y + HBH / 2 > b.y - 12) { W.bx[bi] = true; W.score += 20; sfx('perfect'); pop(W, b.x, b.y - 22, '魚乾掉出來！', '#ffe38a'); for (var k = 0; k < 8; k++) W.fx.push({ x: b.x, y: b.y, vx: (Math.random() - .5) * 120, vy: -Math.random() * 120, t: 0, life: 0.5, gold: 1 }); } });
     for (var qi = 0; qi < QBS.length; qi++) {                // 空翻頂到「？」磚→進對應的隱藏室
       var qb = QBS[qi]; 
-      if (!W.qUsed[qb.room] && (p.spinT > 0 || !p.on) && Math.abs(p.x - qb.x) < 34 && p.y - HBH / 2 < qb.y + 24 && p.y + HBH / 2 > qb.y - 18) { enterRoom(W, qb.room, qb.ret || { x: qb.x + 70, y: p.y }); return; }
+      if (!W.qUsed[qb.room] && (p.spinT > 0 || !p.on) && Math.abs(p.x - qb.x) < 24 && p.y - HBH / 2 < qb.y + 20 && p.y + HBH / 2 > qb.y - 12) { enterRoom(W, qb.room, qb.ret || { x: qb.x + 70, y: p.y }); return; }
     }
     if (ri >= 0) {
       W.rc.forEach(function (c) { if (!c.got && !(c.b !== undefined && !W.bx[c.b]) && Math.abs(p.x - c.x) < (c.gold ? 24 : 15) && Math.abs(p.y - c.y) < (c.gold ? 36 : 26)) { c.got = true; if (c.gold) { W.gold = true; sfx('perfect'); pop(W, c.x, c.y - 16, GOLD_NAME[c.r] + '！+' + c.v, '#ffd24a'); } else { W.rcN++; W.rcn[c.r]++; sfx('coin'); pop(W, c.x, c.y - 14, '+' + c.v, '#ffe38a'); } W.score += c.v; if (c.gold) W['g' + c.r] = 1; } });
-      if (ri === 0) STEAM.forEach(function (v) { var u = (W.t + v.off) % v.per; if (u >= v.per - 1.7 && u < v.per - 0.8 && Math.floor(u * 8) % 4 === 0 && (W.sh || 0) < W.t - 0.2) { W.sh = W.t; sfx('save'); } if (u >= v.per - 0.8 && p.inv <= 0 && !p.dead && !W.slide && Math.abs(p.x - v.x) < 15 && p.y > v.y - 70 && p.y - HBH < v.y) hurt(W, { x: v.x }); });
+      if (ri === 0) STEAM.forEach(function (v) { var u = (W.t + v.off) % v.per; if (u >= v.per - 1.7 && u < v.per - 0.8 && Math.floor(u * 8) % 4 === 0 && (W.sh || 0) < W.t - 0.2) { W.sh = W.t; sfx('save'); } if (u >= v.per - 0.8 && p.inv <= 0 && p.dead <= 0 && !W.slide && Math.abs(p.x - v.x) < 15 && p.y > v.y - 70 && p.y - HBH < v.y) hurt(W, { x: v.x }); });
       if (p.x > EXS[ri]) {
         var tot = 0; W.rc.forEach(function (c) { if (c.r === ri && !c.gold) tot++; }); var all = W.rcn[ri] >= tot; if (all) { W.score += 500; W.maxHp++; W.maxLives++; W.lives++; } W.hp = Math.min(W.maxHp, W.hp + 1);
         
         W.oxy = 0; p.x = W.ret.x; p.y = W.ret.y; p.vx = 0; p.vy = 0; p.on = false; p.swing = null; p.spinT = 0;
         var under = null; LV.plats.forEach(function (q) { if (q.x > ROOMX) return; if (p.x >= q.x && p.x <= q.x + q.w && q.y >= W.ret.y - 40 && q.y <= W.ret.y + HBH + 140 && (!under || q.y < under.y)) under = q; });
         if (under) { p.y = under.y - HBH / 2; p.on = true; }       // 回到原處時一定要站在平台上（不會掉進水裡）
-        p.inv = 2.5; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5; sfx(all ? 'perfect' : 'save');
+        p.inv = 2.5; W.hold = true; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5; sfx(all ? 'perfect' : 'save');
         pop(W, p.x, p.y - 40, all ? COIN_NAME[ri] + '全收！多一顆愛心' : '收了 ' + W.rcn[ri] + ' 顆' + COIN_NAME[ri], '#ffe38a');
         if (W['g' + ri] && W.titles.indexOf(TITLES[ri]) < 0) { W.titles.push(TITLES[ri]); try { localStorage.setItem('sunnuGymTitles', JSON.stringify(W.titles)); } catch (_) { } W.banner = { txt: '稱號：' + TITLES[ri], t: 0 }; } return;
       }
     }
-    if (!W.done && p.x >= GOAL.x - 4 && p.x < ROOMX && !p.dead) {       // 跳起來抓到終點大吊環＝過關，抓越高分越多
+    if (!W.done && p.x >= GOAL.x - 4 && p.x < ROOMX && p.dead <= 0) { p.inv = 0;       // 跳起來抓到終點大吊環＝過關，抓越高分越多
       var fyy = LV.plats[5].y, hgt = clamp(fyy - (p.y - HO), 30, 95), bonus = 100 + Math.round((hgt - 30) / 65 * 500); W.gh0 = p.y - HO; W.gFy = fyy;
       bank(W, p); W.score += bonus; W.gbonus = bonus; W.done = true; W.doneT = 0; p.swing = null; p.vx = p.vy = 0; p.on = false; p.spinT = 0; sfx('win'); pop(W, GOAL.x, GOAL.y - 30, '大吊環！+' + bonus, '#ffe38a');
     }
@@ -7022,18 +7037,37 @@ var GymGame = (function () {
 
   /* ---------- 畫面 ---------- */
   var host = o.host;
-  var cw = host.clientWidth || innerWidth, ch = host.clientHeight || innerHeight, scale = 2;
-  var WF = Math.min(360, Math.ceil(cw / scale)), H = Math.max(312, Math.floor(ch / scale));
+  var cw = host.clientWidth || innerWidth, ch = host.clientHeight || innerHeight, DPR = Math.min(3, window.devicePixelRatio || 1),
+    scale = cw < 600 ? (DPR >= 2 ? Math.round(1.33 * DPR) / DPR : 1.33) : 2;   /* 手機放大倍率小一點，看得到更後面的場景；整數裝置像素才不會糊 */
+  var WF = Math.min(640, Math.ceil(cw / scale)), H = Math.max(312, Math.floor(ch / scale));
   var cv = document.createElement('canvas'); cv.width = WF; cv.height = H;
   cv.style.cssText = 'position:absolute;image-rendering:pixelated;touch-action:none;left:' + Math.floor((cw - WF * scale) / 2) + 'px;top:0;width:' + WF * scale + 'px;height:' + H * scale + 'px';
   host.appendChild(cv); var g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+  /* 文字層：主畫布是低解析像素畫（放大 2 倍以上），字直接畫會糊成一團，所以字另畫在高解析疊層上 */
+  var TS = scale * DPR;
+  var tv = document.createElement('canvas'); tv.style.pointerEvents = 'none';
+  tv.style.cssText = cv.style.cssText + ';pointer-events:none;image-rendering:auto';
+  tv.width = Math.round(WF * TS); tv.height = Math.round(H * TS);
+  host.appendChild(tv); var tg = tv.getContext('2d');
   var W = newWorld(), inp = { l: false, r: false, a: false }, cam = { x: 0, y: 150 };
   var relT = 0;
   function relayout() {       // 地圖版：結算列出現後舞台會變矮，重新量高度，避免畫面底部（商品橫幅）被切掉
     var h2 = host.clientHeight; if (!h2) return; var nh = Math.max(312, Math.floor(h2 / scale)); if (nh === H) return;
-    H = nh; cv.height = H; cv.style.height = H * scale + 'px'; g.imageSmoothingEnabled = false;
+    H = nh; cv.height = H; cv.style.height = H * scale + 'px'; g.imageSmoothingEnabled = false; tv.height = Math.round(H * TS); tv.style.height = H * scale + 'px';
   }
-  function txt(t, x, y, sz, col, al) { g.font = 'bold ' + sz + 'px sans-serif'; var mw = g.measureText(t).width, lim = WF - 12; if (mw > lim) { sz = Math.max(7, Math.floor(sz * lim / mw * 10) / 10); g.font = 'bold ' + sz + 'px sans-serif'; }   /* 字太寬（手機窄螢幕）自動縮小，不被切掉 */ g.textAlign = al || 'center'; g.textBaseline = 'middle'; g.lineWidth = 3; g.strokeStyle = '#2b2118'; g.strokeText(t, x, y); g.fillStyle = col; g.fillText(t, x, y); }
+  var PXF = 'Cubic11,"PingFang TC","Microsoft JhengHei",sans-serif';
+  try { if (document.fonts && document.fonts.load) { document.fonts.load('22px Cubic11', '體操午仔魚'); } } catch (e) { }
+  function txt(t, x, y, sz, col, al) {
+    var m = g.getTransform(); x += m.e; y += m.f;
+    /* Cubic11 是 11 格像素字，裝置像素字級取 11 的倍數才清晰；字太寬（手機窄螢幕）就降一階 */
+    var n = Math.max(1, Math.round(sz * TS / 11 + 0.25)), lim = (WF - 12) * TS;
+    tg.font = (n * 11) + 'px ' + PXF; while (n > 1 && tg.measureText(t).width > lim) { n--; tg.font = (n * 11) + 'px ' + PXF; }
+    var fs = n * 11;
+    tg.textAlign = al || 'center'; tg.textBaseline = 'middle'; tg.lineJoin = 'round'; tg.lineWidth = Math.max(2, Math.round(fs / 5.5)); tg.strokeStyle = '#2b2118';
+    var px = Math.round(x * TS), py = Math.round(y * TS);
+    tg.strokeText(t, px, py); tg.fillStyle = col; tg.fillText(t, px, py);
+  }
+
   function updCam(dt) {
     var p = W.p, tx = p.x - WF / 2 + p.face * 24, ty = p.y - H * 0.5;
     cam.x += (tx - cam.x) * Math.min(1, dt * 5); cam.y += (ty - cam.y) * Math.min(1, dt * 4);
@@ -7157,7 +7191,13 @@ var GymGame = (function () {
   }
   function drawQBlock(t) {
     QBS.forEach(function (qb) {
-      
+      if (qb.room === 1) {            // 雲上吊環的入口＝蝴蝶結貓咪雲（金邊、發光、閃星）：從吊環盪出去碰到它就進去
+        var cu = W.qUsed[1], cb = cu ? 0 : Math.sin(t * 2.2) * 2, cx = qb.x, cy = qb.y + cb, es = CLOUDS.entry;
+        if (!cu) { var ha = 0.25 + 0.15 * Math.sin(t * 3); g.fillStyle = 'rgba(255,236,150,' + ha + ')'; g.beginPath(); g.arc(cx, cy, 30, 0, 7); g.fill(); g.fillStyle = 'rgba(255,236,150,' + ha * 0.7 + ')'; g.beginPath(); g.arc(cx, cy, 22, 0, 7); g.fill(); }
+        g.globalAlpha = cu ? 0.5 : 1; g.drawImage(es, Math.round(cx - es.width * 0.65), Math.round(cy - es.height * 0.65), Math.round(es.width * 1.3), Math.round(es.height * 1.3)); g.globalAlpha = 1;
+        if (!cu) { var tw = Math.floor(t * 3) % 3; g.fillStyle = '#fff6b0'; [[-26, -14], [24, -2], [8, -22]].forEach(function (q, qi) { if (qi === tw) { g.fillRect(cx + q[0] - 1, cy + q[1], 3, 1); g.fillRect(cx + q[0], cy + q[1] - 1, 1, 3); } }); }
+        return;
+      }
       var used = W.qUsed[qb.room], bob = used ? 0 : Math.max(0, Math.sin(t * 6 + qb.room)) * -1.5, x = qb.x - 8, y = qb.y - 8 + bob;
       g.fillStyle = '#2a1204'; g.fillRect(x - 1, y - 1, 18, 18); g.fillStyle = used ? '#8a5a38' : '#fcb83c'; g.fillRect(x, y, 16, 16); g.fillStyle = used ? '#6a4228' : '#e88a10'; g.fillRect(x + 1, y + 13, 14, 2); g.fillRect(x + 13, y + 1, 2, 14);
       g.fillStyle = used ? '#6a4228' : '#fff0b0'; g.fillRect(x + 1, y + 1, 2, 2); g.fillRect(x + 13, y + 1, 2, 2); g.fillRect(x + 1, y + 13, 2, 2); g.fillRect(x + 13, y + 13, 2, 2);
@@ -7174,7 +7214,7 @@ var GymGame = (function () {
     g.strokeStyle = '#7a1c10'; g.lineWidth = 2; for (var i = 0; i < 4; i++) { g.beginPath(); g.moveTo(r.px, r.py); g.lineTo(r.px + Math.cos(ang + i * 1.571) * 7, r.py + Math.sin(ang + i * 1.571) * 7); g.stroke(); } g.fillStyle = '#ffb4a0'; g.fillRect(r.px - 1, r.py - 1, 3, 3);
   }
   function drawGeyser(t) {
-    var gu = W.t % GEY.per, mx = GEY.x, fy2 = 330; g.fillStyle = '#1a1a20'; g.fillRect(mx - 17, fy2 - 11, 34, 12); g.fillStyle = '#8a929c'; g.fillRect(mx - 15, fy2 - 9, 30, 9); g.fillStyle = '#d0d6de'; g.fillRect(mx - 15, fy2 - 9, 30, 2); g.fillStyle = '#6b7488'; g.fillRect(mx - 19, fy2 - 13, 38, 4);
+    var gu = geyU(), mx = GEY.x, fy2 = 330; g.fillStyle = '#1a1a20'; g.fillRect(mx - 17, fy2 - 11, 34, 12); g.fillStyle = '#8a929c'; g.fillRect(mx - 15, fy2 - 9, 30, 9); g.fillStyle = '#d0d6de'; g.fillRect(mx - 15, fy2 - 9, 30, 2); g.fillStyle = '#6b7488'; g.fillRect(mx - 19, fy2 - 13, 38, 4);
     if (gu >= GEY.t0 - 0.6 && gu < GEY.t0) { g.fillStyle = 'rgba(210,240,255,.85)'; for (var i = 0; i < 5; i++) { var bb = ((t * 1.6 + i * 0.21) % 1); g.beginPath(); g.arc(mx + Math.sin(i * 2.3 + t * 5) * 10, fy2 - 14 - bb * 34, 2 + (i % 2), 0, 7); g.fill(); } }
     else if (gu >= GEY.t0 && gu < GEY.t1) {
       var ft = Math.min(1, (gu - GEY.t0) / 0.2), top = fy2 - 12 - 160 * ft, hw = GEY.w / 2 * 0.62; g.fillStyle = 'rgba(150,215,250,.55)'; g.fillRect(mx - hw, top, hw * 2, fy2 - 12 - top); g.fillStyle = 'rgba(235,248,255,.6)'; g.fillRect(mx - hw * 0.45, top, hw * 0.9, fy2 - 12 - top);
@@ -7242,7 +7282,17 @@ var GymGame = (function () {
     var x0 = RXS[i], x1 = RXS[i + 1], y0 = Math.floor(cam.y) - 4, hh = H + 8, k, gr;
     if (i === 1) {                                                    // 雲上：藍天白雲海
       gr = g.createLinearGradient(0, y0, 0, y0 + hh); gr.addColorStop(0, '#6cc0ff'); gr.addColorStop(0.7, '#cdeaff'); gr.addColorStop(1, '#f2fbff'); g.fillStyle = gr; g.fillRect(x0, y0, x1 - x0, hh);
-      for (k = 0; k < 46; k++) { var cx = x0 + k * 41 + ((k * 53) % 37) + ((t * 3 + k * 7) % 30), cy = 60 + ((k * 61) % 330), cr = 22 + ((k * 17) % 22); g.fillStyle = 'rgba(255,255,255,' + (0.35 + (k % 3) * 0.1) + ')'; g.beginPath(); g.ellipse(cx, cy, cr * 1.6, cr * 0.7, 0, 0, 7); g.ellipse(cx - cr * 0.7, cy + 3, cr, cr * 0.55, 0, 0, 7); g.ellipse(cx + cr * 0.8, cy + 4, cr * 0.9, cr * 0.5, 0, 0, 7); g.fill(); }
+      // 太陽光暈
+      var sx2 = cam.x + WF * 0.78, sy2 = 70 - cam.y * 0.05, sg = g.createRadialGradient(sx2, sy2, 4, sx2, sy2, 120); sg.addColorStop(0, 'rgba(255,248,190,.95)'); sg.addColorStop(0.25, 'rgba(255,240,170,.45)'); sg.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = sg; g.fillRect(sx2 - 130, sy2 - 130, 260, 260);
+      // 遠處淡淡的小雲（慢、半透明）→ 近處大朵蓬鬆雲（快、不透明），三層視差
+      [[0.22, 1, 0.5, 9, 0.9, 40], [0.45, 1, 0.85, 7, 1.4, 120], [0.7, 2, 1, 5, 2.2, 260]].forEach(function (L, li) {
+        var par = L[0], sc = L[1], al = L[2], cnt = L[3], dr = L[4], yb = L[5], span = WF + 200;
+        for (k = 0; k < cnt; k++) {
+          var spr = CLOUDS.bg[(k + li) % 4], sw = spr.width * sc, sh = spr.height * sc, off = k * (span / cnt) + (k * 37 % 29) - cam.x * par + t * dr * 6;
+          var sxx = (((off % span) + span) % span) - 100, syy = yb + ((k * 83 + li * 41) % 260) - cam.y * 0.08 * (li + 1) + Math.sin(t * 0.5 + k) * 3;
+          g.globalAlpha = al; g.drawImage(spr, Math.round(cam.x + sxx), Math.round(syy), sw, sh);
+        }
+      }); g.globalAlpha = 1;
       g.fillStyle = 'rgba(255,255,255,.8)'; g.fillRect(x0, 440, x1 - x0, 400); return;
     }
     if (i === 2) {                                                    // 魚乾倉庫：木板牆、橫梁、燈
@@ -7261,13 +7311,50 @@ var GymGame = (function () {
     var sh = (t * 0.6) % 5; if (sh < 1) { var sx2 = x0 + 700 + sh * 300 + Math.floor(t / 5) * 90; g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 2; g.beginPath(); g.moveTo(sx2, 40 + sh * 120); g.lineTo(sx2 - 40, 40 + sh * 120 - 24); g.stroke(); }
     g.fillStyle = '#0a0a28'; g.fillRect(x0, 400, x1 - x0, 400);
   }
+  /* ---------- 可愛雲（入口＝蝴蝶結貓咪雲、平台＝圓滾滾笑臉雲），用圓形聯集自動描邊上陰影 ---------- */
+  var CLOUDS = (function () {
+    function blob(circles, w, h, o) {
+      var m = []; for (var y = 0; y < h; y++) m.push(new Array(w).fill(0));
+      circles.forEach(function (c) { for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) { var dx = x + .5 - c[0], dy = y + .5 - c[1]; if (dx * dx + dy * dy <= c[2] * c[2]) m[y][x] = 1; } });
+      if (o.body) for (var y = o.body[0]; y < o.body[1]; y++) for (var x = o.body[2]; x < o.body[3]; x++) m[y][x] = 1;
+      var c = document.createElement('canvas'); c.width = w; c.height = h; var cg = c.getContext('2d');
+      function ins(x, y) { return x >= 0 && y >= 0 && x < w && y < h && m[y][x]; }
+      for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) if (m[y][x]) {
+        var edge = !ins(x - 1, y) || !ins(x + 1, y) || !ins(x, y - 1) || !ins(x, y + 1), bot = !ins(x, y + 1) || !ins(x, y + 2);
+        cg.fillStyle = edge ? o.line : bot ? o.shade : o.fill; cg.fillRect(x, y, 1, 1);
+      }
+      return { c: c, g: cg };
+    }
+    function px(g, x, y, col, w, h) { g.fillStyle = col; g.fillRect(x, y, w || 1, h || 1); }
+    function blush(g, cx, cy, gap) { [cx - gap, cx + gap].forEach(function (x) { px(g, x - 1, cy, '#ff9ab8', 3, 2); px(g, x, cy, '#ffb8cc'); }); }
+    function eyesHappy(g, cx, cy, gap) { [cx - gap, cx + gap].forEach(function (x) { px(g, x - 1, cy + 1, '#2b2040'); px(g, x, cy, '#2b2040', 2, 1); px(g, x + 2, cy + 1, '#2b2040'); }); }
+    function smile(g, cx, cy) { px(g, cx - 1, cy, '#2b2040'); px(g, cx, cy + 1, '#2b2040', 2, 1); px(g, cx + 2, cy, '#2b2040'); }
+    function bow(g, x, y) { px(g, x - 3, y, '#ff6a8a', 3, 3); px(g, x + 3, y, '#ff6a8a', 3, 3); px(g, x, y + 1, '#ff3a66', 3, 2); px(g, x - 3, y, '#ffc0d0'); px(g, x + 5, y, '#ffc0d0'); }
+    // 入口：蝴蝶結貓咪雲（金邊）
+    var eo = blob([[8, 14, 6], [15, 12, 7.5], [23, 14, 6], [14, 16, 8], [19, 16, 7], [8, 7, 3], [22, 7, 3]], 31, 24, { line: '#b07a2a', fill: '#fffaf0', shade: '#ffe6b0' }), g = eo.g;
+    [[13, 13], [17, 13]].forEach(function (e) { px(g, e[0] - 1, e[1], '#2b2040', 2, 3); px(g, e[0] - 1, e[1], '#fff'); });
+    blush(g, 15, 16, 7); px(g, 12, 17, '#2b2040'); px(g, 13, 18, '#2b2040'); px(g, 14, 17, '#2b2040'); px(g, 15, 18, '#2b2040'); px(g, 16, 17, '#2b2040'); bow(g, 24, 3);
+    var cache = {};
+    // 平台：寬度 w 的笑臉雲（頂面接近平的，魚站在上面；底部是一朵朵圓肚子）
+    function plat(w) {
+      var key = Math.round(w); if (cache[key]) return cache[key];
+      var W2 = key + 6, H = 28, cs = [], i = 0; for (var x = 10; x < W2 - 8; x += 11, i++) cs.push([x, 14 + (i % 2 ? 1 : 0), 11]);
+      cs.push([W2 - 10, 14, 11]);
+      var o = blob(cs, W2, H, { line: '#5a4a8a', fill: '#ffffff', shade: '#d6e2ff', body: [6, 21, 3, W2 - 3] }), gg = o.g;
+      for (var fx = Math.min(32, W2 / 2); fx < W2 - 16; fx += 70) { eyesHappy(gg, Math.round(fx), 11, 5); blush(gg, Math.round(fx), 14, 8); smile(gg, Math.round(fx) - 1, 15); }
+      return cache[key] = o.c;
+    }
+    // 背景雲：4 種蓬鬆形狀（淡藍描邊、底部淡藍陰影），其中兩種帶小笑臉
+    var SH = [
+      { w: 56, h: 30, cs: [[12, 19, 9], [24, 14, 12], [38, 17, 10], [47, 21, 7], [30, 22, 9]], face: 0 },
+      { w: 74, h: 36, cs: [[12, 25, 10], [26, 18, 13], [42, 14, 14], [58, 20, 12], [66, 26, 8], [40, 26, 11]], face: 1 },
+      { w: 44, h: 26, cs: [[10, 17, 8], [21, 12, 10], [33, 16, 9], [24, 19, 8]], face: 0 },
+      { w: 64, h: 32, cs: [[11, 22, 9], [24, 15, 12], [38, 18, 12], [52, 22, 9], [32, 24, 10]], face: 1 }];
+    var bgc = SH.map(function (d) { var b = blob(d.cs, d.w, d.h, { line: '#b4cff0', fill: '#ffffff', shade: '#d9e9ff' }); if (false && d.face) { var fx = Math.round(d.w / 2) - 1, fy = Math.round(d.h * 0.58); eyesHappy(b.g, fx, fy - 2, 4); blush(b.g, fx, fy + 1, 7); smile(b.g, fx - 1, fy + 2); } return b.c; });
+    return { entry: eo.c, plat: plat, bg: bgc };
+  })();
   function drawCloudPlat(q) {
-    var x, n = Math.ceil(q.w / 22);
-    g.fillStyle = '#4a6aa0'; for (x = 0; x < n; x++) { g.beginPath(); g.ellipse(q.x + 11 + x * 22 * q.w / (n * 22), q.y + 5, 16, 11.5, 0, 0, 7); g.fill(); }
-    g.beginPath(); g.rect(q.x - 1, q.y + 1, q.w + 2, 11); g.fill();
-    g.fillStyle = '#d9ecff'; for (x = 0; x < n; x++) { g.beginPath(); g.ellipse(q.x + 11 + x * 22 * q.w / (n * 22), q.y + 7, 14, 9, 0, 0, 7); g.fill(); }
-    g.fillStyle = '#ffffff'; for (x = 0; x < n; x++) { g.beginPath(); g.ellipse(q.x + 11 + x * 22 * q.w / (n * 22), q.y + 4, 14, 8.5, 0, Math.PI, 0); g.fill(); }
-    g.fillRect(q.x, q.y, q.w, 3);
+    var sp = CLOUDS.plat(q.w); g.drawImage(sp, Math.round(q.x - 3), Math.round(q.y - 3));
   }
   function drawWhFloor(q) {
     g.fillStyle = '#1a0c06'; g.fillRect(q.x - 1, q.y - 1, q.w + 2, q.h + 2); g.fillStyle = '#5b3b20'; g.fillRect(q.x, q.y, q.w, q.h);
@@ -7278,18 +7365,19 @@ var GymGame = (function () {
   var TB_W = Math.min(100, Math.floor(WF / 2) - 8);        // 測試按鈕寬度（手機窄螢幕要縮小，不然會切到邊）
   var TBTN = [{ k: 'goal', t: '直達終點', x: function () { return Math.round(WF / 2 - TB_W - 4); }, y: 250 }, { k: 'room', t: '水管牆', x: function () { return Math.round(WF / 2 + 4); }, y: 250 }, { k: 'r1', t: '雲上吊環', x: function () { return Math.round(WF / 2 - TB_W - 4); }, y: 280 }, { k: 'r2', t: '魚乾倉庫', x: function () { return Math.round(WF / 2 + 4); }, y: 280 }], TB_Y = 250, TB_H = 24;
   function enterRoom(W, i, ret) {
-    var p = W.p; W.qUsed[i] = true; W.ret = ret; p.x = ENT[i]; p.y = ENTY[i]; p.vx = p.vy = 0; p.on = true; p.swing = null; p.spinT = 0; W.rsp = { x: ENT[i], y: ENTY[i] };
+    var p = W.p; W.qUsed[i] = true; W.ret = ret; W.gs = W.t - 0.55; p.x = ENT[i]; p.y = ENTY[i]; p.vx = p.vy = 0; p.on = true; p.swing = null; p.spinT = 0; W.rsp = { x: ENT[i], y: ENTY[i] };
     cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5; sfx('warp'); W.banner = { txt: ROOM_NAMES[i], t: 0 };
   }
   function warpTest(k) {
     W = newWorld(); var p = W.p; W.started = true;
     if (k === 'goal') { var C = LV.plats[5]; p.x = 3040; p.y = C.y - HBH / 2; W.cpPlat = C; W.zi = 1; W.cp = { x: 3070, y: C.y - HBH / 2 }; }
-    else { var ki = k === 'r1' ? 1 : k === 'r2' ? 2 : 0; enterRoom(W, ki, { x: QBS[ki].x + 70, y: 300 }); W.zi = zoneIdx(p.x); }
+    else { var ki = k === 'r1' ? 1 : k === 'r2' ? 2 : 0; enterRoom(W, ki, QBS[ki].ret || { x: QBS[ki].x + 70, y: 300 }); W.zi = zoneIdx(p.x); }
     p.vx = 0; p.on = true; cam.x = p.x - WF / 2; cam.y = p.y - H * 0.5;
   }
   var MBTN = { w: 22, h: 14, x: function () { return WF - 28; }, y: 26 };
   function draw() {
     if ((++relT) % 15 === 0) relayout();
+    tg.clearRect(0, 0, tv.width, tv.height);
     var p = W.p, t = W.t;
     var TH = themeAt(cam.x + WF / 2);
     (function () { var NB = 12, y0 = 0; for (var bi = 0; bi < NB; bi++) { var u = bi / (NB - 1), c = u < 0.45 ? mixHex(TH.sky[0], TH.sky[1], u / 0.45) : u < 0.78 ? mixHex(TH.sky[1], TH.sky[2], (u - 0.45) / 0.33) : mixHex(TH.sky[2], TH.sky[3], (u - 0.78) / 0.22); g.fillStyle = c; var y1 = Math.round((bi + 1) * H / NB); g.fillRect(0, y0, WF, y1 - y0 + 1); y0 = y1; } })();
@@ -7422,7 +7510,7 @@ var GymGame = (function () {
       if (!e.alive) g.restore();
     });
     // 魚
-    if (p.dead <= 0 && !(p.inv > 0 && Math.floor(t * 14) % 2)) {
+    if (p.dead <= 0 && !(p.inv > 0 && !W.done && Math.floor(t * 14) % 2)) {
       if (W.done && W.gbonus) {
         var dry = clamp((W.doneT - 0.5) / 3, 0, 1), sw2 = Math.sin(W.doneT * 2.4) * (1 - dry * 0.6);
         var hst = { aL: 0.75, aR: 0.75, tail: 1.1, ph: W.doneT * 3, wave: 0.8, wp: W.doneT * 2, tw: sw2 * 0.05, sy: 1 - 0.1 * dry, dry: dry }, hx3 = p.x, hy3 = p.y - HO, hps = [-1, 1].map(function (sd) { return toWorld(handLocal(sd, 0.75, hst), hx3, hy3, sw2 * 0.05, p.face); });
@@ -7460,8 +7548,9 @@ var GymGame = (function () {
     txt('命 ×' + (W.lives === Infinity ? '∞' : W.lives), 8, 44, 10, W.lives <= 1 && Math.floor(W.t * 4) % 2 ? '#ff6a6a' : '#fff', 'left');
     txt('特技 ' + (W.score + W.fl.pts) + '　擊退 ' + W.kills, WF - 8, 11, 10, '#fff', 'right');
     var near = !p.on && !p.swing && ringNear(p, 60), al = p.swing ? '放開＝放手' : (p.on ? '點＝跳' : (near ? '按住＝抓環' : '點＝空翻'));
-    g.fillStyle = (inp.a ? 'rgba(244,194,74,.9)' : 'rgba(58,44,32,.6)'); g.fillRect(0, H - 40, WF, 40);
-    txt(al, WF / 2, H - 20, 16, '#fff');
+    if (!W.done) { g.fillStyle = (inp.a ? 'rgba(244,194,74,.9)' : 'rgba(58,44,32,.6)'); g.fillRect(0, H - 40, WF, 40);
+    txt(al, WF / 2, H - 20, 16, '#fff'); }
+    if (W.hold && !W.done) txt('點一下繼續往前', WF / 2, 70, 11, '#ffe38a');
     if (W.banner) { var bt = W.banner.t, ba = bt < 0.3 ? bt / 0.3 : bt > 2 ? (2.4 - bt) / 0.4 : 1; g.globalAlpha = Math.max(0, ba); g.fillStyle = 'rgba(30,20,40,.62)'; g.fillRect(0, 96, WF, 36); txt(W.banner.txt, WF / 2, 114, 18, '#ffe38a'); g.globalAlpha = 1; }
     if (p.swing && p.swing.ring.kind === 'break' && p.swing.t > 1) txt('快放手！環要斷了', WF / 2, 70, 11, '#ff9a8a'); else if (p.swing && p.swing.perf) txt('現在放手＝完美！', WF / 2, 70, 11, '#ffe38a');
     else if (p.swing) txt('◀▶ 偏向一邊　放開按鈕放手', WF / 2, 70, 9, '#fff');
@@ -7475,12 +7564,13 @@ var GymGame = (function () {
     else if (W.t < 10 && !W.done) txt('自動往前跑　點螢幕跳、靠近吊環按住抓', WF / 2, 70, 10, '#fff');
     if (W.done && W.gbonus && W.doneT <= 3.2) txt(W.doneT < 1.2 ? '抓到大吊環！+' + W.gbonus : '曬太陽中……', WF / 2, 86, 14, '#ffe38a');
     if (W.done && W.doneT > (W.failed ? 1.6 : 3.2)) {
-      g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, H - 118, WF, 114); txt(W.failed ? '午仔魚曬不成魚乾了…（' + DF().name + '）' : '午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, H - 104, 14, W.failed ? '#ff9a8a' : '#f4dd7a');
-      txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips, WF / 2, H - 88, 9, '#fff'); txt('擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, H - 77, 9, '#fff');
-      txt(NOTE || ((typeof o !== 'undefined' && o && o.onEnd) ? '' : '點空白處再玩（或按 R）' + (W.titles.length ? '　稱號：' + W.titles.join('、') : '')), WF / 2, H - 65, 9, NOTE || W.titles.length ? '#ffd24a' : '#cdbfa8');
-      var bw = Math.min(WF - 24, 300), bx = (WF - bw) / 2, by = H - 52, bh = 40, pu = Math.floor(W.doneT * 2.5) % 2; SHOPBAND = { x: bx, y: by, w: bw, h: bh };       // 黃色橫幅＝去賣場買周邊（成功／失敗都有）
+      g.fillStyle = 'rgba(0,0,0,.6)'; var PY = H - 162; if (W.gbonus) PY = Math.min(PY, Math.max(60, Math.round(LV.plats[5].y - cam.y + 14)));   // 勝利：結算字放在紅磚牆上（平台頂面下方）
+      g.fillRect(0, PY, WF, 158); txt(W.failed ? '午仔魚曬不成魚乾了…（' + DF().name + '）' : '午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, PY + 14, 14, W.failed ? '#ff9a8a' : '#f4dd7a');
+      txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips, WF / 2, PY + 35, 9, '#fff'); txt('擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, PY + 52, 9, '#fff');
+      txt(NOTE || ((typeof o !== 'undefined' && o && o.onEnd) ? '' : '點空白處再玩（或按 R）' + (W.titles.length ? '　稱號：' + W.titles.join('、') : '')), WF / 2, PY + 69, 9, NOTE || W.titles.length ? '#ffd24a' : '#cdbfa8');
+      var bw = Math.min(WF - 24, 300), bx = (WF - bw) / 2, by = PY + 88, bh = 62, pu = Math.floor(W.doneT * 2.5) % 2; SHOPBAND = { x: bx, y: by, w: bw, h: bh };       // 黃色橫幅＝去賣場買周邊（成功／失敗都有）
       g.fillStyle = '#2a1c10'; g.fillRect(bx, by, bw, bh); g.fillStyle = pu ? '#ffe27a' : '#ffd95a'; g.fillRect(bx + 1, by + 1, bw - 2, bh - 2); g.fillStyle = '#ffeb9a'; g.fillRect(bx + 1, by + 1, bw - 2, 2); g.fillStyle = '#e0a92a'; g.fillRect(bx + 1, by + bh - 4, bw - 2, 3);
-      if (W.failed) { txt('想要更多午仔魚嗎', WF / 2, by + 13, 12, '#fff'); txt('來選購午仔魚周邊吧～', WF / 2, by + 28, 10, '#fff'); } else { txt('午仔魚吊環高手！', WF / 2, by + 13, 12, '#fff'); txt('來選購午仔魚周邊吧～', WF / 2, by + 28, 10, '#fff'); }
+      if (W.failed) { txt('想要更多午仔魚嗎', WF / 2, by + 18, 12, '#fff'); txt('來選購午仔魚周邊吧～', WF / 2, by + 43, 10, '#fff'); } else { txt('午仔魚吊環高手！', WF / 2, by + 18, 12, '#fff'); txt('來選購午仔魚周邊吧～', WF / 2, by + 43, 10, '#fff'); }
     } else SHOPBAND = null;
     if (p.dead > 0) { g.fillStyle = 'rgba(30,60,80,' + Math.min(0.5, p.dead) + ')'; g.fillRect(0, 0, WF, H); }
   }
@@ -7500,6 +7590,12 @@ var GymGame = (function () {
     if (W.done && W.doneT > (W.failed ? 1.6 : 3.2) && SHOPBAND && qx >= SHOPBAND.x && qx <= SHOPBAND.x + SHOPBAND.w && qy >= SHOPBAND.y && qy <= SHOPBAND.y + SHOPBAND.h) { openShop(); return; }
     if (W.done && W.doneT > (W.failed ? 1.8 : 3.4) && !o.onEnd) { W = newWorld(); return; } try { cv.setPointerCapture(e.pointerId); } catch (_) { } ptrs[e.pointerId] = 'a'; recalc(); });
   function pup(e) { delete ptrs[e.pointerId]; recalc(); }
+  /* 手指放開卻沒收到 pointerup（iOS 偶爾會漏）→ 按鍵卡住、放不了手：任何「全部手指離開」的事件都把按住狀態清掉 */
+  function clearAll() { ptrs = {}; recalc(); }
+  addEventListener('pointerup', function (e) { if (ptrs[e.pointerId]) pup(e); }); addEventListener('pointercancel', function (e) { if (ptrs[e.pointerId]) pup(e); });
+  addEventListener('touchend', function (e) { if (!e.touches || e.touches.length === 0) clearAll(); }, true); addEventListener('touchcancel', clearAll, true);
+  cv.addEventListener('lostpointercapture', function (e) { if (ptrs[e.pointerId]) pup(e); });
+  addEventListener('blur', clearAll); document.addEventListener('visibilitychange', function () { if (document.hidden) clearAll(); });
   cv.addEventListener('pointerup', pup); cv.addEventListener('pointercancel', pup); cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   var KM = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', Space: 'a', KeyZ: 'a', ArrowUp: 'a', KeyW: 'a', KeyX: 'a', KeyK: 'a', ShiftLeft: 'a', ShiftRight: 'a', ArrowDown: 'a' };
   function kd(e) { audioOn(); var k = KM[e.code]; if (k) { e.preventDefault(); keys[k] = 1; recalc(); } }
@@ -7573,7 +7669,7 @@ var GymGame = (function () {
     const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
     try { document.fonts && document.fonts.load && document.fonts.load('10px Cubic11', '連吃五碗豆花福春豆花伯狂吃喝水嗆到哇加料完食'); } catch (e) {}
     { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }
-    const dg = DofuGame.create({ host, diff: c.df.k, chars: { ceo: sprite('boss_corgi') }, shopUrl: () => { const L = ['https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E7%9A%84%E5%B3%B6%E7%81%B0%E5%88%BA%E7%B9%A1%E8%80%81%E5%B8%BD-1-1', 'https://www.sunnu.co/products/%E4%BA%94%E7%A2%97%E5%B3%B6%E7%81%B0%E7%9F%AD%E8%A2%96%E4%B8%8A%E8%A1%A3', 'https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E8%B6%85%E5%A4%9A%E7%A2%97%E5%B3%B6%E7%81%B0%E7%B7%B9%E8%8A%B1%E4%B8%AD%E7%AD%92%E8%A5%AA']; return L[Math.floor(Math.random() * L.length)]; }, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    const dg = DofuGame.create({ host, diff: c.df.k, chars: { ceo: sprite('boss_corgi') }, shopUrl: () => { const L = ['https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E7%9A%84%E5%B3%B6%E7%81%B0%E5%88%BA%E7%B9%A1%E8%80%81%E5%B8%BD-1-1', 'https://www.sunnu.co/products/%E4%BA%94%E7%A2%97%E5%B3%B6%E7%81%B0%E7%9F%AD%E8%A2%96%E4%B8%8A%E8%A1%A3', 'https://www.sunnu.co/products/%E6%9D%B1%E5%90%89%E8%B6%85%E5%A4%9A%E7%A2%97%E5%B3%B6%E7%81%B0%E7%B7%B9%E8%8A%B1%E4%B8%AD%E7%AD%92%E8%A5%AA']; return L[Math.floor(Math.random() * L.length)]; }, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; if (r.win && r.firstT > 0 && r.firstT < 10) ST().dofuFast = 1; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
     if (/[?&]debug/.test(location.search)) window.__dofu = dg;
     c.ivs.push(setInterval(() => { if (c.dead) { try { dg.freeze(); } catch (e) {} } }, 300));
   } };
@@ -7586,7 +7682,7 @@ var GymGame = (function () {
     const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
     try { document.fonts && document.fonts.load && document.fonts.load('10px Cubic11', '吊環五仔魚乾古厝呷飯擺盪十字撐大迴旋落地曬乾目標'); } catch (e) {}
     { const bx = $('smv3-arena'), sy = bx.querySelector('.say'); if (sy) sy.style.display = 'none'; c.hud.hidden = true; c.hud.style.setProperty('display', 'none', 'important'); }
-    const rg = RingGame.create({ host, diff: c.df.k, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    const rg = RingGame.create({ host, diff: c.df.k, sound: () => sound, onEnd: r => { if (c.dead || c.finishing) return; if (r.win && r.firstT > 0 && r.firstT < 10) ST().dofuFast = 1; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
     if (/[?&]debug/.test(location.search)) window.__ring = rg;
     c.ivs.push(setInterval(() => { if (c.dead) { try { rg.freeze(); } catch (e) {} } }, 300));
   } };
@@ -7611,7 +7707,7 @@ var GymGame = (function () {
     const host = document.createElement('div'); host.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000;touch-action:none;z-index:2'; c.st.appendChild(host);
     try { document.fonts && document.fonts.load && document.fonts.load('10px Cubic11', '吉普車翹翹板集集特技村吃苦當作吃補'); } catch (e) {}
     const pal = Object.assign({}, PAL, palX);
-    const jg = JeepGame.create({ host, diff: c.df.k, pal, sound: () => sound, externalHud: true, onTick: t => c.bar(1 - t.T2 / t.T, '▶ 吉普車翹翹板', '剩 ' + Math.max(0, t.T - t.T2).toFixed(0) + 's'), onEnd: r => { if (c.dead || c.finishing) return; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
+    const jg = JeepGame.create({ host, diff: c.df.k, pal, sound: () => sound, externalHud: true, onTick: t => c.bar(1 - t.T2 / t.T, '▶ 吉普車翹翹板', '剩 ' + Math.max(0, t.T - t.T2).toFixed(0) + 's'), onEnd: r => { if (c.dead || c.finishing) return; if (r.win && r.firstT > 0 && r.firstT < 10) ST().dofuFast = 1; c.finish(!!r.win, !!r.win && !!r.challenge, r.score | 0); } });
     if (/[?&]debug/.test(location.search)) window.__jeep = jg;
     c.ivs.push(setInterval(() => { if (c.dead) { try { jg.freeze(); } catch (e) {} } }, 300));   /* 結束後只停住（保留勝利畫面），不拆畫布 */
   } };
