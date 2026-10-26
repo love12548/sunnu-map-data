@@ -1,0 +1,48 @@
+{
+ "v": 1,
+ "rev": "b940f8e4",
+ "tracks": [
+  {
+   "id": "c21fbd15",
+   "file": "m_c21fbd15.mp3",
+   "title": "深夜0時の新宿",
+   "artist": "",
+   "tags": [
+    "日語"
+   ],
+   "dur": 208.2,
+   "size": 2498708,
+   "src": "c21fbd15",
+   "added": "2026-10-24",
+   "hide": false
+  },
+  {
+   "id": "1fda6298",
+   "file": "m_1fda6298.mp3",
+   "title": "ひだまりの君へ",
+   "artist": "",
+   "tags": [
+    "日語"
+   ],
+   "dur": 179.0,
+   "size": 2149190,
+   "src": "1fda6298",
+   "added": "2026-10-24",
+   "hide": false
+  },
+  {
+   "id": "1aa52f3f",
+   "file": "m_1aa52f3f.mp3",
+   "title": "泰國情歌",
+   "artist": "",
+   "tags": [
+    "泰語"
+   ],
+   "dur": 199.6,
+   "size": 2396517,
+   "src": "1aa52f3f",
+   "added": "2026-10-24",
+   "hide": false
+  }
+ ]
+}
