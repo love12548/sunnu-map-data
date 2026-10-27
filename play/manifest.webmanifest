@@ -1,0 +1,23 @@
+{
+ "name": "孫女遊戲間（離線版）",
+ "short_name": "孫女遊戲間",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#fbf6ec",
+ "theme_color": "#ffd45c",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
