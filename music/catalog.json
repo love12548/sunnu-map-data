@@ -1,6 +1,6 @@
 {
  "v": 1,
- "rev": "b940f8e4",
+ "rev": "dfac67e4",
  "tracks": [
   {
    "id": "c21fbd15",
@@ -43,6 +43,39 @@
    "src": "1aa52f3f",
    "added": "2026-10-24",
    "hide": false
+  },
+  {
+   "id": "e4ff44c7",
+   "file": "m_e4ff44c7.mp3",
+   "title": "夢の遊園地",
+   "artist": "",
+   "tags": [],
+   "dur": 223.6,
+   "size": 2684282,
+   "src": "e4ff44c7",
+   "added": "2026-11-05"
+  },
+  {
+   "id": "01bc175b",
+   "file": "m_01bc175b.mp3",
+   "title": "帰れないあの駅で",
+   "artist": "",
+   "tags": [],
+   "dur": 260.4,
+   "size": 3125020,
+   "src": "01bc175b",
+   "added": "2026-11-05"
+  },
+  {
+   "id": "7b6135c5",
+   "file": "m_7b6135c5.mp3",
+   "title": "風のまち角",
+   "artist": "",
+   "tags": [],
+   "dur": 253.2,
+   "size": 3039756,
+   "src": "7b6135c5",
+   "added": "2026-11-05"
   }
  ]
 }
