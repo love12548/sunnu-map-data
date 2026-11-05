@@ -4672,11 +4672,15 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
       const pic = (re, enc) => { const q = places.find(x => re.test(x.name)), ic = q && sprOf(q); return ic && hasSprite(ic) ? { ...enc, ic } : enc; };
       add({ ...TRAIN_ENC, train: 1 }); add(pic(JEEP_PLACE, JEEP_ENC)); add(pic(DOFU_PLACE, DOFU_ENC)); add(pic(RING_PLACE, GYM_ENC)); add(pic(CHICKEN_PLACE, CHICKEN_ENC));
       ['找訊號', '頂風', '翻翻樂', '排隊', '追車', '記憶', '找營業', '群怪', '讓開拍照'].forEach(g => add(byG(g)));
+      /* 測試用：大魔王與監獄也放進大廳（地圖上要連續遇怪／連輸才會出現），朋友一次就能玩到全部 */
+      const ceo = bosses.find(b => b.code === 'ceo') || bosses[0];
+      if (ceo) L.push({ e: { t: 'mon', solo: true, n: '夾褲大魔王', g: '__boss', s: bossSpr(ceo), lobbyBoss: ceo }, tip: '超稀有大魔王夾褲三連戰，打贏拿獎杯。' });
+      L.push({ e: { t: 'mon', solo: true, n: '桃園女子監獄', g: '__prison', s: 'pr_poster', lobbyPrison: 1 }, tip: '體驗被抓進監獄：保釋、服刑或越獄。' });
       return L;
     };
     const paint = () => {
       const G = box.querySelector('.lb-grid');
-      G.innerHTML = list().map((x, i) => { const e = x.e, g = e.g, tip = ((V2_GAMES[g] || GAMES[g] || {}).tip) || ''; let ic = ''; try { ic = sprite(e.ic || e.s); } catch (er) {}
+      G.innerHTML = list().map((x, i) => { const e = x.e, g = e.g, tip = x.tip || ((V2_GAMES[g] || GAMES[g] || {}).tip) || ''; let ic = ''; try { ic = sprite(e.ic || e.s); } catch (er) {}
         return '<button type="button" class="lb-card" data-i="' + i + '"><span class="lb-ic">' + (ic ? '<img alt="" src="' + esc(ic) + '">' : '') + '</span><b>' + esc(e.t === 'mon' && e.solo ? e.n : encName(e)) + '</b><small>' + esc(tip.slice(0, 40)) + '</small></button>'; }).join('');
       G._list = list();
     };
@@ -4688,6 +4692,8 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
       if (ev.target.closest('[data-lb=shop]')) { try { window.open('https://www.sunnu.co/', '_blank'); } catch (e) {} return; }
       const c = ev.target.closest('.lb-card'); if (!c) return; const x = box.querySelector('.lb-grid')._list[+c.dataset.i]; if (!x) return;
       const e = x.e; if (e.train) { trainStart(tp ? tp.id : '', tp ? tp.name : ''); return; }
+      if (e.lobbyPrison) { prisonArrest(); prisonOpen(); return; }
+      if (e.lobbyBoss) { const b = e.lobbyBoss, go = () => bossIntro(b, () => arenaOpen(bossEnc(b, 0))); if (b.code === 'ceo' && !gameState.boss.jiaku.story1) { gameState.boss.jiaku.story1 = true; saveGameState(); storyCard(CEO_LORE.first, go); } else go(); return; }
       arenaOpen({ ...e });
     });
   }
