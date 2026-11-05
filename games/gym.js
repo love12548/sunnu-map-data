@@ -93,8 +93,8 @@ var GymGame = (function () {
   /* ---------- 難度：簡單／普通／困難（愛心數、無敵時間、動物速度、判定大小） ---------- */
   var DFS = {
     easy: { name: '簡單', heal: 1, hp: 9, inv: 2.0, sp: 0.8, hit: 0.85, fall: 1, reset: 0, vault: 1, autoGrab: 1 },
-    normal: { name: '普通', heal: 2, hp: 6, inv: 1.5, sp: 1.0, hit: 1.0, fall: 1, reset: 0 },
-    hard: { name: '困難', heal: 0, hp: 3, inv: 1.0, sp: 1.3, hit: 1.15, fall: 1, reset: 0 }
+    normal: { name: '普通', heal: 2, hp: 6, inv: 1.5, sp: 1.0, hit: 1.0, fall: 1, reset: 0, autoGrab: 1 },
+    hard: { name: '困難', heal: 0, hp: 3, inv: 1.0, sp: 1.3, hit: 1.15, fall: 1, reset: 0, autoGrab: 1 }
   };
   var diffKey = DFS[o.diff] ? o.diff : 'normal', LOCK = !!o.diff, dead = false, raf = 0, reported = false, tmr = 0;
   
@@ -951,15 +951,15 @@ var GymGame = (function () {
     if (W.hold && !W.done) txt('點一下繼續往前', WF / 2, 70, 11, '#ffe38a');
     if (W.banner) { var bt = W.banner.t, ba = bt < 0.3 ? bt / 0.3 : bt > 2 ? (2.4 - bt) / 0.4 : 1; g.globalAlpha = Math.max(0, ba); g.fillStyle = 'rgba(30,20,40,.62)'; g.fillRect(0, 96, WF, 36); txt(W.banner.txt, WF / 2, 114, 18, '#ffe38a'); g.globalAlpha = 1; }
     if (p.swing && p.swing.ring.kind === 'break' && p.swing.t > 1) txt('快放手！環要斷了', WF / 2, 70, 11, '#ff9a8a'); else if (p.swing && p.swing.perf) txt('現在放手＝完美！', WF / 2, 70, 11, '#ffe38a');
-    else if (p.swing) txt('◀▶ 偏向一邊　放開按鈕放手', WF / 2, 70, 9, '#fff');
+    else if (p.swing) txt('◀▶ 偏向一邊　點一下放手', WF / 2, 70, 9, '#fff');
     else if (!W.started) {
       txt(LOCK ? '點一下開始（' + DF().name + '）' : '選難度，再點空白處開始', WF / 2, 86, 11, '#fff');
       if (!LOCK) ['easy', 'normal', 'hard'].forEach(function (k, bi) { var d = DFS[k], by = DBTN.y0 + bi * DBTN.dy, on = k === diffKey; g.fillStyle = on ? '#f4c24a' : 'rgba(58,44,32,.78)'; g.fillRect(DBTN.x(), by, DBTN.w, DBTN.h); g.fillStyle = on ? '#7a5532' : 'rgba(255,255,255,.25)'; g.fillRect(DBTN.x(), by + DBTN.h - 3, DBTN.w, 3); txt(d.name + '　' + d.hp + ' 愛心', WF / 2, by + 12, 12, '#fff'); });
-      txt('點＝跳　空中靠近吊環按住＝抓', WF / 2, DBTN.y0 + 3 * DBTN.dy + 8, 9, '#fff');
+      txt('點＝跳　空中靠近吊環自動抓', WF / 2, DBTN.y0 + 3 * DBTN.dy + 8, 9, '#fff');
       if (DEV) TBTN.forEach(function (b) { g.fillStyle = '#3aa86a'; g.fillRect(b.x(), b.y, TB_W, TB_H); g.fillStyle = '#1f6a40'; g.fillRect(b.x(), b.y + TB_H - 3, TB_W, 3); txt(b.t, b.x() + TB_W / 2, b.y + 11, 11, '#fff'); });
       txt(diffKey === 'easy' ? '落水扣 1 顆・每塊平台有愛心可吃' : diffKey === 'normal' ? '落水扣 1 顆・隔一塊平台有愛心' : '落水扣 1 顆・沒有愛心可吃', WF / 2, DBTN.y0 + 3 * DBTN.dy + 24, 9, '#ffe38a');
     }
-    else if (W.t < 10 && !W.done) txt('自動往前跑　點螢幕跳、靠近吊環按住抓', WF / 2, 70, 10, '#fff');
+    else if (W.t < 10 && !W.done) txt('自動往前跑　點螢幕跳、靠近吊環自動抓', WF / 2, 70, 10, '#fff');
     if (W.done && W.gbonus && W.doneT <= 3.2) txt(W.doneT < 1.2 ? '抓到大吊環！+' + W.gbonus : '曬太陽中……', WF / 2, 86, 14, '#ffe38a');
     if (W.done && W.doneT > (W.failed ? 0.3 : 3.2)) {
       g.fillStyle = 'rgba(0,0,0,.6)'; var PY = H - 162; if (W.gbonus) PY = Math.min(PY, Math.max(60, Math.round(GP.y - cam.y + 14)));   // 勝利：結算字放在紅磚牆上（平台頂面下方）
