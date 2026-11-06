@@ -194,10 +194,14 @@ const EMBED = /[?&]embed=1/.test(location.search), DIFF = (/[?&]diff=(easy|norma
 if (EMBED) { $('tip').textContent = '點一下開始'; setTimeout(() => pop(TH.name, W / 2, H * .42, 1800, 'big'), 500); }
 if (EMBED) { document.body.classList.add('embed'); try { parent.postMessage({ dinoReady: 1 }, '*'); } catch (e) { } }
 function report() { if (!EMBED) return; const sc = Math.floor(S.dist / 10); try { parent.postMessage({ sunnuDino: 1, win: S.got >= 4, challenge: S.got >= 4 && sc >= 1000, score: sc, bosses: S.run.boss || 0, ach: Object.keys(ST.got) }, '*'); } catch (e) { } }
+/* 每日挑戰：網址帶 seed＝同一天大家同一關（出怪、道具、魔王用固定種子；雲、星星等裝飾照舊隨機） */
+const DSEED = +((/[?&]seed=(\d+)/.exec(location.search) || [])[1] || 0), mkLR = function(s){let a=s>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};};
+let LR = Math.random;
 /* —— 遊戲狀態 —— */
 const P = { y: 0, vy: 0, duck: false, hold: false, holdT: 0 };
 const S = { phase: 'ready', reveal: 44, speed: 0, dist: 0, obs: [], items: [], got: 0, next: 0, nextItem: 0, t: 0, hi: +(localStorage.getItem('sunnuDinoHI') || 0), clouds: [[80, 30], [200, 50], [290, 24]], stars: [], night: false, blink: 0, ceo: 0, train: null, nextTrain: 0, lastH: 0, lastN: 0, won: false, overAt: 0, boss: null, shots: [], nextBoss: 0, nextCeo: 0, bossN: 0, combo: 0, comboT: 0, mag: 0, stick: 0, shield: 0, seg: '', segT: 0, nextSeg: 0, beam: 0, run: {} };
 function reset(intro) {
+  if (DSEED) LR = mkLR(DSEED);
   Object.assign(S, { phase: 'run', speed: 150, dist: 0, obs: [], items: [], got: 0, next: 320, nextItem: 380, t: 0, blink: 0, ceo: 0, inv: 0, ceoFly: null, train: null, nextTrain: TH.train ? 900 : 1600, lastH: 0, lastN: 0, won: false, boss: null, shots: [], nextBoss: 2200, nextCeo: 1200, bossN: 0, combo: 0, comboT: 0, mag: 0, stick: 0, shield: 0, seg: '', segT: 0, nextSeg: 4500, beam: 0, run: { stomps: 0 } });
   if (!intro) S.reveal = W;
   S.stars = Array.from({ length: 8 }, () => [Math.random() * W, 10 + Math.random() * 50]);
@@ -229,22 +233,22 @@ const KINDS = [
 const STOMP = { mini: 1, fly: 1, mon: 1 };   /* 小弟和小怪可以從上面踩下去 */
 function pickKind() {
   const sc = S.dist / 10, pool = KINDS.filter(o => sc >= o.min), ws = pool.map(o => (o.w0 === 0 ? 0 : 1) + (TH.extra[o.k] || 0)), tot = ws.reduce((a, b) => a + b, 0);
-  let r = Math.random() * tot; for (let i = 0; i < pool.length; i++) { r -= ws[i]; if (r <= 0) return pool[i]; } return pool[0];
+  let r = LR() * tot; for (let i = 0; i < pool.length; i++) { r -= ws[i]; if (r <= 0) return pool[i]; } return pool[0];
 }
 function spawn() {
-  const o = pickKind(), im = spr(o.k === 'bird' ? 'birdA' : o.k === 'spin' ? 'spinA' : o.k === 'mini' ? 'miniA' : o.k === 'fly' ? 'flyA' : o.k), n = o.grp && S.speed > 180 ? 1 + Math.floor(Math.random() * (S.speed > 230 ? 3 : 2)) : 1;
-  for (let i = 0; i < n; i++) S.obs.push({ k: o.k, w: im.width, h: im.height, x: W + 10 + i * (im.width + 1), y: o.k === 'bird' ? [4, 13, 28][Math.floor(Math.random() * 3)] : o.k === 'fly' ? [13, 13, 28][Math.floor(Math.random() * 3)] : 0, vx: o.vx || 1, said: false, hop: Math.random() * 3 });
-  S.next = S.speed * (0.85 + Math.random() * 0.9) + 70 + (n - 1) * 20;
+  const o = pickKind(), im = spr(o.k === 'bird' ? 'birdA' : o.k === 'spin' ? 'spinA' : o.k === 'mini' ? 'miniA' : o.k === 'fly' ? 'flyA' : o.k), n = o.grp && S.speed > 180 ? 1 + Math.floor(LR() * (S.speed > 230 ? 3 : 2)) : 1;
+  for (let i = 0; i < n; i++) S.obs.push({ k: o.k, w: im.width, h: im.height, x: W + 10 + i * (im.width + 1), y: o.k === 'bird' ? [4, 13, 28][Math.floor(LR() * 3)] : o.k === 'fly' ? [13, 13, 28][Math.floor(LR() * 3)] : 0, vx: o.vx || 1, said: false, hop: LR() * 3 });
+  S.next = S.speed * (0.85 + LR() * 0.9) + 70 + (n - 1) * 20;
 }
 function spawnItem() {
   /* 夾褲固定出場：第 120 分左右第一次，之後每跑約 250 分再來一次；其他道具偶爾出現 */
-  const r = Math.random(), ceo = S.dist >= S.nextCeo && S.ceo <= 0, pw = !ceo && r < .14 && S.dist > 500;
-  const k = ceo ? 'ceo' : pw ? ['power', 'stick', 'drink'][Math.floor(Math.random() * 3)] : S.got >= 4 ? 'wifi' : r < .8 ? 'bar' : S.got >= 1 ? 'wifi' : 'bar';
-  if (ceo) S.nextCeo = S.dist + 2200 + Math.random() * 800;
-  const it = { k, x: W + 10, y: k === 'ceo' ? 0 : pw ? 10 : [8, 8, 28, 42][Math.floor(Math.random() * 4)] }; S.items.push(it);
+  const r = LR(), ceo = S.dist >= S.nextCeo && S.ceo <= 0, pw = !ceo && r < .14 && S.dist > 500;
+  const k = ceo ? 'ceo' : pw ? ['power', 'stick', 'drink'][Math.floor(LR() * 3)] : S.got >= 4 ? 'wifi' : r < .8 ? 'bar' : S.got >= 1 ? 'wifi' : 'bar';
+  if (ceo) S.nextCeo = S.dist + 2200 + LR() * 800;
+  const it = { k, x: W + 10, y: k === 'ceo' ? 0 : pw ? 10 : [8, 8, 28, 42][Math.floor(LR() * 4)] }; S.items.push(it);
   /* 鴿子小偷：飛去叼走訊號牌 */
-  if (k === 'bar' && S.dist > 2000 && Math.random() < .28) S.obs.push({ k: 'bird', w: 14, h: 7, x: W + 80, y: it.y, vx: 1.55, thief: it, hop: 0 });
-  S.nextItem = 560 + Math.random() * 320;
+  if (k === 'bar' && S.dist > 2000 && LR() < .28) S.obs.push({ k: 'bird', w: 14, h: 7, x: W + 80, y: it.y, vx: 1.55, thief: it, hop: 0 });
+  S.nextItem = 560 + LR() * 320;
 }
 function addCombo(x, y) { S.combo = S.comboT > 0 ? S.combo + 1 : 1; S.comboT = 2.5; if (S.combo >= 2) pop('連擊 ×' + Math.min(4, S.combo), x, y - 10, 700, 'plain'); if (S.combo >= 4) unlock('combo4'); return Math.min(4, S.combo); }
 function hurt(cause, obj) {   /* 被打到：夾褲護駕→撞飛；珍奶護盾→擋一次；不然就結束 */
@@ -257,7 +261,7 @@ const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
 function startBoss() {
   S.bossN++; const big = S.bossN >= 4, kind = ['shots', 'minions', 'steal'][(S.bossN - 1) % 3];
   S.boss = { x: W + 20, y: 34, t: 0, shots: kind === 'shots' ? 3 + (S.speed > 220 ? 1 : 0) : kind === 'steal' ? 2 : 1, cd: 1.7, leave: 0, kind, big, hp: big ? 2 : 1, did: 0 };
-  S.nextBoss = 3200 + Math.random() * 1600;
+  S.nextBoss = 3200 + LR() * 1600;
   pop(big ? '！大魔王來了（要踩兩次）' : '！冷門到沒訊號怪來了', W / 2, 36, 1500, 'big'); tone(196, .2, .05, 0, 'sawtooth'); later(220, () => tone(147, .3, .05, 0, 'sawtooth'));
 }
 function step(dt) {
@@ -271,7 +275,7 @@ function step(dt) {
   if (S.reveal >= W) { if (!S.boss) { S.next -= dx; if (S.next <= 0) spawn(); } S.nextItem -= dx; if (S.nextItem <= 0) spawnItem(); }
   /* 路段變化：下坡變快、隧道變暗、颱風跳不高 */
   if (S.seg) { S.segT -= dt; if (S.segT <= 0) S.seg = ''; }
-  else if (S.dist >= S.nextSeg && !S.boss) { S.seg = ['downhill', 'tunnel', 'typhoon'][Math.floor(Math.random() * 3)]; S.segT = 7; S.nextSeg = S.dist + 4500; pop({ downhill: '下坡衝刺！', tunnel: '進隧道了，好暗…', typhoon: '颱風天，跳不高！' }[S.seg], W / 2, 40, 1500, 'big'); }
+  else if (S.dist >= S.nextSeg && !S.boss) { S.seg = ['downhill', 'tunnel', 'typhoon'][Math.floor(LR() * 3)]; S.segT = 7; S.nextSeg = S.dist + 4500; pop({ downhill: '下坡衝刺！', tunnel: '進隧道了，好暗…', typhoon: '颱風天，跳不高！' }[S.seg], W / 2, 40, 1500, 'big'); }
   /* 冷門到沒訊號怪：每次攻擊方式不同；第 4 次起是大魔王（要踩兩次） */
   S.nextBoss -= dx; if (S.nextBoss <= 0 && !S.boss && S.dist > 2000 && !S.seg) startBoss();
   if (S.boss) { const b = S.boss; b.t += dt;
@@ -279,12 +283,12 @@ function step(dt) {
     else { b.x += (W - (b.big ? 56 : 44) - b.x) * Math.min(1, dt * 3); b.y = 34 + Math.sin(b.t * 3) * 5;
       if (b.kind === 'minions' && !b.did && b.t > 1) { b.did = 1; pop('小弟們，排好！', b.x, GY - 70, 900, 'plain'); for (let i = 0; i < 3; i++) S.obs.push({ k: 'mini', w: 9, h: 10, x: W + 20 + i * Math.max(150, S.speed * .85), y: 0, vx: 1.1, hop: i * .7 }); }
       if (b.kind === 'steal' && !b.did && b.t > 1) { b.did = 1; S.beam = .7; if (S.got > 0 && !S.won) { S.got--; paintBars(); pop('訊號被吸走了！', PX + 20, GY - 40, 1200, 'big'); } else pop('沒訊號可以吸了啦', PX + 20, GY - 40, 1000, 'plain'); tone(900, .5, .05, 120, 'sawtooth'); }
-      b.cd -= dt; b.warn = b.shots > 0 && b.cd < .4; if (b.cd <= 0 && b.shots > 0) { b.shots--; b.cd = 1.5;  /* 丟之前 0.4 秒會抖一下、頭上出現驚嘆號 */ const lane = [0, 0, 13, 4][Math.floor(Math.random() * 4)]; S.shots.push({ x: b.x - 4, y: lane, roll: lane === 0 }); tone(330, .1, .04, 160); }
+      b.cd -= dt; b.warn = b.shots > 0 && b.cd < .4; if (b.cd <= 0 && b.shots > 0) { b.shots--; b.cd = 1.5;  /* 丟之前 0.4 秒會抖一下、頭上出現驚嘆號 */ const lane = [0, 0, 13, 4][Math.floor(LR() * 4)]; S.shots.push({ x: b.x - 4, y: lane, roll: lane === 0 }); tone(330, .1, .04, 160); }
       if (b.shots === 0 && b.cd < -.6 && (b.kind !== 'minions' || b.t > 4)) { b.leave = 1; pop('哼！下次再來', b.x, GY - 70, 900, 'plain'); S.next = Math.max(S.next, 160); } } }
   if (S.beam > 0) S.beam -= dt;
   S.shots.forEach(s => s.x -= dx + 30 * dt); S.shots = S.shots.filter(s => s.x > -12 && !s.gone);
   /* 背景火車：冷門車站主題比較常來 */
-  S.nextTrain -= dx; if (S.nextTrain <= 0 && !S.train) { S.train = { x: W + 10 }; S.nextTrain = (TH.train ? 1400 : 2600) + Math.random() * 1800; tone(330, .35, .03, 0, 'sawtooth'); later(380, () => tone(262, .5, .03, 0, 'sawtooth')); }
+  S.nextTrain -= dx; if (S.nextTrain <= 0 && !S.train) { S.train = { x: W + 10 }; S.nextTrain = (TH.train ? 1400 : 2600) + LR() * 1800; tone(330, .35, .03, 0, 'sawtooth'); later(380, () => tone(262, .5, .03, 0, 'sawtooth')); }
   if (S.train) { S.train.x -= dx * .45 + 40 * dt; if (S.train.x < -130) S.train = null; }
   S.obs.forEach(o => { o.x -= dx * o.vx; if (o.k === 'mini' && !o.dead) { o.hop += dt; o.y = Math.abs(Math.sin(o.hop * 4.2)) * 15; } if (o.dead) o.dead -= dt; if (o.fly) { o.fx += o.fly[0] * dt; o.fly[1] += 900 * dt; o.fyy += o.fly[1] * dt; }
     if (o.k === 'abe' && !o.said && o.x < W - 40) { o.said = true; pop('那邊有訊號啦！', o.x + 10, GY - 22, 1100); }
