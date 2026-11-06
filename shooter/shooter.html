@@ -103,6 +103,8 @@ button:active{transform:translateY(3px);box-shadow:none}
   <p class="help">電腦：方向鍵移動，X 鍵超載（熱血槽滿時），拿到光束炮會持續射擊，消耗熱血槽，空白鍵或 F 開始。</p>
 </div>
 <script>
+/* 每日挑戰：網址帶 seed＝整局亂數用固定種子（同一天大家從同一關、同樣的敵人開始） */
+(function () { const m = /[?&]seed=(\d+)/.exec(location.search); if (m) Math.random = (function(s){let a=s>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};})(+m[1]); })();
 const EMB = /[?&]embed=1/.test(location.search), DF = ((location.search.match(/[?&]diff=(easy|normal|hard)/) || [])[1]) || 'normal';
 /* 三種難度（只在嵌入地圖時生效）。每個數值依關卡 [第1關,第2關,第3關]；start＝開局配置 */
 const Z = {
