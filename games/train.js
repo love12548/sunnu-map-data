@@ -767,7 +767,7 @@ var TrainGame = (function () {
     function pause(on) {
       if (on && st.mode === 'play') { st.mode = 'paused'; clearInput(); au.sfx('pause'); } else if (!on && st.mode === 'paused') { st.mode = 'play'; clearInput(); last = performance.now(); au.sfx('pause'); }
     }
-    function restart() { st.board = null; st.notch = NMID; if (RT) { RT.total = 0; RT.stops = 0; RT.fails = 0; RT.stars3 = 0; RT.results = []; RT.best = routeBest(); RT.newBest = false; useStn(RT.infos[0]); setTrain(RT.infos[0].full); st.region = null; sim = TrainSim.createRoute(diffKey, { lines: RT.lines, startX: 0 }); st.mode = 'idle'; st.stopCard = false; st.msg = null; st.t = 0; st.acc = 0; st.resT = 0; st.reported = false; st.saved = false; clearInput(); return; } sim = TrainSim.create(diffKey, sdOpts()); st.tut = tutSeen ? -1 : 0; st.mode = 'countdown'; st.cd = o.fastStart ? 1.2 : 3.2; st.t = 0; st.acc = 0; st.resT = 0; st.reported = false; st.saved = false; st.newBest = false; st.best = loadBest(); clearInput(); }
+    function restart() { st.board = null; st.ani = null; st.notch = NMID; if (RT) { RT.total = 0; RT.stops = 0; RT.fails = 0; RT.stars3 = 0; RT.results = []; RT.best = routeBest(); RT.newBest = false; useStn(RT.infos[0]); setTrain(RT.infos[0].full); st.region = null; sim = TrainSim.createRoute(diffKey, { lines: RT.lines, startX: 0 }); st.mode = 'idle'; st.stopCard = false; st.msg = null; st.t = 0; st.acc = 0; st.resT = 0; st.reported = false; st.saved = false; clearInput(); return; } sim = TrainSim.create(diffKey, sdOpts()); st.tut = tutSeen ? -1 : 0; st.mode = 'countdown'; st.cd = o.fastStart ? 1.2 : 3.2; st.t = 0; st.acc = 0; st.resT = 0; st.reported = false; st.saved = false; st.newBest = false; st.best = loadBest(); clearInput(); }
     function down(e) {
       if (dead) return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} var p = rel(e), px = p.x * CW - UX, py = p.y * H; au.ensure();
       if (st.mode === 'result') {
@@ -821,7 +821,9 @@ var TrainGame = (function () {
     function makeBoard() {
       var T0 = 0.8, doorX = FX + DOOR_DX, lnX = RT && st.cardR ? FX + (RT.lines[st.cardR.idx] - sim.x) * PPM : FX + sim.dist * PPM, sx = Math.min(CW + 10, lnX + 50 * PPM - 8), wG = 1.15, wC = 1.5, g1 = T0 + wG, c0 = T0 + 0.3, c1 = c0 + wC, inT = 0.32, last = Math.max(g1, c1) + inT, close = last + 0.15, dep = close + 0.55, end = dep + 1.0;
       if (KIND === 'funny') return { T0: 0.2, doorX: doorX, sx: sx, g0: 0.2, g1: 0.2, c0: 0.2, c1: 0.2, inT: 0.1, close: 0.3, dep: 1e9, end: 0.6, t: 0, sfx: {}, none: true };   /* 孫女夾褲列車：沒有上車表演，停好直接結算 */
-      return { T0: T0, doorX: doorX, sx: sx, g0: T0, g1: g1, c0: c0, c1: c1, inT: inT, close: close, dep: dep, end: end, t: 0, sfx: {} };
+      var bd = { T0: T0, doorX: doorX, sx: sx, g0: T0, g1: g1, c0: c0, c1: c1, inT: inT, close: close, dep: dep, end: end, t: 0, sfx: {} };
+      if (RT && !sim.done && Math.random() < 0.3) bd.run = { t0: end - 0.6, t1: end + 1.4 };   /* 隨機事件：趕車乘客（等他上車有獎勵，直接開走他就沒趕上） */
+      return bd;
     }
     function R0() { return st.board ? st.board.end + 0.1 : 0.7; }   /* 結算畫面出現的時間 */
     function boardSfx(b, key, at, name) { if (!b.sfx[key] && st.resT >= at) { b.sfx[key] = 1; au.sfx(name); } }
@@ -838,7 +840,7 @@ var TrainGame = (function () {
       q.putImageData(o, 0, 0); OUT[key] = c; return c;
     }
     function drawBoard() {
-      var b = st.board; if (!b || b.none || (sim.phase !== 'result' && !(RT && sim.phase === 'dwell'))) return; var t = st.resT, door = t >= b.T0 && t < b.close;
+      var b = st.board; if (!b || b.none || (sim.phase !== 'result' && !(RT && sim.phase === 'dwell'))) return; var t = st.resT, door = t >= b.T0 && (t < b.close || (b.run && t >= b.run.t0 && t < b.run.t1 + b.inT + 0.1));
       boardSfx(b, 'open', b.T0, 'dooropen'); boardSfx(b, 'close', b.close, 'doorclose'); boardSfx(b, 'horn', b.dep - 0.1, 'go');
       var by = RAIL + 10 - (NOWHEEL[KIND] && !(o.bogie && (KIND === 'puyuma' || KIND === 'emu3000')) ? 27 : 32) * TS, dx0 = b.doorX - 4;
       /* 開著的車門：深色門洞 */
@@ -853,12 +855,32 @@ var TrainGame = (function () {
       var BA = CH.ba || CH.a, BB = CH.ba ? CH.bb : CH.b;   /* 上車表演固定用原本的孫女，不跟造型 */
       walker(BA, BB, b.g0, b.g1, !BB || !BB.complete || !BB.naturalWidth);
       walker(CH.ceo, null, b.c0, b.c1, true, true);
+      var rn = b.run; if (rn && t >= rn.t0 && t < rn.t1 + b.inT) {   /* 趕車乘客：提公事包的上班族，從月台跑過來 */
+        var ru = Math.min(1, (t - rn.t0) / (rn.t1 - rn.t0)), rx = Math.round(b.sx + (b.doorX - b.sx) * ru), rin = t > rn.t1 ? Math.min(1, (t - rn.t1) / b.inT) : 0, ry = Math.round(feet - 16 - rin * 10 - (Math.floor(t * 9) % 2 ? 1 : 0)), lg = Math.floor(t * 9) % 2;
+        g.globalAlpha = 1 - rin * 0.9; R(g, INK, rx - 4, ry - 1, 9, 17); R(g, '#3a4a6a', rx - 3, ry + 5, 7, 6); R(g, '#f0c9a0', rx - 3, ry, 7, 5); R(g, '#2a2319', rx - 3, ry, 7, 2); R(g, '#fff6dc', rx - 1, ry + 5, 3, 3); R(g, '#c0453c', rx, ry + 6, 1, 3);
+        R(g, '#2a2a3a', rx - 3 + (lg ? -1 : 1), ry + 11, 2, 4); R(g, '#2a2a3a', rx + 1 - (lg ? -1 : 1), ry + 11, 2, 4); R(g, INK, rx + 4, ry + 8, 4, 4); R(g, '#8a5a2a', rx + 5, ry + 9, 2, 2); g.globalAlpha = 1;
+        if (t < rn.t1) { var sw = 5 * 11 + 8; R(g, INK, rx - sw / 2 - 1, ry - 18, sw + 2, 15); R(g, '#fff6dc', rx - sw / 2, ry - 17, sw, 13); txt('等等我～！', rx, ry - 10, 11, '#3b2a1e', 'center', false); }
+      }
+      if (rn && rn.done && t < rn.t1 + b.inT + 1.6) { var tw2 = 9 * 11 + 8, tx2 = Math.max(tw2 / 2 + 2, Math.min(CW - tw2 / 2 - 2, b.doorX)), ty2 = feet - 44; R(g, INK, tx2 - tw2 / 2 - 1, ty2 - 1, tw2 + 2, 15); R(g, '#ffd95a', tx2 - tw2 / 2, ty2, tw2, 13); txt('謝謝司機！　+80', tx2, ty2 + 7, 11, '#3b2a1e', 'center', false); }
+    }
+    function drawAni() {   /* 軌道上的動物（側面像素小圖） */
+      var an = st.ani; if (!an) return; var A2 = ANI[an.k], ax = Math.round(FX + (an.x - sim.x) * PPM), ay = RAIL + 4, al = 1;
+      if (an.st === 1) { ax += Math.round(an.t * 40); ay += Math.round(an.t * 14); al = Math.max(0, 1 - an.t / 1.6); }
+      else if (an.st === 2) { ax += Math.round(an.t * 70); ay -= Math.round(Math.max(0, 60 * an.t - 50 * an.t * an.t)); al = Math.max(0, 1 - an.t / 1.6); }
+      if (!an.st && ax > CW - 4 && an.warn) txt('前方 ' + Math.round(an.x - sim.x) + ' m 有' + A2.n + '！', CW - 6, RAIL - 30, 11, Math.floor(st.t * 4) % 2 ? '#ffd95a' : '#fff6dc', 'right');
+      if (ax < -20 || ax > CW + 20) return; var hop = !an.st && Math.floor(st.t * 3) % 2 ? -1 : 0; g.globalAlpha = al;
+      if (an.k === 1) { R(g, INK, ax - 5, ay - 10 + hop, 10, 9); R(g, A2.c, ax - 4, ay - 9 + hop, 8, 7); R(g, '#e84a3a', ax - 3, ay - 12 + hop, 3, 2); R(g, '#e8a020', ax - 7, ay - 7 + hop, 2, 2); R(g, INK, ax - 3, ay - 8 + hop, 1, 1); R(g, '#e8a020', ax - 2, ay - 1, 1, 2); R(g, '#e8a020', ax + 1, ay - 1, 1, 2); }
+      else { R(g, INK, ax - 7, ay - 9 + hop, 15, 7); R(g, A2.c, ax - 6, ay - 8 + hop, 13, 5); R(g, INK, ax - 9, ay - 12 + hop, 6, 6); R(g, A2.c, ax - 8, ay - 11 + hop, 4, 4); R(g, A2.d, ax - 8, ay - 13 + hop, 2, 2); R(g, INK, ax - 8, ay - 10 + hop, 1, 1); R(g, A2.d, ax + 7, ay - 11 + hop, 2, 3); R(g, A2.d, ax - 5, ay - 3, 2, 3); R(g, A2.d, ax + 4, ay - 3, 2, 3); }
+      g.globalAlpha = 1;
     }
     function trainShift() { if (RT) return 0; var b = st.board; if (!b || sim.phase !== 'result' || st.resT < b.dep) return 0; var u = st.resT - b.dep; return Math.round(0.5 * 180 * u * u + 6 * u); }
 
     /* 路線模式：每站的結果、繼續開、結算 */
     function cardBtn() { return { x: W - 8 - 60 - 4, y: HUDH + 18 + 66, w: 60, h: 20 }; }
-    function routeResume() { sim.phase = 'play'; sim.brk = 0; st.board = null; st.resT = 0; st.stopCard = false; au.sfx('go'); still = false; }
+    var ANI = [{ n: '狗狗', c: '#b8763a', d: '#7a4a1e' }, { n: '小雞', c: '#fff6dc', d: '#e8c060' }, { n: '貓咪', c: '#f0a050', d: '#b86a2a' }];   /* 隨機事件：軌道上的動物 */
+    function routeResume() { var rb = st.board && st.board.run; if (rb && !rb.done) st.msg = { text: '趕車的乘客沒搭上…', t: 1.4 };
+      if (RT && !sim.done && Math.random() < 0.25) { var nl = RT.lines[sim.sidx]; if (nl - sim.x > 450) st.ani = { x: sim.x + (nl - sim.x) * (0.4 + Math.random() * 0.2), k: Math.floor(Math.random() * ANI.length), st: 0, t: 0 }; }
+      sim.phase = 'play'; sim.brk = 0; st.board = null; st.resT = 0; st.stopCard = false; au.sfx('go'); still = false; }
     function onStation(r) {
       var lt = legTop; legTop = 0;
       if (r.win) { RT.total += r.score; RT.stops++; if (r.stars === 3) RT.stars3++; } else if (r.why !== 'miss') { RT.fails++; if (o.onFail) { try { o.onFail(KIND); } catch (e) {} } }   /* 不想停的站直接開過去不算失誤；停車失敗才算 */ RT.results.push(r); st.flash = 0.1;
@@ -1122,7 +1144,7 @@ var TrainGame = (function () {
       TScene.poles(g, CW, RAIL, scroll);
       var vis = []; for (var i = 0; i < n; i++) { var x0 = lx(i); if (x0 > -420 && x0 < CW + 420) vis.push(i); }
       vis.forEach(function (i) { TScene.propsBack(g, CW, RAIL, lx(i), RT.infos[i].full, T); TScene.station(g, CW, RAIL, lx(i), T, txt, RT.infos[i]); });
-      TScene.tracks(g, CW, RAIL, scroll, null);
+      TScene.tracks(g, CW, RAIL, scroll, null); drawAni();
       vis.forEach(function (i) { TScene.propsFront(g, CW, RAIL, lx(i), RT.infos[i].full, T); });
       if (TOD !== 'day') todDim(vis.map(lx));
       var nxt = sim.done ? -1 : sim.sidx;
@@ -1138,7 +1160,7 @@ var TrainGame = (function () {
       R(g, 'rgba(27,23,18,.82)', 0, 0, CW, HUDH); R(g, '#fff6dc', 0, HUDH - 1, CW, 1); g.save(); g.translate(UX, 0);
       /* 左：下一站（小標籤＋大站名）；右：分數或倒數（小標籤＋大數字）；最右：暫停。時速在下方儀表，不在這裡重複 */
       var nm = sim.done ? '終點到了' : String(RT ? RT.infos[sim.sidx].name : (NAMEFIX[STN.full] || STN.full)).replace(/(火)?車站$/, '');
-      txt(sim.done ? '' : (RT ? '下一站' : '停靠'), 6, 11, 11, '#c9bda5', 'left'); txt(nm, 6, 29, 22, '#fff6dc', 'left');
+      var dly = RT && !sim.done && o.isDaily && o.isDaily(RT.infos[sim.sidx].full); txt(sim.done ? '' : (RT ? (dly ? '下一站　★今日任務站' : '下一站') : '停靠'), 6, 11, 11, dly ? '#ffd95a' : '#c9bda5', 'left'); txt(nm, 6, 29, 22, '#fff6dc', 'left');
       var tl = RT ? P.tMax : sim.phase === 'play' || st.mode === 'paused' || sim.phase === 'result' ? Math.max(0, P.tMax - sim.t) : P.tMax;
       txt(RT ? '分數' : '剩餘', W - 32, 11, 11, '#c9bda5', 'right'); txt(RT ? String(RT.total) : Math.ceil(tl) + 's', W - 32, 29, 22, RT ? '#ffd95a' : tl < 10 ? '#ec6a5c' : '#fff6dc', 'right');
       var px = W - 24; R(g, INK, px - 1, 11, 20, 20); R(g, '#fff6dc', px, 12, 18, 18); R(g, '#5b4a2e', px + 5, 15, 3, 12); R(g, '#5b4a2e', px + 10, 15, 3, 12);
@@ -1243,11 +1265,19 @@ var TrainGame = (function () {
       }
       if (RT && st.mode === 'play' && sim.phase === 'dwell') {
         st.resT += dt; applyInput();
+        var rb2 = st.board && st.board.run; if (rb2) { if (!rb2.warn && st.resT >= rb2.t0) { rb2.warn = 1; au.sfx('step'); } if (!rb2.done && st.resT >= rb2.t1 + st.board.inT) { rb2.done = 1; RT.total += 80; RT.runner = (RT.runner || 0) + 1; au.sfx('good'); } }
         if (sim.done) { if (st.resT > st.board.end + 1.2) finishRoute(); }
         else if (st.inp.lever > 0 && st.resT > st.board.end - 0.3) routeResume();
       }
       if (RT && sim.phase !== 'result') { var ri = RT.infos.length - 1; for (var qi = 0; qi < RT.bounds.length; qi++) if (sim.x < RT.bounds[qi]) { ri = qi; break; } if (ri !== st.region) { var pv = st.region; st.region = ri; var inf = RT.infos[ri]; var setTrainChanged = setTrain(inf.full); if (setTrainChanged || (pv != null && RT.infos[pv].line !== inf.line)) { var tn = KIND === 'alishan' ? '阿里山小火車' : KIND === 'diesel' ? '柴聯車' : '電聯車', ln = inf.line || ''; st.msg = { text: (setTrainChanged ? '換乘 ' + tn : '進入 ' + ln) + (setTrainChanged && ln && (tn + ln).length <= 7 ? '・' + ln : ''), t: 2.6 }; } } }
       if (st.msg) { st.msg.t -= dt; if (st.msg.t <= 0) st.msg = null; }
+      if (st.ani && RT && sim.phase === 'play') { var an = st.ani, ad = an.x - sim.x, anm = ANI[an.k].n;
+        if (!an.st) {
+          if (!an.warn && ad < 260) { an.warn = 1; st.msg = { text: '前方軌道上有' + anm + '！減速到 25 以下', t: 2.2 }; au.sfx('horn'); }
+          if (ad < Math.min(70, (CW - FX) / PPM - 4) && sim.v * 3.6 <= 25) {   /* 動物進到畫面裡、車速 25 以下牠才跳開 */ an.st = 1; RT.total += 100; RT.ani = (RT.ani || 0) + 1; st.msg = { text: anm + '安全離開了 +100', t: 1.6 }; au.sfx('good'); }
+          else if (ad < 6) { an.st = 2; st.msg = { text: '嚇到' + anm + '了…牠逃走了', t: 1.6 }; au.sfx('fail'); }
+        } else { an.t += dt; if (an.t > 1.6) st.ani = null; }
+      }
       if (sim.phase === 'result') {
         st.resT += dt;
         if (!RT && !st.reported && st.resT > R0() + 1.7) { st.reported = true; var r = sim.result; if (!r.win && o.onFail) { try { o.onFail(KIND); } catch (e) {} } if (o.onEnd) { try { o.onEnd({ win: r.win, challenge: r.challenge, stars: r.stars, score: r.score, err: r.err, absErr: r.absErr, grade: r.grade, why: r.why, time: r.time }); } catch (e) { if (window.console) console.error(e); } } }

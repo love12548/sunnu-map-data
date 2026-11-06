@@ -81,6 +81,14 @@ var GymGame = (function () {
   var ENS = [];
   /* 彩色魚乾（每區 5 條，先做第 1 區）：放在要抓環盪高或空中拿的位置，收滿 5 條有獎勵 */
   var CFISH = [];
+  /* 限時收集：三個主要區各 5 片金魚鱗，進區開始計時（在隱藏室裡不計時），時間內撿齊有獎勵。
+     位置取自實際路線：吊環擺到最低點（環 y＋10）的位置，以及要在平台上跳起來才撿得到的高處（平台 y−72） */
+  var TCH = [
+    { z: 0, sec: 22, pts: [[485, 355], [880, 273], [985, 288], [1125, 270], [1420, 233]] },
+    { z: 1, sec: 26, pts: [[1955, 245], [2120, 176], [2410, 185], [2790, 103], [2855, 130]] },
+    { z: 5, sec: 24, pts: [[11890, 275], [12035, 265], [12200, 228], [12850, 233], [13160, 262]] }
+  ];
+  function tchLim(c) { return c.sec * ({ easy: 1.3, hard: 0.85 }[diffKey] || 1); }
   ZONES.forEach(function (z) {
     z.plats.forEach(function (q) { LV.plats.push({ x: q[0], y: q[1], w: q[2], st: q[3], h: q[4] || LV.bottom - q[1] }); });
     z.rings.forEach(function (r) { var o = r[2] || {}; LV.rings.push({ x: r[0], y: r[1], R: 70, kind: o.kind || '', cx: r[0], ax: o.ax || 0, per: o.per || 3, ph: o.ph || 0 }); });
@@ -235,7 +243,7 @@ var GymGame = (function () {
     var rooms = 0, gold = 0;
     for (var ri = 0; ri < 4; ri++) { var tot = 0, got = 0; W.rc.forEach(function (c) { if (c.r === ri && !c.gold) { tot++; if (c.got) got++; } }); if (tot && got >= tot) rooms++; }
     W.rc.forEach(function (c) { if (c.gold && c.got) gold++; });
-    return { cf: W.cfN, vaults: W.vaults || 0, rooms: rooms, gold: gold, lives: Math.max(0, W.hp), titles: W.titles.slice(), zone: W.zi };
+    return { tc: W.tcOk || 0, cf: W.cfN, vaults: W.vaults || 0, rooms: rooms, gold: gold, lives: Math.max(0, W.hp), titles: W.titles.slice(), zone: W.zi };
   }
   function mkHearts() {                                           // 平台上的愛心：簡單每塊平台一顆、普通隔一塊一顆、困難沒有
     var out = [], n = 0, heal = DF().heal; if (!heal) return out;
@@ -246,7 +254,7 @@ var GymGame = (function () {
   function newWorld() {
     var cp = { x: 40, y: 380 };
     return { t: 0, p: { x: cp.x, y: cp.y, vx: 0, vy: 0, face: 1, on: true, coy: 0, jbuf: 0, jumping: false, spinT: 0, stun: 0, swing: null, rel: 0, dead: 0, inv: 0 },
-      rc: ROOM_COINS.map(function (c) { return { x: c.x, y: c.y, v: c.v, gold: c.gold, r: c.r, b: c.b, got: false }; }), bx: [], rcN: 0, rcn: [0, 0, 0], cf: CFISH.map(function () { return false; }), cfN: 0, hs: mkHearts(), safe: null, bub: null, titles: [], rsp: null, wk: 0, oxy: 0, qUsed: {}, qOn: [Math.random() < 0.5, Math.random() < 0.5, Math.random() < 0.5], ret: null, cp: cp, zi: 0, banner: null,   failed: false, hp: DF().hp, maxHp: DF().hp, kills: 0, faints: 0, en: mkEnemies(), pa: false, pops: [], fx: [], flips: 0, falls: 0, score: 0, perfects: 0, started: false, fl: { n: 0, pts: 0 }, done: false, doneT: 0, clean: true };
+      rc: ROOM_COINS.map(function (c) { return { x: c.x, y: c.y, v: c.v, gold: c.gold, r: c.r, b: c.b, got: false }; }), bx: [], rcN: 0, rcn: [0, 0, 0], cf: CFISH.map(function () { return false; }), cfN: 0, tc: TCH.map(function (c) { return { got: c.pts.map(function () { return false; }), n: 0, el: 0, ok: false, fail: false }; }), tcOk: 0, hs: mkHearts(), safe: null, bub: null, titles: [], rsp: null, wk: 0, oxy: 0, qUsed: {}, qOn: [Math.random() < 0.5, Math.random() < 0.5, Math.random() < 0.5], ret: null, cp: cp, zi: 0, banner: null,   failed: false, hp: DF().hp, maxHp: DF().hp, kills: 0, faints: 0, en: mkEnemies(), pa: false, pops: [], fx: [], flips: 0, falls: 0, score: 0, perfects: 0, started: false, fl: { n: 0, pts: 0 }, done: false, doneT: 0, clean: true };
   }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function pop(W, x, y, txt, col) { var sn = POPS[txt] || (txt.indexOf('擊退') === 0 ? 'kill' : txt.indexOf('連續空翻') === 0 ? 'flip' : txt.indexOf('抓到') === 0 ? 'grab' : ''); if (sn) sfx(sn); W.pops.push({ x: x, y: y, t: 0, txt: txt, col: col || '#fff' }); }
@@ -305,6 +313,13 @@ var GymGame = (function () {
     var ri = roomIdx(p.x);
     if (ri >= 1 && p.on && !p.swing && !W.slide) { var rq = null; LV.plats.forEach(function (q) { if (p.x >= q.x && p.x <= q.x + q.w && Math.abs(q.y - HBH / 2 - p.y) < 6) rq = q; }); W.rsp = { x: rq ? Math.min(p.x - 10, Math.max(rq.x + 50, p.x - 260)) : p.x - 10, y: p.y }; }   /* 回上一段：退回平台前段（至少退 260 px 或到平台起點 +50），不會又掉一次 */       // 隱藏室 2–4 沒有水：掉下去回到最後站的地方
     var zi = zoneIdx(p.x); if (zi !== W.zi) { if (zi > W.zi) { W.banner = { txt: ZONES[zi].name, t: 0 }; sfx('zone'); } W.zi = zi; }
+    TCH.forEach(function (c, ci) {                           /* 限時收集：只在那一區、而且不在隱藏室時計時 */
+      var q = W.tc[ci]; if (q.ok || q.fail || W.zi !== c.z || inRoom(p.x)) return;
+      if (W.started && !W.done) q.el += dt;
+      c.pts.forEach(function (pt, k) { if (!q.got[k] && Math.abs(p.x - pt[0]) < 16 && Math.abs(p.y - pt[1]) < 26) { q.got[k] = true; q.n++; W.score += 30; sfx('coin'); pop(W, pt[0], pt[1] - 16, '金魚鱗 ' + q.n + '/5', '#ffe38a'); } });
+      if (q.n >= c.pts.length) { q.ok = true; W.tcOk++; W.score += 400; sfx('zone'); W.banner = { txt: '限時收集達成！+400', t: 0 }; for (var k = 0; k < 14; k++) W.fx.push({ x: p.x, y: p.y - 10, vx: (Math.random() - .5) * 220, vy: -Math.random() * 180, t: 0, life: 0.6, gold: 1 }); }
+      else if (q.el > tchLim(c)) { q.fail = true; pop(W, p.x, p.y - 40, '時間到！金魚鱗飛走了', '#ffb08a'); }
+    });
 
     if (W.slide) {                                          /* ---- 水管溜滑梯：沿管子自動滑，越滑越快，尾端衝出 ---- */
       var sl = W.slide; sl.v = Math.min(300, sl.v + 130 * dt); sl.s += sl.v * dt; p.inv = Math.max(p.inv, 0.05);
@@ -820,6 +835,11 @@ var GymGame = (function () {
     });
     W.hs.forEach(function (h) { if (h.got) return; var hy = h.y + Math.sin(t * 3 + h.x) * 3, hx = h.x - 6; g.fillStyle = 'rgba(255,150,170,' + (0.25 + 0.12 * Math.sin(t * 5)) + ')'; g.beginPath(); g.arc(h.x, hy, 13, 0, 7); g.fill(); g.fillStyle = '#7a1f2c'; g.fillRect(hx - 1, hy - 5, 14, 4); g.fillRect(hx, hy - 7, 4, 3); g.fillRect(hx + 8, hy - 7, 4, 3); g.fillRect(hx, hy - 1, 12, 4); g.fillRect(hx + 2, hy + 3, 8, 3); g.fillRect(hx + 4, hy + 6, 4, 2); g.fillStyle = '#ee4455'; g.fillRect(hx + 1, hy - 6, 3, 2); g.fillRect(hx + 8, hy - 6, 3, 2); g.fillRect(hx, hy - 4, 12, 3); g.fillRect(hx + 1, hy - 1, 10, 3); g.fillRect(hx + 3, hy + 2, 6, 2); g.fillRect(hx + 5, hy + 4, 2, 2); g.fillStyle = '#ffb3bc'; g.fillRect(hx + 2, hy - 5, 2, 1); });
     CFISH.forEach(function (c, i) { if (W.cf[i]) return; var by = c[1] + Math.sin(t * 3 + c[0]) * 2, hue = (t * 120 + i * 60) % 360; g.save(); g.translate(c[0], by); g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.arc(0, 0, 15 + Math.sin(t * 6 + i) * 2, 0, 7); g.fill(); g.fillStyle = '#3a2410'; g.beginPath(); g.ellipse(0, 0, 11, 6.5, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(9, 0); g.lineTo(16, -6); g.lineTo(16, 6); g.fill(); g.fillStyle = 'hsl(' + hue + ',90%,66%)'; g.beginPath(); g.ellipse(0, 0, 10, 5.5, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(9, 0); g.lineTo(15, -5); g.lineTo(15, 5); g.fill(); g.fillStyle = '#fff'; g.fillRect(-7, -2, 9, 1.5); g.restore(); });
+    TCH.forEach(function (c, ci) { var q = W.tc[ci]; if (q.ok || q.fail) return; c.pts.forEach(function (pt, k) { if (q.got[k]) return; var by = pt[1] + Math.sin(t * 3 + pt[0]) * 2;   /* 金魚鱗 */
+      g.fillStyle = 'rgba(255,220,90,' + (0.22 + 0.12 * Math.sin(t * 6 + k)) + ')'; g.beginPath(); g.arc(pt[0], by, 13, 0, 7); g.fill();
+      g.fillStyle = '#7a5208'; g.beginPath(); g.moveTo(pt[0], by - 9); g.quadraticCurveTo(pt[0] + 9, by - 3, pt[0] + 6, by + 6); g.quadraticCurveTo(pt[0], by + 10, pt[0] - 6, by + 6); g.quadraticCurveTo(pt[0] - 9, by - 3, pt[0], by - 9); g.fill();
+      g.fillStyle = '#ffd24a'; g.beginPath(); g.moveTo(pt[0], by - 7); g.quadraticCurveTo(pt[0] + 7, by - 2, pt[0] + 4.5, by + 4.5); g.quadraticCurveTo(pt[0], by + 7.5, pt[0] - 4.5, by + 4.5); g.quadraticCurveTo(pt[0] - 7, by - 2, pt[0], by - 7); g.fill();
+      g.fillStyle = '#fff3b0'; g.fillRect(pt[0] - 3, by - 4, 2, 5); }); });
     drawQBlock(t); drawBoxes(t); if (cam.x + WF > ROOMX - 100 && cam.x < RXS[1]) drawRoomProps(t); if (cam.x + WF > RXS[1]) drawRoomsExtra(t);
     // 終點：跟前面一模一樣的吊環（細繩＋小環＋木架），只是掛上去之後拿來曬乾
     var fy = GP.y, gx = GOAL.x, gy = GOAL.y, bmY = GOAL.beam, gp = W.done && W.gbonus ? 1 : 0;
@@ -943,6 +963,7 @@ var GymGame = (function () {
     g.fillStyle = MUS.on ? 'rgba(244,194,74,.9)' : 'rgba(120,110,100,.9)'; g.fillRect(MBTN.x(), MBTN.y, 22, 14); txt(MUS.on ? '♪' : '✕', MBTN.x() + 11, MBTN.y + 7, 11, '#3a2c20');
     var hsp = W.maxHp > 3 ? 12 : 14; for (var hi = 0; hi < W.maxHp; hi++) { var hx = 8 + hi * hsp; g.fillStyle = hi < W.hp ? '#ee4455' : '#5a4a44'; g.fillRect(hx + 1, 26, 3, 3); g.fillRect(hx + 6, 26, 3, 3); g.fillRect(hx, 27, 10, 3); g.fillRect(hx + 1, 30, 8, 2); g.fillRect(hx + 3, 32, 4, 2); g.fillRect(hx + 4, 34, 2, 1); if (hi < W.hp) { g.fillStyle = '#ff9aa5'; g.fillRect(hx + 2, 27, 1, 1); } }
     if (W.cfN) txt('魚乾 ' + W.cfN + '/' + CFISH.length, 8, 44, 10, '#fff', 'left');
+    TCH.forEach(function (c, ci) { var q = W.tc[ci]; if (q.ok || q.fail || W.zi !== c.z || inRoom(p.x) || W.done) return; var left = Math.max(0, tchLim(c) - q.el); txt('金魚鱗 ' + q.n + '/5　剩 ' + Math.ceil(left) + ' 秒', 8, 44, 11, left < 6 && Math.floor(W.t * 4) % 2 ? '#ff9a8a' : '#ffe38a', 'left'); });
     txt('特技 ' + (W.score + W.fl.pts) + '　擊退 ' + W.kills, WF - 8, 11, 10, '#fff', 'right');
     var near = !p.on && !p.swing && ringNear(p, 60), al = p.swing ? (DF().autoGrab ? '點＝放手' : '放開＝放手') : (p.on ? '點＝跳' : (near ? (DF().autoGrab ? '自動抓環' : '按住＝抓環') : '點＝空翻'));
     if (!W.done) { g.fillStyle = (inp.a ? 'rgba(244,194,74,.9)' : 'rgba(58,44,32,.6)'); g.fillRect(0, H - 40, WF, 40);

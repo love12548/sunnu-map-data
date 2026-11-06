@@ -299,13 +299,13 @@ var JeepSim = (function () {
     return s;
   }
   function gust(s) { var D = s.D, t = s.T2; return D.wind * WINDMUL[s.wave] * (Math.sin(t * 0.9 + s.wph) * 0.6 + Math.sin(t * 2.3 + s.wph * 1.7) * 0.3 + Math.sin(t * 0.37 + s.wph * 0.5) * 0.5); }
-  function mult(s) { return 1 + Math.min(s.combo, 10) * 0.1; }
-  function addCombo(s, n) { s.combo += n; s.bestCombo = Math.max(s.bestCombo, s.combo); }
+  function mult(s) { return (1 + Math.min(s.combo, 10) * 0.1) * (s.fever > 0 ? 2 : 1); }   /* 狂熱模式：分數 ×2 */
+  function addCombo(s, n) { var b = Math.floor(s.combo / 10); s.combo += n; s.bestCombo = Math.max(s.bestCombo, s.combo); if (Math.floor(s.combo / 10) > b) { s.fever = 5; s.fevers = (s.fevers || 0) + 1; s.ev.push({ k: 'fever' }); } }   /* 每滿 10 連擊進 5 秒狂熱 */
   function jxOf(s) { return clamp(s.p, -1.1, 1.1) * 0.8; }
 
   function step(s, dt, inp) {
     if (s.phase === 'win' || s.phase === 'lose') return s;
-    s.t += dt; s.T2 += dt; s.ev.length = 0; var D = s.D, V = s.V, HW = V.hitW;
+    s.t += dt; s.T2 += dt; s.ev.length = 0; var D = s.D, V = s.V, HW = V.hitW; if (s.fever > 0) s.fever -= dt;
     s.wave = Math.min(2, Math.floor(s.T2 / s.waveLen)); var wmul = WAVEMUL[s.wave];
     var fin = s.T2 >= D.T - FIN; if (fin && !s.finale) { s.finale = true; s.finNext = s.T2 + 0.3; s.finIdx = 0; s.ev.push({ k: 'finale' }); } s.finLeft = Math.max(0, D.T - s.T2);
     var stable = Math.abs(s.th) < D.thGood * 1.5 && Math.abs(s.p) < 0.4;
@@ -334,7 +334,7 @@ var JeepSim = (function () {
     if (s.finale && s.T2 >= s.finNext && s.finIdx < D.fin * 2) {
       var k2 = s.finIdx % 2 ? 'bird' : 'tire', d2 = (s.finIdx >> 1) % 2 ? 1 : -1; if (s.finIdx % 2) d2 = -d2;
       s.pend.push({ at: s.T2 + 0.7, dir: d2, kind: k2 }); s.ev.push({ k: 'warnObs', kind: k2, dir: d2 }); s.finIdx++; s.finNext = s.T2 + 1.3 - Math.min(0.25, s.finIdx * 0.04);
-      if (s.finIdx === 3 || s.finIdx === D.fin * 2 - 1) { s.crates.push({ s: clamp(jx + (s.R() - 0.5) * 0.5, -0.9, 0.9), at: s.T2 + 1.1, done: false }); s.ev.push({ k: 'crateWarn' }); }
+      if (s.finIdx === 1 || s.finIdx === 3 || s.finIdx === D.fin * 2 - 1) { var sd = s.R() < 0.5 ? -1 : 1; s.crates.push({ s: clamp(jx + (s.R() - 0.5) * 0.5, -0.9, 0.9), at: s.T2 + 1.1, done: false, ceo: sd }); s.ev.push({ k: 'ceoThrow', sd: sd }); }   /* 決戰：夾褲從場邊丟雞腿骨 */
     }
     for (var pi = s.pend.length - 1; pi >= 0; pi--) {
       var pd = s.pend[pi]; if (s.T2 < pd.at) continue; s.pend.splice(pi, 1);
@@ -586,6 +586,8 @@ var JeepGame = (function () {
     var gy = Math.round(H * 0.66), PX = Math.round(W / 2), PY = gy - 84, LEN = Math.round(Math.min(W, 230) * 0.92), HALF = LEN / 2, THICK = 13, ANG = 1.35;
     var BTN_Y = H - 44, BTN_H = 34;
     function pop(text, x, y, col) { st.pops.push({ text: text, x: x, y: y, age: 0, col: col || '#fff6dc' }); }
+    var CEO_THROW = ['接招！汪！', '雞腿骨給你～', '本 CEO 也要玩！'];   /* 暫代台詞 */
+    function bone(x, y, a) { g.save(); g.translate(Math.round(x), Math.round(y)); g.rotate(a); R(g, K.ink, -8, -2, 16, 5); R(g, '#fff4da', -7, -1, 14, 3); R(g, K.ink, -10, -4, 5, 9); R(g, K.ink, 5, -4, 5, 9); R(g, '#fff4da', -9, -3, 3, 7); R(g, '#fff4da', 6, -3, 3, 7); g.restore(); }
     function banner(text, col, ttl) { st.banners.push({ text: text, col: col || '#ffd95a', age: 0, ttl: ttl || 1.6 }); }
     function buzz(n) { try { if (navigator.vibrate) navigator.vibrate(n); } catch (e) {} }
     function boom(x, y, n, cols) { for (var i = 0; i < n; i++) st.conf.push({ x: x, y: y, vx: (Math.random() - 0.5) * 120, vy: -40 - Math.random() * 90, c: cols[i % cols.length], age: 0, life: 1.4 + Math.random() * 0.6 }); }
@@ -644,6 +646,8 @@ var JeepGame = (function () {
         case 'slip': au.sfx('slip'); pop('打滑！', jp.x, jp.y - 50, '#ec6a5c'); break;
         case 'gustWarn': au.sfx('gustWarn'); st.gustWarn = 1.2; st.gustSg = ev.sg; banner('強風來了！', '#bfe6f5', 1.4); break;
         case 'finale': au.sfx('finale'); banner('特技決戰！', '#ec6a5c', 2.0); st.shake = 0.3; break;
+        case 'ceoThrow': au.sfx('crateWarn'); st.ceoT = 1.3; st.ceoSd = ev.sd; pop(CEO_THROW[Math.floor(Math.random() * CEO_THROW.length)], ev.sd < 0 ? 64 : W - 64, gy - 70, '#ffd95a'); break;
+        case 'fever': au.sfx('stunt'); au.sfx('cheer'); S.cheer = 3; buzz([20, 30, 20]); banner('狂熱模式！分數 ×2', '#ff7ab8', 1.6); boom(W / 2, 110, 30, ['#ff7ab8', '#ffd95a', '#fff6dc', '#78bfe8']); break;
         case 'warn': au.sfx('warn'); st.warnT = 0.6; break;
         case 'perfect': au.sfx('perfect'); au.sfx('cheer'); S.cheer = 2.2; pop('完美平衡！', W / 2, 92, '#ffd95a'); boom(W / 2, 120, 16, ['#ffd95a', '#ec6a5c', '#78bfe8', '#86cf62']); break;
         case 'win': au.sfx('win'); au.sfx('cheer'); S.cheer = 4; boom(W / 2, 90, 80, ['#ffd95a', '#ec6a5c', '#78bfe8', '#86cf62', '#f9b5c4', '#fff6dc']); st.endT = 0; finishWin(); break;
@@ -708,6 +712,7 @@ var JeepGame = (function () {
       txt('分數 ' + sim.score, W - x - 2, by + 20, 11, '#ffd95a', 'right');
       txt('完美 ×' + sim.perfects, W - x - 2, by + 33, 11, '#fff6dc', 'right');
       if (sim.combo >= 2) txt('連擊 ×' + sim.combo, x + 2, by + 20, 11, '#ffd95a', 'left');
+      if (sim.fever > 0) { txt('狂熱 ×2　' + Math.ceil(sim.fever), x + 2, by + 33, 11, Math.floor(st.t * 8) % 2 ? '#ff7ab8' : '#fff6dc', 'left'); R(g, '#ff7ab8', 0, 0, W, 2); R(g, '#ff7ab8', 0, H - 2, W, 2); R(g, '#ff7ab8', 0, 0, 2, H); R(g, '#ff7ab8', W - 2, 0, 2, H); }
       if (sim.streak > 0.2) { panel(W / 2 - 30, by + 34, 60, 7, '#2a2319'); R(g, '#86cf62', W / 2 - 29, by + 35, 58 * Math.min(1, sim.streak / 2.5), 5); }
       var bw1 = Math.round(W * 0.34), bwm = W - bw1 * 2 - 24;
       btn(8, BTN_Y, bw1, BTN_H, '左推', st.inp.left, '#9bd3f2', 'L'); btn(8 + bw1 + 4, BTN_Y, bwm, BTN_H, sim.cool > 0 && sim.air <= 0 ? '緩衝' : '跳', sim.air > 0.2 || (sim.cool > 0 && sim.air <= 0), '#ffd95a', 'U'); btn(W - 8 - bw1, BTN_Y, bw1, BTN_H, '右推', st.inp.right, '#9bd3f2', 'R');
@@ -742,8 +747,12 @@ var JeepGame = (function () {
         if (!cr.done) {
           var u = Math.max(0, Math.min(1, (sim.T2 - (cr.at - 1.1)) / 1.1)), blink2 = Math.floor(st.t * 10) % 2;
           R(g, blink2 ? '#ec4a3c' : '#8e2c3a', sur.x - 13, sur.y - 1, 26, 3); R(g, K.ink, sur.x - 14, sur.y - 2, 28, 1); R(g, K.ink, sur.x - 14, sur.y + 2, 28, 1);
-          var cy0 = -30, cyy = cy0 + (tgt.y - cy0) * u * u; JScene.blitRot(g, IM.crate, tgt.x, cyy, da * u + Math.sin(st.t * 14) * 0.12 * (1 - u), 1);
-        } else { g.globalAlpha = Math.max(0, cr.life / 0.5); JScene.blitRot(g, IM.crate, tgt.x, tgt.y, da, 1); g.globalAlpha = 1; }
+          if (cr.ceo) { var bx0 = cr.ceo < 0 ? 30 : W - 30, by0 = gy - 40, bxx = bx0 + (tgt.x - bx0) * u, byy = by0 + (tgt.y - by0) * u - Math.sin(u * Math.PI) * 70; bone(bxx, byy, st.t * 12); }
+          else { var cy0 = -30, cyy = cy0 + (tgt.y - cy0) * u * u; JScene.blitRot(g, IM.crate, tgt.x, cyy, da * u + Math.sin(st.t * 14) * 0.12 * (1 - u), 1); }
+        } else { g.globalAlpha = Math.max(0, cr.life / 0.5); if (cr.ceo) bone(tgt.x, tgt.y, 0); else JScene.blitRot(g, IM.crate, tgt.x, tgt.y, da, 1); g.globalAlpha = 1; }
+      }
+      if (st.ceoT > 0) {   /* 夾褲從場邊探出來丟東西 */
+        var cpx = st.ceoSd < 0 ? 26 : W - 26, peek = Math.min(1, st.ceoT / 0.3, (1.3 - st.ceoT) / 0.2 + 0.2); g.save(); g.translate(cpx, gy - 6 - 22 * peek); if (st.ceoSd > 0) g.scale(-1, 1); g.drawImage(IM.rider, -13, -13); g.restore();
       }
       /* 小鳥、輪胎 */
       for (var oi = 0; oi < sim.obs.length; oi++) {
@@ -816,7 +825,7 @@ var JeepGame = (function () {
         return;
       }
       if (st.mode !== 'play' || !sim) return;
-      applyPtr(); sim.ev.length = 0; if (st.squash > 0) st.squash -= dt; if (st.knock > 0) st.knock -= dt; if (sim.phase === 'play' && sim.tipT > 0.3) dt *= 0.55;   /* 快翻車時放慢一點，讓人來得及救 */
+      applyPtr(); sim.ev.length = 0; if (st.squash > 0) st.squash -= dt; if (st.ceoT > 0) st.ceoT -= dt; if (st.knock > 0) st.knock -= dt; if (sim.phase === 'play' && sim.tipT > 0.3) dt *= 0.55;   /* 快翻車時放慢一點，讓人來得及救 */
       JeepSim.step(sim, dt, st.inp); st.inp.jump = false;
       if (sim.combo < 5) st.cmb5 = 0; else if (Math.floor(sim.combo / 5) > st.cmb5) { st.cmb5 = Math.floor(sim.combo / 5); au.sfx('cheer'); S.cheer = 2; banner('連擊 ×' + sim.combo + '！', '#ffd95a', 1.2); boom(W / 2, 110, 24, ['#ffd95a', '#ec6a5c', '#78bfe8', '#86cf62', '#f9b5c4']); }
       if (sim.wave !== st.wave) { st.wave = sim.wave; au.sfx('wave'); banner('第' + (sim.wave + 1) + '波　' + JeepSim.WAVE_NAMES[sim.wave], '#ffd95a', 1.8); }
