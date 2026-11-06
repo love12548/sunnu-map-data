@@ -34,7 +34,7 @@ var REC_KEYS = ['sunnuRaceRec', 'sunnuDinoHI', 'sunnuDinoStats', 'sunnuShooterBe
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>鹹水雞小貨車大賽・3D 版</title>
 <style>
-@font-face{font-family:Cubic11;src:url(https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@main/fonts/web/Cubic_11.woff2)}
+@font-face{font-family:Cubic11;src:url(https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.500/fonts/web/Cubic_11.woff2)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{margin:0;height:100%;overflow:hidden;background:#101428;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;touch-action:none}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block}
@@ -170,7 +170,7 @@ body.ended #ctl,body.ended #top,body.ended #bBuy{display:none!important}
 </div></div>
 <div id="err"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
 <script>window.THREE||document.write('<script src="three.min.js"><\/script>')</script>
 <script>/* 鹹水雞小貨車的廣播聲（原創合成，不使用任何現成錄音或旋律）
    特徵參考使用者提供的錄音「感覺」：節奏很快的短樂句反覆播放、中高頻為主的小喇叭擴音器音色、聲音有點破。旋律是我另外寫的。
@@ -372,8 +372,67 @@ function place(o, s, lat, y) { var p = poseAt(s); o.position.set(p.x + lat * Mat
 var TOONG = (function () { var d = new Uint8Array([110, 170, 225, 255]), t = new THREE.DataTexture(d, 4, 1, THREE.LuminanceFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t; })();
 function toonMat(o) { o.gradientMap = TOONG; return new THREE.MeshToonMaterial(o); }
 
+/* ——— 近道（馬力歐賽車式）：從賽道岔出去、繞過大彎內側、再接回來的一條真的路，玩家和電腦車都能開 ———
+   坐標還是「里程 s＋橫向 lat」：近道中心線 scC(q,s) 就是一條 lat 隨 s 變化的曲線（內側 = 彎道 sg 方向）。
+   在彎道內側開，實際走的路比 s 短，所以車在近道上時 s 走得比較快（scFz），這就是省下來的時間。
+   兩種：mud＝泥土小路（略慢、比較窄，誰都能走）；jump＝跳台近道（中間斷一截，要壓過加速板（或自己有 35 以上的速度）才跳得過去，沒跳過去掉水裡回岔路口）。 */
+var SC_HW = 4.4, SC_G = 38;
+function scSmooth(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+function qTheme(s) { var n = 0; while (n < TK.sect.length && s >= TK.sect[n]) n++; return TK.th[n]; }
+var QS = (function () {
+  var out = [];
+  if (TK.akina) return out;   /* 秋名山的髮夾彎內側本來就有水溝過彎，不另外放 */
+  var cors = [], c = 0, cr = TK.cross || [];
+  TURNS.forEach(function (t) { if (Math.abs(t[1]) >= 25) cors.push({ s0: c, s1: c + t[0], sg: t[1] > 0 ? 1 : -1, ang: Math.abs(t[1]) }); c += t[0]; });
+  var blocks = Math.max(1, Math.round(RACE_LEN / 3600));
+  function ok(k, lo, hi, minL) {
+    var L = k.s1 - k.s0, r = L / (k.ang * Math.PI / 180);
+    if (k.s0 < lo || k.s1 > hi || L < minL || L > 170 || k.ang < 35 || r < 27) return false;
+    if (k.sg < 0 && qTheme(k.s0) === 3) return false;   /* 海岸賽道左側是海 */
+    if (nearJump(k.s0 - 40, 70) || nearJump(k.s1 + 30, 70) || inRange(TK.tunnels, k.s0 - 60) || inRange(TK.tunnels, k.s1 + 40) || inRange(TK.mud, k.s0 - 40) || inRange(TK.mud, k.s1 + 30)) return false;
+    if (cr.some(function (x) { return x > k.s0 - 100 && x < k.s1 + 100; }) || TK.sect.some(function (x) { return x > k.s0 - 70 && x < k.s1 + 50; })) return false;
+    return true;
+  }
+  function mk(k, type) {
+    var L = k.s1 - k.s0, r = L / (k.ang * Math.PI / 180), dmax = Math.max(12, Math.min(24, r * .48));
+    var q = { i: out.length, type: type, sg: k.sg, s0: k.s0, s1: k.s1, zs0: k.s0 - 30, zs1: k.s1 + 22, dmax: dmax, hw: type === 'mud' ? SC_HW : SC_HW + .4 };
+    if (type === 'jump') {
+      var mid = (k.s0 + k.s1) / 2; q.G = SC_G; q.gs = mid - q.G / 2 + 4; q.ge = q.gs + q.G; q.vy = 8.5;   /* 落水前在空中約 1.1 秒：要 34 以上的速度才飛得過 38 公尺的缺口 */
+      q.J = { s: q.gs, gap: q.G, glide: false, rise: 0, q: q };
+    }
+    out.push(q); return q;
+  }
+  for (var b = 0; b < blocks; b++) {
+    var lo = b * 3600 + 700, hi = b * 3600 + 3200;
+    var cand = cors.filter(function (k) { return ok(k, lo, hi, 40); }).sort(function (x, y) { return (y.s1 - y.s0) * y.ang - (x.s1 - x.s0) * x.ang; });
+    if (!cand.length) continue;
+    var m = cand[0], jmp = null;
+    cors.filter(function (k) { return ok(k, lo, hi, 70) && (k.s0 > m.s1 + 330 || k.s1 < m.s0 - 330); }).sort(function (x, y) { return (y.s1 - y.s0) - (x.s1 - x.s0); }).some(function (k) { jmp = k; return true; });
+    mk(m, 'mud'); if (jmp) mk(jmp, 'jump');
+  }
+  return out;
+})();
+/* 近道中心線的橫向位置（絕對值，乘 q.sg 才是 lat）：入口緊貼路邊，慢慢岔開到彎道內側最深處，出口再併回來 */
+function scCabs(q, s) { var u = (s - q.zs0) / (q.zs1 - q.zs0); return ROADHALF - .8 + (q.dmax - ROADHALF + .8) * scSmooth(u / .34) * scSmooth((1 - u) / .34); }
+function scC(q, s) { return q.sg * scCabs(q, s); }
+/* 路面左右緣（絕對值）：內緣貼著路緣石，一開始只有一小條（像岔路慢慢長出來），外緣是中心＋半寬 */
+function scEdge(q, s) {
+  var u = (s - q.zs0) / (q.zs1 - q.zs0), c = scCabs(q, s), e = c + q.hw, inn = ROADHALF + .05, tp = scSmooth(u / .1) * scSmooth((1 - u) / .1);
+  return [Math.max(inn, c - q.hw), inn + (e - inn) * tp + 0.001];
+}
+/* 近道路面實際的左右範圍（用來清掉路邊的樹、壓平地形） */
+function scBlock(s, lat) {
+  for (var i = 0; i < QS.length; i++) { var q = QS[i]; if (s < q.zs0 - 8 || s > q.zs1 + 8) continue; var a = lat * q.sg; if (a > ROADHALF + .5 && a < scCabs(q, Math.max(q.zs0, Math.min(q.zs1, s))) + q.hw + 4) return true; }
+  return false;
+}
+function scFlat(s, lat) {   /* 地形壓平係數：近道一帶不要有小山丘擋住路 */
+  var w = 0; for (var i = 0; i < QS.length; i++) { var q = QS[i]; if (s < q.zs0 - 10 || s > q.zs1 + 10) continue; var a = lat * q.sg; if (a <= 0) continue; w = Math.max(w, scSmooth((s - q.zs0 + 10) / 16) * scSmooth((q.zs1 + 10 - s) / 16) * scSmooth((q.dmax + q.hw + 22 - a) / 10)); }
+  return 1 - w;
+}
+/* 在近道上，每走 1 公尺的格子（s）實際上只走了 (1 − K·a) 公尺：越靠內側越短，s 就走得越快 */
+function scFz(q, s, a) { var g = 1 / Math.min(2.2, Math.max(.5, 1 - curvAt(s) * q.sg * a)); return Math.min(2.6, 1 + (g - 1) * (q.type === 'jump' ? 1.8 : 1.5)); }   /* 遊戲加成：近道省的時間要明顯一點（跳台比較冒險，加成更多） */
 
-(function(){var _L=THREE.MeshLambertMaterial;THREE.MeshLambertMaterial=function(o){o=o||{};o.gradientMap=TOONG;return new THREE.MeshToonMaterial(o);};})();
+(function(){var _L=THREE.MeshLambertMaterial;THREE.MeshLambertMaterial=function(o){o=o||{};o.gradientMap=TOONG;delete o.flatShading;return new THREE.MeshToonMaterial(o);};})();
 
 
 /* ——— 場景、燈光、相機 ——— */
@@ -382,8 +441,8 @@ var scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(62, 1, 0.1, 
 scene.fog = new THREE.Fog(0xcdeeff, 40, 250);
 var hemi = new THREE.HemisphereLight(0xffffff, 0x8a8f7a, 0.75); scene.add(hemi);
 var sun = new THREE.DirectionalLight(0xfff3d6, 0.9); sun.position.set(-30, 50, 20); scene.add(sun);
-function resize() {
-  var w = innerWidth || 800, h = innerHeight || 600; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, w < 700 ? 1.75 : 2)); renderer.setSize(w, h, false);
+var PRCAP = 0, PRW = { t: 0, n: 0 }; function resize() {   /* PRCAP：手機掉格時自動降解析度，連續 3 秒平均低於約 40 格／秒就降一級（最低 1）；這檔 build 時用行號切，不可加減行 */
+  var w = innerWidth || 800, h = innerHeight || 600; renderer.setPixelRatio(Math.min(devicePixelRatio || 1, PRCAP || (w < 700 ? 1.75 : 2))); renderer.setSize(w, h, false);
   var asp = w / h; camera.aspect = asp; camera.userData.base = 60 + clamp((1.25 - asp) * 26, 0, 30); camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize); resize();
@@ -471,6 +530,7 @@ var LAMPS = [];
 function themeAt(s) { return TK.th[secOf(s)]; }
 function makeSeg() { var g = new THREE.Group(); scene.add(g); return { g: g, props: g, id: -99999 }; }
 function put(P, o, s, lat, y, yaw) { var h = new THREE.Group(); h.add(o); place(h, s, lat, y || 0); if (yaw) h.rotation.y += yaw;
+  if (QS.length && Math.abs(lat) > ROADHALF + .3 && scBlock(s, lat)) return h;   /* 近道路面上不放樹、房子、路燈 */
   if (TK.akina && Math.abs(lat) > ROADHALF + .5) { var n = roadNear(h.position.x, h.position.z, 24); if (n.i >= 0 && Math.abs(n.i * STEP - s) > 30 && n.d < ROADHALF + 3) return h; if (Math.abs(lat) > ROADHALF + 2) h.position.y = terrH(h.position.x, h.position.z) + (y || 0); }
   P.add(h); return h; }
 
@@ -598,12 +658,53 @@ function fillSeg(sg, id) {
     if (!jp && (th !== 2 || id % 2) && th !== 4 || (th === 4 && id % 3 === 0 && !jp)) { var lp = lamp(side, th); put(P, lp, sc + (side > 0 ? 8 : -4), side * (ROADHALF + .8), 0); }
   });
 }
+/* ——— 路旁風景合併：每段建好後，把外觀設定相同的靜態零件合成一塊來畫（手機每格畫圖次數從約 900 降下來）———
+   顏色不同但其他設定一樣的材質，改用「頂點顏色」合在一起，畫出來的顏色不變。光暈（Sprite）不動，夜晚路燈要用。 */
+var MERGE_MAT = {};
+function mergeSig(m) {
+  return [m.type, m.map ? m.map.uuid : '', m.transparent ? 1 : 0, m.opacity, m.side, m.depthWrite ? 1 : 0, m.blending, m.alphaTest, m.fog ? 1 : 0,
+    m.emissive ? m.emissive.getHex() : '', m.emissiveMap ? m.emissiveMap.uuid : '', m.gradientMap ? m.gradientMap.uuid : ''].join('|');
+}
+function mergeMatOf(sig, m) {
+  if (MERGE_MAT[sig]) return MERGE_MAT[sig];
+  var c = m.clone(); c.color = new THREE.Color(0xffffff); c.vertexColors = true; return (MERGE_MAT[sig] = c);
+}
+function segMerge(sg) {
+  var P = sg.props, inv = new THREE.Matrix4(), mx = new THREE.Matrix4(), nm = new THREE.Matrix3(), buckets = {}, drop = [];
+  (sg.merged || []).forEach(function (m) { P.remove(m); m.geometry.dispose(); }); sg.merged = [];
+  P.updateMatrixWorld(true); inv.copy(P.matrixWorld).invert();
+  P.traverse(function (o) {
+    if (!o.isMesh || !o.visible || Array.isArray(o.material) || o.userData.keep) return;
+    var g = o.geometry; if (!g || !g.attributes.position || g.morphAttributes.position) return;
+    var sig = mergeSig(o.material); (buckets[sig] || (buckets[sig] = { m: o.material, list: [] })).list.push(o); drop.push(o);
+  });
+  Object.keys(buckets).forEach(function (sig) {
+    var b = buckets[sig], n = 0, parts = [];
+    b.list.forEach(function (o) { var g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry; parts.push([o, g]); n += g.attributes.position.count; });
+    var pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3), k = 0, v = new THREE.Vector3();
+    parts.forEach(function (q) {
+      var o = q[0], g = q[1], c = o.material.color || new THREE.Color(0xffffff), P3 = g.attributes.position, N3 = g.attributes.normal, U2 = g.attributes.uv;
+      mx.multiplyMatrices(inv, o.matrixWorld); nm.getNormalMatrix(mx);
+      for (var i = 0; i < P3.count; i++, k++) {
+        v.fromBufferAttribute(P3, i).applyMatrix4(mx); pos[k * 3] = v.x; pos[k * 3 + 1] = v.y; pos[k * 3 + 2] = v.z;
+        if (N3) { v.fromBufferAttribute(N3, i).applyMatrix3(nm).normalize(); nor[k * 3] = v.x; nor[k * 3 + 1] = v.y; nor[k * 3 + 2] = v.z; }
+        if (U2) { uv[k * 2] = U2.getX(i); uv[k * 2 + 1] = U2.getY(i); }
+        col[k * 3] = c.r; col[k * 3 + 1] = c.g; col[k * 3 + 2] = c.b;
+      }
+      if (g !== o.geometry) g.dispose();
+    });
+    var mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); mg.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+    mg.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); mg.setAttribute('color', new THREE.BufferAttribute(col, 3)); mg.computeBoundingSphere();
+    var mm = new THREE.Mesh(mg, mergeMatOf(sig, b.m)); mm.matrixAutoUpdate = false; mm.renderOrder = b.list[0].renderOrder; P.add(mm); sg.merged.push(mm);
+  });
+  drop.forEach(function (o) { if (o.parent) o.parent.remove(o); });
+}
 
 
-var segs = []; for (var q = 0; q < NSEG; q++) segs.push(makeSeg());
+var segs = []; for (var q = 0; q < NSEG; q++) segs.push(makeSeg()); window.__segs = segs;   /* 測試用：比對合併前後畫面 */
 function updateSegs(sp) {
   var base = Math.floor(sp / SEG) - 3, ch = false;
-  for (var i = 0; i < NSEG; i++) { var want = base + i, sg = segs[((want % NSEG) + NSEG) % NSEG]; if (sg.id !== want) { fillSeg(sg, want); ch = true; } }
+  for (var i = 0; i < NSEG; i++) { var want = base + i, sg = segs[((want % NSEG) + NSEG) % NSEG]; if (sg.id !== want) { fillSeg(sg, want); if (!window.__noMerge) segMerge(sg); ch = true; } }
   if (ch) { LAMPS.length = 0; segs.forEach(function (x) { x.g.traverse(function (o) { if (o.isSprite && o.scale.x === 6) LAMPS.push(o); }); }); }
 }
 
@@ -786,7 +887,7 @@ var gndMat = toonMat({ vertexColors: THREE.VertexColors, color: 0xffffff });
 var ZG = [[0x7be04f, 0x6ed346], [0x4fd14a, 0x44c441], [0x35c06a, 0x2fb360], [0xf3dc9a, 0xead08a], [0xf5f9ff, 0xe4edf8], [0x2d6b4a, 0x275f42], [0x2c4a34, 0x27432f]], SIDEW = new THREE.Color(0xf2e4c8), ROCK = new THREE.Color(0xb7a98a);
 function hillAmp(s, side) { var t = themeAt(s); return Math.max(.6, ([3, 8, 6, .8, 12, .8, 10][t]) * (.55 + .45 * Math.sin(s / 61 + side * 2.3))); }
 function gY(s, lat) {
-  var a = Math.abs(lat), side = lat < 0 ? -1 : 1, b = baseY(s), hill = hillAmp(s, side) * smoothS((a - 14) / 40);
+  var a = Math.abs(lat), side = lat < 0 ? -1 : 1, b = baseY(s), hill = hillAmp(s, side) * smoothS((a - 14) / 40) * (QS.length ? scFlat(s, lat) : 1);
   if (themeAt(s) === 3 && side < 0) hill = -1.1 * smoothS((a - 20) / 6);
   return gapAt(s) ? b - 6 + 6 * smoothS((a - 18) / 14) + hill : b - .05 + hill;
 }
@@ -981,6 +1082,48 @@ PINS.forEach(function (c) {
   mkStrip(ar, c.s0 - 34, c.s0 - 4, { y: function (s, l, h) { return h + .05; }, mat: m, vs: 6 });
 });
 function nearCorner(s, m) { for (var i = 0; i < CORNERS.length; i++) if (s > CORNERS[i].s0 - m && s < CORNERS[i].s1 + m) return CORNERS[i]; return null; }
+/* —— 近道（規則與資料在 T_cut.js）：從賽道岔出去、繞過彎道內側再接回來的真路，玩家和電腦車都能開 —— */
+function mkStripV(sA, sB, o) {   /* 左右緣隨里程變化的路面條（o.edge(s) 回傳 [內緣, 外緣] 的絕對值，o.sg 決定在哪一側） */
+  var ns = Math.max(2, Math.round((sB - sA) / STEP) + 1), pos = new Float32Array(ns * 6), uv = new Float32Array(ns * 4), idx = [], i, j;
+  for (i = 0; i < ns; i++) {
+    var s = Math.min(sB, sA + i * STEP), p = poseAt(s), c = Math.cos(p.th), sn = Math.sin(p.th), e = o.edge(s), yy = baseY(s) + o.y;
+    for (j = 0; j < 2; j++) { var lat = e[j] * o.sg, k = i * 2 + j; pos[k * 3] = p.x + lat * c; pos[k * 3 + 1] = yy; pos[k * 3 + 2] = p.z + lat * sn; uv[k * 2] = j; uv[k * 2 + 1] = s / (o.vs || 6); }
+    if (i) { var a0 = (i - 1) * 2; idx.push(a0, a0 + 1, a0 + 2, a0 + 1, a0 + 3, a0 + 2); }
+  }
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+  var m = new THREE.Mesh(g, o.mat); m.frustumCulled = false; m.renderOrder = o.ro || 0; scene.add(m); return m;
+}
+(function () {
+  if (!QS.length) return;
+  var dirtTex = ctex(64, 64, function (g, w, h) { g.fillStyle = '#a97b47'; g.fillRect(0, 0, w, h); g.fillStyle = '#8f6636'; [[12, 0], [46, 0]].forEach(function (q) { g.fillRect(q[0], 0, 6, h); }); var r = rngOf(31); for (var i = 0; i < 70; i++) { g.fillStyle = r() < .5 ? '#c49660' : '#7a5429'; g.fillRect(Math.floor(r() * w), Math.floor(r() * h), 2 + Math.floor(r() * 3), 2); } });
+  var plankTex = ctex(64, 64, function (g, w, h) { g.fillStyle = '#b98a4e'; g.fillRect(0, 0, w, h); for (var y = 0; y < h; y += 16) { g.fillStyle = y % 32 ? '#c79a5c' : '#aa7c42'; g.fillRect(0, y, w, 14); g.fillStyle = '#6b4423'; g.fillRect(0, y + 14, w, 2); g.fillRect(6, y + 5, 3, 3); g.fillRect(w - 9, y + 5, 3, 3); } });
+  [dirtTex, plankTex].forEach(function (x) { x.wrapS = x.wrapT = THREE.RepeatWrapping; x.magFilter = THREE.NearestFilter; });
+  var mudMat = new THREE.MeshBasicMaterial({ map: dirtTex, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+  var plkMat = new THREE.MeshBasicMaterial({ map: plankTex, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+  var padMat = new THREE.MeshBasicMaterial({ map: padTex, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -5, polygonOffsetUnits: -5 });
+  var stakeG = new THREE.BoxGeometry(.22, .9, .22), stakeM = new THREE.MeshLambertMaterial({ color: 0xd9a35f }), dm = new THREE.Object3D();
+  QS.forEach(function (q) {
+    var jm = q.type === 'jump', mt = jm ? plkMat : mudMat, edge = function (s) { return scEdge(q, s); };
+    if (jm) { mkStripV(q.zs0, q.gs, { sg: q.sg, edge: edge, y: .09, mat: mt, vs: 4 }); mkStripV(q.ge, q.zs1, { sg: q.sg, edge: edge, y: .09, mat: mt, vs: 4 }); }
+    else mkStripV(q.zs0, q.zs1, { sg: q.sg, edge: edge, y: .09, mat: mt, vs: 5 });
+    /* 路邊木樁：外緣一整排，內緣在離開路緣石以後也有 */
+    var pts = [];
+    for (var s = q.zs0 + 4; s < q.zs1 - 2; s += 5) {
+      if (jm && s > q.gs - 3 && s < q.ge + 3) continue;
+      var e = edge(s); if (e[1] - e[0] < 3) continue;
+      pts.push([s, e[1] - .25]); if (e[0] > ROADHALF + 1) pts.push([s, e[0] + .25]);
+    }
+    var im = new THREE.InstancedMesh(stakeG, stakeM, pts.length);
+    pts.forEach(function (pt, i) { var p = poseAt(pt[0]), lat = pt[1] * q.sg; dm.position.set(p.x + lat * Math.cos(p.th), baseY(pt[0]) + .45, p.z + lat * Math.sin(p.th)); dm.rotation.set(0, -p.th, 0); dm.updateMatrix(); im.setMatrixAt(i, dm.matrix); });
+    im.frustumCulled = false; scene.add(im);
+    if (jm) {
+      /* 加速板（壓過去加速）、跳台口的橘色錐筒、底下的水 */
+      mkStripV(q.gs - 26, q.gs - 14, { sg: q.sg, edge: function (s) { var c = scCabs(q, s); return [c - 2.4, c + 2.4]; }, y: .13, mat: padMat, vs: 5, ro: 2 });
+      [q.gs, q.ge].forEach(function (s0) { [-1, 1].forEach(function (sd) { var f = new THREE.Group(), c = new THREE.Mesh(new THREE.ConeGeometry(.5, 1.3, 8), mat(0xff7a1a)); c.position.y = .65; f.add(c); place(f, s0, q.sg * scCabs(q, s0) + sd * (q.hw - .5), 0); scene.add(f); }); });
+      var gm = (q.gs + q.ge) / 2, w2 = new THREE.Mesh(new THREE.PlaneGeometry((q.hw + 3.2) * 2, q.G + 7), new THREE.MeshBasicMaterial({ color: 0x35c8ff, transparent: true, opacity: .92 })); w2.rotation.x = -Math.PI / 2; var wg = new THREE.Group(); wg.add(w2); place(wg, gm, q.sg * scCabs(q, gm), .0); scene.add(wg);
+    }
+  });
+})();
 var PLAN = [], planI = 0;
 function buildPlan() {
   var pr = rngOf(777 + TKI * 31), ev = [], LL = [-LANE, 0, LANE], i, k, last = 0;
@@ -1014,7 +1157,7 @@ function reset() {
   S = { phase: 'title', t: 0, cd: 3, race: 0, steer: 0, dragSteer: 0, camLat: 0, roll: 0, fov: 0, shake: 0, spd: 0, smoke: 0, score: 0, endT: 0, orbit: 0, rsT: null, bumpT: 0, lastRank: 8, secShown: 0, sec: 0, shown: false, nm: 0, rollIco: 0, hitN: 0, winner: null, jmsg: {} };
   R.forEach(function (r, i) {
     var g = GRID[i]; r.s = r.ps = g[0] + OFF; r.lat = g[1]; r.latV = 0; r.kick = 0; r.v = 0; r.bt = 0; r.bv = 0; r.stun = 0; r.spinA = 0; r.shield = 0; r.item = null; r.rollT = 0; r.coins = 0; r.rank = 1; r.out = false;
-    r.tl = r.lat; r.tt = 0; r.draft = 0; r.drift = 0; r.charge = 0; r.lvl = 0; r.hits = 0; r.turbos = 0; r.o.visible = true; r.y = roadY(r.s); r.vy = 0; r.air = false; r.glide = false; r.trick = 0; r.jump = null; r.buyT = null; r.tricks = 0; r.falls = 0; r.big = 0; r.dashT = 0; r.magT = 0; r.springT = 0; r.zapT = 0; r.triN = null; r.fo = 1; if (r.trSp) r.trSp.visible = false; r.ramT = 0; r.o.scale.set(1, 1, 1);
+    r.q = null; r.qo = 0; r.qt = 0; r.qpick = null; r.qd = {}; r.qPad = 0; r.qDeep = 0; r.qOK = 0; r.tl = r.lat; r.tt = 0; r.draft = 0; r.drift = 0; r.charge = 0; r.lvl = 0; r.hits = 0; r.turbos = 0; r.o.visible = true; r.y = roadY(r.s); r.vy = 0; r.air = false; r.glide = false; r.trick = 0; r.jump = null; r.buyT = null; r.tricks = 0; r.falls = 0; r.big = 0; r.dashT = 0; r.magT = 0; r.springT = 0; r.zapT = 0; r.triN = null; r.fo = 1; if (r.trSp) r.trSp.visible = false; r.ramT = 0; r.o.scale.set(1, 1, 1);
   });
   TR.thr = 3; TR.s = TRGAP + OFF; TR.lat = 0; TR.v = 0; TR.parked = false; TR.fly = null; TR.y = 0; truckM.g.visible = true; if (typeof truckSpr !== 'undefined') truckSpr.sp.material.rotation = 0;
   spawnAhead(R[0].s + 240);
@@ -1023,7 +1166,7 @@ function reset() {
 reset();
 
 /* 道具抽選：越後面越有機會拿到好用的 */
-function rollItem(rank) {
+function rollItem(rank, s) {   /* s：這台車目前位置（可省略） */
   var w;
   /* 照瑪利歐賽車：前面的人拿防禦／香蕉，後面的人拿加速／追蹤／閃電，只留 9 種 */
   if (rank <= 1) w = { bone: 38, shield: 30, chili: 32 };
@@ -1031,6 +1174,13 @@ function rollItem(rank) {
   else if (rank <= 5) w = { chili: 22, smoke: 22, triple: 16, missile: 14, super: 18, bolt: 4, shield: 4 };
   else w = { chili: 24, super: 26, triple: 18, missile: 18, smoke: 6, bolt: 8 };
   if (rank >= 8) w.trainDash = 55;
+  /* 落後越多道具越強：離第一名 40 m 起慢慢加，200 m 封頂（香蕉／盾牌變少，超級辣椒／追蹤／閃電／火車變多） */
+  if (s != null && rank > 1) {
+    var top = -1e9; R.forEach(function (o) { if (!o.out && o.s > top) top = o.s; });
+    var g = Math.max(0, Math.min(1, (top - s - 40) / 160));
+    if (g > 0) { if (w.bone) w.bone *= 1 - g * .7; if (w.shield) w.shield *= 1 - g * .7; if (w.smoke) w.smoke *= 1 - g * .5;
+      w.super = (w.super || 0) + 30 * g; w.missile = (w.missile || 0) + 18 * g; w.bolt = (w.bolt || 0) + 8 * g; if (g > .5) w.trainDash = (w.trainDash || 0) + 40 * (g - .5); }
+  }
   var tot = 0, k; for (k in w) tot += w[k]; var x = Math.random() * tot; for (k in w) { x -= w[k]; if (x <= 0) return k; } return 'chili';
 }
 
@@ -1361,24 +1511,64 @@ function endDrift(r, cancel) {
   }
 }
 
+/* ——— 近道（資料在 T_cut.js）：進出、沿路走、加速板 ——— */
+function qFz(r) { return r.q && !r.air ? scFz(r.q, r.s, Math.max(0, r.lat * r.q.sg)) : 1; }
+function qGap(r) { return r.q && r.q.type === 'jump' && r.s > r.q.gs && r.s < r.q.ge ? r.q.J : null; }
+function qLeave(r, ok) {
+  var q = r.q; r.q = null;
+  if (ok && !r.ai) { var pts = q.type === 'jump' ? 140 : 80; S.score += pts; S.scN = (S.scN || 0) + 1; fxFlash(2); SFX.boost(); vib(30); say('走近道成功！+' + pts, 1500); }
+}
+function qPick(r) {   /* 電腦車在岔路口前決定要不要走近道（跳台近道只有技術好的才敢） */
+  if (r.q || r.qpick || r.air || r.stun > 0) return;
+  for (var i = 0; i < QS.length; i++) {
+    var Q = QS[i]; if (r.s < Q.zs0 - 50 || r.s > Q.zs0 + 2 || r.qd[Q.i] !== undefined) continue;
+    r.qd[Q.i] = Math.random() < (Q.type === 'jump' ? .05 + .5 * r.skill : .2 + .55 * r.skill) ? 1 : 0; if (r.qd[Q.i]) r.qpick = Q;
+  }
+}
+function qCtl(r, dt) {   /* 每格在橫向移動後呼叫：在近道上就沿著近道中心線走（r.qo＝離中心線的左右偏移），不在就看有沒有開進入口 */
+  var s = r.s, q = r.q, i;
+  if (q) {
+    if (r.dashT > 0) { r.q = null; return; }
+    var c = scC(q, s), edge = q.hw - .9, lim = edge * (.12 + .88 * scSmooth((q.zs1 - s) / 16));
+    r.qo = Math.max(-lim, Math.min(lim, r.qo)); r.lat = c + r.qo;
+    var a = r.lat * q.sg; if (a > ROADHALF + 5) r.qDeep = 1;
+    if (s > q.zs1) { qLeave(r, r.qDeep && (q.type !== 'jump' || r.qOK)); return; }
+    if (s < q.zs0 + (q.zs1 - q.zs0) * .3 && a < EDGE - 1.2) { r.q = null; return; }   /* 還在岔路口就轉回主路 */
+    if (q.type === 'jump' && !r.air && !r.qPad && s > q.gs - 26 && s < q.gs - 14 && Math.abs(r.qo) < 2.6) { r.qPad = 1; boost(r, 1.1, 41); if (!r.ai) { SFX.boost(); fxFlash(1); S.fov = Math.max(S.fov, .6); } }
+    if (!r.ai && q.type === 'mud' && !r.air && Math.random() < dt * 26) { var dp = fxWorld((Math.random() - .5) * 1.4, .3, -.9); fxSpawn(dp, (Math.random() - .5) * 3, 1.5 + Math.random() * 2, (Math.random() - .5) * 3, .6, .8 + Math.random() * .6, 0xb59a6a, .7, true, 3); }
+    return;
+  }
+  if (r.air || r.stun > 0 || r.dashT > 0) return;
+  for (i = 0; i < QS.length; i++) {
+    var Q = QS[i]; if (s < Q.zs0 + 3 || s > Q.zs0 + (Q.zs1 - Q.zs0) * .32) continue;
+    var cc = scCabs(Q, s), aa = r.lat * Q.sg;
+    if (r.ai ? (r.qpick === Q && aa > EDGE - 1.8) : (aa > Math.max(EDGE + .35, cc - Q.hw + .6) && aa < cc + Q.hw - 1.2)) {
+      r.q = Q; r.qo = Math.max(-(Q.hw - .9), Math.min(Q.hw - .9, r.lat - Q.sg * cc)); r.qDeep = 0; r.qOK = 0; r.qPad = 0; r.qpick = null;
+      if (r.ai) r.qt = Q.type === 'jump' ? (Math.random() < r.skill ? 0 : (Math.random() < .5 ? -1 : 1) * 3.1) : (Math.random() - .5) * 2;
+      return;
+    }
+  }
+}
+
 /* ——— 跳台、空中、落水 ——— */
 function respawn(r) {
-  var J = r.jump; r.air = false; r.glide = false; r.trick = 0; r.s = r.ps = J.s - 40; r.lat = 0; r.latV = 0; r.kick = 0; r.v = 27; r.y = roadY(r.s); r.vy = 0; r.stun = 0; r.bt = 1.6; r.bv = 36; r.falls++; r.shield = Math.max(r.shield, 1.2);
+  var J = r.jump; r.air = false; r.glide = false; r.trick = 0; r.s = r.ps = J.q ? J.q.zs0 - 8 : J.s - 40; r.q = null; r.qpick = null; r.lat = 0; r.latV = 0; r.kick = 0; r.v = 27; r.y = roadY(r.s); r.vy = 0; r.stun = 0; r.bt = 1.6; r.bv = 36; r.falls++; r.shield = Math.max(r.shield, 1.2);
   if (!r.ai) { say('掉進水裡了！重新來', 1100); SFX.splash(); vib(80); S.shake = .4; }
 }
 function stepVertical(r, dt) {
   var i, J;
   if (!r.air) {
     for (i = 0; i < JUMPS.length; i++) { J = JUMPS[i]; if (r.ps < J.s && r.s >= J.s) { r.air = true; r.glide = J.glide; r.jump = J; r.gpick = Math.random() < .5 ? 'chicken' : 'duck'; r.vy = (J.glide ? .4 : .35) * r.v * (r.springT > 0 ? 1.35 : 1); r.trick = 0; r.trickA = 0; r.trickT = r.ai && Math.random() < .55 ? .15 + Math.random() * .3 : -1; r.y = roadY(J.s); if (r.drift) endDrift(r, true); if (!r.ai) { SFX.jump(); S.fov = .8; vib(20); } break; } }
+    if (!r.air && r.q && r.q.type === 'jump' && r.ps < r.q.gs && r.s >= r.q.gs) { J = r.q.J; r.air = true; r.glide = false; r.jump = J; r.gpick = Math.random() < .5 ? 'chicken' : 'duck'; r.vy = J.q.vy * (r.springT > 0 ? 1.35 : 1); r.trick = 0; r.trickA = 0; r.trickT = r.ai && Math.random() < .55 ? .15 + Math.random() * .3 : -1; r.y = roadY(J.s); if (r.drift) endDrift(r, true); if (!r.ai) { SFX.jump(); S.fov = .8; vib(20); } }
     if (!r.air) { r.y = roadY(r.s); return; }
   }
   r.y += r.vy * dt; r.vy -= (r.glide ? 10 : 24) * dt;
   if (r.trickT >= 0) { r.trickT -= dt; if (r.trickT < 0) { r.trick = 1; r.trickT = -1; } }
   if (r.trick) r.trickA = Math.min(Math.PI * 2, r.trickA + dt * 11);
-  var gap = gapAt(r.s), gnd = gap ? roadY(r.s) - 5.4 : roadY(r.s);
+  var gap = gapAt(r.s) || qGap(r), gnd = gap ? roadY(r.s) - 5.4 : roadY(r.s);
   if (r.y <= gnd && r.vy <= 0) {
     if (gap) { respawn(r); return; }
-    r.air = false; r.y = gnd; r.vy = 0; var tr = r.trick; r.trick = 0; r.trickA = 0; r.glide = false;
+    r.air = false; r.y = gnd; r.vy = 0; if (r.q && r.q.type === 'jump' && r.s >= r.q.ge) r.qOK = 1; var tr = r.trick; r.trick = 0; r.trickA = 0; r.glide = false;
     if (r.hopL >= 2 && !r.jump) boost(r, .7, 40); r.hopL = 0;
     if (tr) { boost(r, .9, 40); r.tricks++; if (!r.ai) { SFX.turbo(1); say('特技成功！', 800); S.score += 40; } } else if (!r.ai) SFX.land();
     if (!r.ai) { S.shake = Math.max(S.shake, .25); vib(25); }
@@ -1408,24 +1598,26 @@ function stepPlayer(P, dt, auto) {
   if (P.dashT > 0) str = clamp(-P.lat * .55, -1, 1);
   var tgt = str * (P.drift ? 10.5 : P.glide ? 9.6 : 8.6) + (P.drift ? P.drift * .9 : 0), resp = P.drift ? 8 : (Math.abs(tgt) > Math.abs(P.latV) ? 12 : 9);
   if (S.sec === 1 && !P.drift && !P.air) resp *= .8;
-  P.latV += (tgt - P.latV) * Math.min(1, dt * resp); P.kick *= Math.pow(.02, dt); P.lat += (P.latV + P.kick) * dt;
-  if (!P.air && !(P.dashT > 0) && !auto && !P.gut && !gutAim(P)) P.lat -= curvAt(P.s) * P.v * P.v * CF * (P.drift ? .25 : 1) * dt;
-  if (Math.abs(P.lat) > EDGE) {
+  P.latV += (tgt - P.latV) * Math.min(1, dt * resp); P.kick *= Math.pow(.02, dt); if (P.q) P.qo += (P.latV + P.kick) * dt; else P.lat += (P.latV + P.kick) * dt;
+  if (!auto) qCtl(P, dt);
+  if (!P.air && !(P.dashT > 0) && !auto && !P.gut && !P.q && !gutAim(P)) P.lat -= curvAt(P.s) * P.v * P.v * CF * (P.drift ? .25 : 1) * dt;
+  if (!P.q && Math.abs(P.lat) > EDGE) {
     var rc = !P.air && !gapAt(P.s) ? nearCorner(P.s, 0) : null, rail = rc && P.lat * rc.sg < -EDGE; var lim = rail ? 6.9 : (P.air || gapAt(P.s) || nearJump(P.s, 30)) ? EDGE : themeAt(P.s) === 0 ? 7.6 : TK.akina ? 6.9 : 13;
     if (Math.abs(P.lat) > lim) { P.lat = clamp(P.lat, -lim, lim); P.latV *= .2; if (rail) { P.railT = .25; } else if (!P.air) { P.v -= P.v * dt * .9; S.shake = Math.max(S.shake, .1); if (!S.scrT || S.t - S.scrT > .2) { S.scrT = S.t; SFX.scrape(); } } }
     else if (rail) { P.railT = .25; if (Math.random() < dt * 40) { var rp = fxWorld(-rc.sg * .8, .2, -.6); fxSpawn(rp, (Math.random() - .5) * 2, 2 + Math.random() * 3, (Math.random() - .5) * 2, .35, 1, 0xffd060); } if (!S.rlT || S.t - S.rlT > .22) { S.rlT = S.t; tone(2400 + Math.random() * 900, .04, 'square', .02, 1800); } }
     else if (!P.air) { P.v -= P.v * dt * .45; S.shake = Math.max(S.shake, .07 + P.v / 400); P.off = true; if (!S.scrT || S.t - S.scrT > .35) { S.scrT = S.t; SFX.scrape(); } if (Math.random() < dt * 30) { var dp = fxWorld((Math.random() - .5) * 1.4, .3, -.9); fxSpawn(dp, (Math.random() - .5) * 3, 1.5 + Math.random() * 2, (Math.random() - .5) * 3, .6, .8 + Math.random() * .6, 0xb59a6a, .7, true, 3); } }
   }
   var gutV = gutStep(P, dt, stunned);
-  var vT = VM + Math.min(10, P.coins) * .22; if (P.dashT > 0) { vT = 58; P.stun = 0; } if (P.drift) vT -= 1.2; if (Math.abs(P.lat) > 5.2 && !(P.railT > 0)) vT -= Math.min(10, (Math.abs(P.lat) - 5.2) * 3); if (P.railT > 0) { P.railT -= dt; } vT += gutV; if (P.draft > .8) vT += 2.6; if (auto) vT = 16;
+  var vT = VM + Math.min(10, P.coins) * .22; if (P.dashT > 0) { vT = 58; P.stun = 0; } if (P.drift) vT -= 1.2; if (Math.abs(P.lat) > 5.2 && !(P.railT > 0) && !P.q) vT -= Math.min(10, (Math.abs(P.lat) - 5.2) * 3); if (P.railT > 0) { P.railT -= dt; } vT += gutV; if (P.draft > .8) vT += 2.6; if (auto) vT = 16;
   if (P.bt > 0) { vT = Math.max(vT, P.bv); P.bt -= dt; } else P.bv = 0;
   if (stunned) { vT = 12; P.stun -= dt; P.spinA = (1 - Math.max(0, P.stun) / P.stunMax) * Math.PI * 2; } else P.spinA = 0;
   if (P.zapT > 0) { vT *= .55; P.zapT -= dt; }
+  if (P.q && P.q.type === 'mud') vT *= .97;
   if (S.fs) vT *= 1.05;
   if (P.air) vT = Math.max(P.v - 1, vT * .9);
   var braking = inp.brake && !P.air && !stunned && !auto && !(P.dashT > 0); if (braking) { vT = Math.min(vT, 8); P.bt = 0; }
-  P.v += (vT - P.v) * Math.min(1, dt * (braking ? 4.2 : P.bt > 0 ? 5 : P.v < vT ? 1.7 : 2.6)); P.s += P.v * dt; P.shield -= dt;
-  if (P.item === 'roll') { P.rollT -= dt; S.rollIco += dt * 14; if (P.rollT <= 0) { P.item = rollItem(P.rank); SFX.got(); } }
+  P.v += (vT - P.v) * Math.min(1, dt * (braking ? 4.2 : P.bt > 0 ? 5 : P.v < vT ? 1.7 : 2.6)); P.s += P.v * dt * qFz(P); P.shield -= dt;
+  if (P.item === 'roll') { P.rollT -= dt; S.rollIco += dt * 14; if (P.rollT <= 0) { P.item = rollItem(P.rank, P.s); SFX.got(); } }
   if (inp.use) { inp.use = false; if (!auto && P.item && P.item !== 'roll') useItem(P); }
 }
 
@@ -1448,8 +1640,10 @@ function aiPlan(r) {
 }
 function stepAI(r, dt) {
   r.tt -= dt; if (r.tt <= 0) { r.tt = .22 + Math.random() * .12; aiPlan(r); }
-  var stunned = r.stun > 0, want = clamp(((r.dashT > 0 ? 0 : r.tl) - r.lat) * 3.2, -7.2, 7.2);
-  r.latV += ((stunned ? 0 : want) - r.latV) * Math.min(1, dt * 7); r.kick *= Math.pow(.02, dt); r.lat = clamp(r.lat + (r.latV + r.kick) * dt, -EDGE + .4, EDGE - .4);
+  qPick(r); if (r.qpick && !r.q) { if (r.s > r.qpick.zs0 + (r.qpick.zs1 - r.qpick.zs0) * .32) r.qpick = null; else r.tl = r.qpick.sg * (EDGE - .5); }
+  var stunned = r.stun > 0, want = clamp(((r.dashT > 0 ? 0 : r.q ? r.qt : r.tl) - (r.q ? r.qo : r.lat)) * 3.2, -7.2, 7.2);
+  r.latV += ((stunned ? 0 : want) - r.latV) * Math.min(1, dt * 7); r.kick *= Math.pow(.02, dt); if (r.q) r.qo += (r.latV + r.kick) * dt; else r.lat = clamp(r.lat + (r.latV + r.kick) * dt, -EDGE + .4, EDGE - .4);
+  qCtl(r, dt);
   var P = R[0], d = P.s - r.s, rub = d > 0 ? clamp(d / 110, 0, .16) : -clamp(-d / 320, 0, .05);
   /* 拉鋸：玩家領先時電腦追得更兇、電腦領先時只稍微放慢；每台車步調各自起伏，會互相超車 */
   var vT = r.vmax * (1 + rub) * (1 + .035 * Math.sin(S.t * .37 + r.id * 1.7)); if (r.draft > .8) vT += 2; if (r.dashT > 0) { vT = 58; r.stun = 0; stunned = false; r.tl = 0; }
@@ -1463,8 +1657,8 @@ function stepAI(r, dt) {
   if (r.bt > 0) { vT = Math.max(vT, r.bv); r.bt -= dt; } else r.bv = 0;
   if (cbV < 99 && r.dashT <= 0 && !r.air) { vT = Math.min(vT, cbV); r.bt = 0; r.bv = 0; }
   if (stunned) { vT = 10; r.stun -= dt; r.spinA = (1 - Math.max(0, r.stun) / r.stunMax) * Math.PI * 2; } else r.spinA = 0;
-  if (inRange(TK.mud, r.s) && !r.air) vT *= .7; if (S.winner) vT = Math.min(vT, 12); if (r.air) vT = Math.max(r.v - 1, vT * .9);
-  r.v += (vT - r.v) * Math.min(1, dt * (r.bt > 0 ? 4 : stunned ? 3 : cbV < 99 ? 4.5 : 1.6)); r.s += r.v * dt; r.shield -= dt;
+  if (inRange(TK.mud, r.s) && !r.air) vT *= .7; if (r.q && r.q.type === 'mud') vT *= .97; if (S.winner) vT = Math.min(vT, 12); if (r.air) vT = Math.max(r.v - 1, vT * .9);
+  r.v += (vT - r.v) * Math.min(1, dt * (r.bt > 0 ? 4 : stunned ? 3 : cbV < 99 ? 4.5 : 1.6)); r.s += r.v * dt * qFz(r); r.shield -= dt;
   if (r.item && r.item !== 'roll') {
     r.useT -= dt;
     if (r.useT <= 0) {
@@ -1591,7 +1785,7 @@ function step(dt) {
             tone(880, .1, 'square', .06, 1320); fxPickup(r, T === 'chick' ? 0xffb347 : 0xfff2b0);
           }
           else if (T === 'pad') { if (r.bt < .6 || r.bv < 40) { var pn = 0; if (!r.ai) { pn = (S.t - (r.lastPad || -9) < 1.6) ? Math.min(4, (r.padN || 0) + 1) : 0; r.padN = pn; r.lastPad = S.t; } boost(r, 1.2 + pn * .12, 40 + pn * 1.5); if (!r.ai) { SFX.pad(); if (pn) tone(520 + pn * 110, .12, 'square', .05, 700 + pn * 130); S.fov = .7 + pn * .1; S.shake = Math.max(S.shake, .12 + pn * .03); vib(10 + pn * 5); if (pn >= 2) say('加速墊 ×' + (pn + 1), 500); } } }
-          else if (T === 'box') { if (!(it.respT > 0) && !r.item) { it.respT = 6; it.m.visible = false; fxPickup(r, 0xffe27a); if (!r.ai) { r.item = 'roll'; r.rollT = .7; S.rollIco = 0; SFX.chili(); } else { r.item = rollItem(r.rank); r.useT = 1.2 + Math.random() * 2.5; } } }
+          else if (T === 'box') { if (!(it.respT > 0) && !r.item) { it.respT = 6; it.m.visible = false; fxPickup(r, 0xffe27a); if (!r.ai) { r.item = 'roll'; r.rollT = .7; S.rollIco = 0; SFX.chili(); } else { r.item = rollItem(r.rank, r.s); r.useT = 1.2 + Math.random() * 2.5; } } }
         }
       });
     }
@@ -1692,9 +1886,9 @@ function step(dt) {
   $('smoke').style.opacity = clamp(S.smoke / 1.2, 0, 1) * .92;
   /* 相機 */
   var back = 9.3 + P.v * .05 + spd * 1.2 + (phase === 'count' || phase === 'title' ? 5 * smooth(S.cd / 3) : 0), camS = P.s - back;
-  S.camLat += (P.lat * .72 - P.drift * 1.3 - S.camLat) * Math.min(1, dt * (P.drift ? 3 : 5));
+  S.cq = (S.cq || 0) + ((P.q ? 1 : 0) - (S.cq || 0)) * Math.min(1, dt * 3); S.camLat += (P.lat * (.72 + .25 * S.cq) - P.drift * 1.3 - S.camLat) * Math.min(1, dt * (P.drift ? 3 : 5));
   var pc = poseAt(camS), lift = clamp(P.y - roadY(P.s), -3, 14) * .55, cpos = new THREE.Vector3(pc.x + S.camLat * Math.cos(pc.th), pc.h + 4.2 + (P.bt > 0 ? -.3 : 0) + lift, pc.z + S.camLat * Math.sin(pc.th));
-  var pl = poseAt(P.s + 12), look = new THREE.Vector3(pl.x + P.lat * .55 * Math.cos(pl.th), pl.h + 1.5 + lift * .6, pl.z + P.lat * .55 * Math.sin(pl.th));
+  var pl = poseAt(P.s + 12), look = new THREE.Vector3(pl.x + P.lat * (.55 + .4 * S.cq) * Math.cos(pl.th), pl.h + 1.5 + lift * .6, pl.z + P.lat * (.55 + .4 * S.cq) * Math.sin(pl.th));
   if (phase === 'finish') { var po = poseAt(P.s), r0 = 11; cpos.set(po.x + Math.sin(S.orbit) * r0, po.h + 3.8 + Math.sin(S.orbit * .7), po.z + Math.cos(S.orbit) * r0 * .9); look.set(po.x, po.h + 1.6, po.z); }
   if (spd > .55 && playing) { cpos.x += (Math.random() - .5) * spd * .07; cpos.y += (Math.random() - .5) * spd * .07; }
   if (S.shake > 0) { cpos.x += (Math.random() - .5) * S.shake * .8; cpos.y += (Math.random() - .5) * S.shake * .6; }
@@ -1728,9 +1922,9 @@ function step(dt) {
   } else if (eng && ac) { eng.g.gain.setTargetAtTime(0, ac.currentTime, .1); if (eng.wind) eng.wind.gain.setTargetAtTime(0, ac.currentTime, .1); if (scr) scr.gain.setTargetAtTime(0, ac.currentTime, .05); }
 }
 var last = performance.now();
-function frame(now) { var dt = Math.min(.05, (now - last) / 1000); last = now; if (document.hidden) { requestAnimationFrame(frame); return; } step(dt); renderer.render(scene, camera); requestAnimationFrame(frame); }
+function frame(now) { var last0 = last, dt = Math.min(.05, (now - last) / 1000); last = now; if (document.hidden) { requestAnimationFrame(frame); return; } if (S.phase === 'play') { PRW.t += (now - last0) / 1000; PRW.n++; if (PRW.t > 3) { var pr = renderer.getPixelRatio(); if (PRW.t / PRW.n > 1 / 40 && pr > 1) { PRCAP = Math.max(1, pr - .5); resize(); } PRW.t = PRW.n = 0; } } else PRW.t = PRW.n = 0; step(dt); renderer.render(scene, camera); requestAnimationFrame(frame); }
 step(0.016); renderer.render(scene, camera); requestAnimationFrame(frame);
-window.__race = { S: function () { return S; }, R: R, TR: TR, CROSS: CROSS, step: function (dt) { step(dt); renderer.render(scene, camera); }, items: function () { return items; }, shots: function () { return shots; }, inp: inp, start: startGame, cam: camera, use: function () { return useItem(R[0]); }, rollItem: rollItem, give: function (k) { R[0].item = k; }, trk: TRK };
+window.__race = { S: function () { return S; }, R: R, QS: QS, TR: TR, CROSS: CROSS, step: function (dt) { step(dt); renderer.render(scene, camera); }, items: function () { return items; }, shots: function () { return shots; }, inp: inp, start: startGame, cam: camera, use: function () { return useItem(R[0]); }, rollItem: rollItem, give: function (k) { R[0].item = k; }, trk: TRK };
 /* ——— 水溝過彎（秋名山髮夾彎，頭文字D 的溝落とし）：彎道前段貼內側→內側輪子「喀噹」卡進水溝，沿溝自動繞彎、越跑越快，出彎彈出加速。
    每次都跳出漫畫特寫，旁邊的電腦車會驚訝。方向鍵只能微調，往外用力轉 0.3 秒會提早出溝。 ——— */
 var GUTL = ROADHALF - .35, GUT_SAY = ['什麼！？', '那是…水溝過彎！？', '不可能吧…'];
