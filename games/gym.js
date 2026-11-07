@@ -51,9 +51,12 @@ var GymGame = (function () {
       theme: { sky: ['#3b2a1c', '#4a3524', '#5a4230', '#6b4a2e'], sun: '#ffcf6a', halo: '255,200,110', hill1: '#4a3220', hill2: '#3a2616', cloud: '200,160,110', water: ['#2a1c10', '#1a1008'], wave: '#6b4a2e' } }
   );
   ZONES.push(
-    { name: '港口夜景', x0: 11400, plats: [[11380, 320, 300, 'dock'], [12090, 300, 240, 'dock'], [12700, 305, 300, 'dock'], [13335, 295, 355, 'dock']],
-      rings: [[11745, 265], [11890, 255], [12035, 245], [12385, 255, { kind: 'rail', ax: 10, per: 8, ph: 0 }], [12495, 250, { kind: 'rail', ax: 10, per: 8, ph: 2 }], [12605, 255, { kind: 'rail', ax: 10, per: 8, ph: 4 }], [13030, 252], [13160, 242, { kind: 'break' }], [13285, 238]],
-      ens: [{ k: 'gull', x0: 11760, x1: 11980, y: 215, spd: 46 }, { k: 'gull', x0: 12420, x1: 12640, y: 200, spd: 50 }, { k: 'gull', x0: 13050, x1: 13250, y: 190, spd: 54 }],
+    { name: '港口夜景', x0: 11400, plats: [[11380, 320, 300, 'dock'], [12090, 300, 240, 'dock'], [12430, 346, 70, 'dock'], [12700, 305, 300, 'dock'], [13335, 295, 355, 'dock']],   /* 12430 是兩段軌道環之間的小浮台，可以喘口氣 */
+      rings: [[11745, 265], [11890, 255, { kind: 'move', ax: 24, per: 4.4 }], [12035, 245], [12385, 255, { kind: 'rail', ax: 10, per: 8, ph: 0 }], [12495, 250, { kind: 'rail', ax: 10, per: 8, ph: 2 }], [12605, 255, { kind: 'rail', ax: 10, per: 8, ph: 4 }], [13030, 252, { kind: 'move', ax: 22, per: 4 }], [13160, 242, { kind: 'break' }], [13285, 238]],
+      ens: [{ k: 'gull', x0: 11760, x1: 11980, y: 215, spd: 46 }, { k: 'gull', x0: 12420, x1: 12640, y: 200, spd: 50 }, { k: 'gull', x0: 13050, x1: 13250, y: 190, spd: 54 },
+        { k: 'cat', x0: 12110, x1: 12310, plat: 'x:12090', spd: 38 }, { k: 'tile', x: 12210, per: 3.4, off: 1.1, y0: 90 },
+        { k: 'otter', x: 11960, per: 3.8, off: 0.9 }, { k: 'mouse', x0: 12730, x1: 12960, plat: 'x:12700', spd: 62 },
+        { k: 'heron', x: 13095, per: 3.7, off: 1.4 }, { k: 'tile', x: 13230, per: 3.0, off: 2.0, y0: 80 }],
       theme: { sky: ['#0b1233', '#1b2a5e', '#34508a', '#5b7fb0'], sun: '#eef2ff', halo: '200,220,255', hill1: '#27406b', hill2: '#1c2f52', cloud: '120,140,190', water: ['#1d3f78', '#0c1d44'], wave: '#6f9bd8' } }
   );
   var GOAL = { x: 13520, y: 226, r: 24, beam: 156 };
@@ -80,14 +83,9 @@ var GymGame = (function () {
   var LV = { w: 13800, waterY: 470, bottom: 620, goalX: 3240, plats: [], rings: [], zones: ZONES };
   var ENS = [];
   /* 彩色魚乾（每區 5 條，先做第 1 區）：放在要抓環盪高或空中拿的位置，收滿 5 條有獎勵 */
-  var CFISH = [];
-  /* 限時收集：三個主要區各 5 片金魚鱗，進區開始計時（在隱藏室裡不計時），時間內撿齊有獎勵。
-     位置取自實際路線：吊環擺到最低點（環 y＋10）的位置，以及要在平台上跳起來才撿得到的高處（平台 y−72） */
-  var TCH = [
-    { z: 0, sec: 22, pts: [[485, 355], [880, 273], [985, 288], [1125, 270], [1420, 233]] },
-    { z: 1, sec: 26, pts: [[1955, 245], [2120, 176], [2410, 185], [2790, 103], [2855, 130]] },
-    { z: 5, sec: 24, pts: [[11890, 275], [12035, 265], [12200, 228], [12850, 233], [13160, 262]] }
-  ];
+  var CFISH = [[11818, 238], [11962, 226], [12440, 236], [12985, 234], [13095, 222]];   /* 港口 5 條彩色魚乾：放在兩個吊環之間盪出去的路線上 */
+  /* 限時收集（金魚鱗）已取消（2026-11-07）：留空陣列，相關迴圈就不會做事 */
+  var TCH = [];
   function tchLim(c) { return c.sec * ({ easy: 1.3, hard: 0.85 }[diffKey] || 1); }
   ZONES.forEach(function (z) {
     z.plats.forEach(function (q) { LV.plats.push({ x: q[0], y: q[1], w: q[2], st: q[3], h: q[4] || LV.bottom - q[1] }); });
@@ -798,6 +796,15 @@ var GymGame = (function () {
     for (i = -1; i < 6; i++) { hx = i * 120 - ((cam.x * 0.25) % 120); hh = 28 + ((i + 5) % 3) * 12; hill(hx, 120, hh, TH.hill1, '#1d4a2a', (i + 5) % 3 === 0); }
     var zb = clamp((cam.x + WF / 2 - (ZONES[1].x0 - 150)) / 300, 0, 1);                       // 區 2：遠處古厝屋頂剪影與亮窗
     if (zb > 0) { g.globalAlpha = zb * 0.85; for (i = -1; i < 6; i++) { var rx = i * 96 - ((cam.x * 0.3) % 96), rh = 20 + ((i + 7) % 3) * 8; g.fillStyle = '#4a2c4a'; g.fillRect(rx + 10, base + 46 - rh, 66, rh + 20); g.beginPath(); g.moveTo(rx + 2, base + 46 - rh); g.lineTo(rx + 43, base + 30 - rh); g.lineTo(rx + 84, base + 46 - rh); g.fill(); g.fillStyle = '#ffd27a'; g.fillRect(rx + 24, base + 50 - rh, 5, 6); g.fillRect(rx + 50, base + 50 - rh, 5, 6); } g.globalAlpha = 1; }
+    var zh = clamp((cam.x + WF / 2 - (ZONES[ZONES.length - 1].x0 - 150)) / 300, 0, 1);          // 區 3：遠處燈塔、貨輪與貨櫃堆（慢速視差）
+    if (zh > 0) {
+      g.globalAlpha = zh;
+      var lx = 300 - ((cam.x * 0.18) % 900) + (cam.x * 0.18 % 900 > 600 ? 900 : 0);
+      for (i = 0; i < 3; i++) { var sx = lx + i * 900; g.fillStyle = '#16264a'; g.fillRect(sx, base - 70, 14, 110); g.fillStyle = '#e8eefc'; g.fillRect(sx - 2, base - 82, 18, 14); g.fillStyle = '#ffe9a0'; g.fillRect(sx + 2, base - 79, 10, 8); g.fillStyle = 'rgba(255,240,170,' + (0.10 + 0.07 * Math.sin(t * 3 + i)) + ')'; g.beginPath(); g.moveTo(sx + 7, base - 75); g.lineTo(sx + 240, base - 125); g.lineTo(sx + 240, base - 40); g.fill(); }
+      for (i = 0; i < 4; i++) { var bx2 = i * 330 - ((cam.x * 0.3) % 330); g.fillStyle = '#1b2f57'; g.fillRect(bx2, base + 14, 150, 18); g.beginPath(); g.moveTo(bx2 - 14, base + 14); g.lineTo(bx2 + 164, base + 14); g.lineTo(bx2 + 140, base + 36); g.lineTo(bx2 + 10, base + 36); g.fill(); [['#a8453a', 0], ['#3f7fb0', 1], ['#c9a43a', 2]].forEach(function (cc) { g.fillStyle = cc[0]; g.fillRect(bx2 + 14 + cc[1] * 34, base - 2, 30, 16); g.fillRect(bx2 + 22 + cc[1] * 30, base - 16, 26, 14); }); g.fillStyle = '#ffd27a'; g.fillRect(bx2 + 130, base + 2, 4, 4); }
+      for (i = 0; i < 8; i++) { var gx2 = i * 110 - ((cam.x * 0.5) % 110); g.fillStyle = '#10203f'; g.fillRect(gx2 + 40, base + 30, 3, 34); g.fillStyle = 'rgba(255,225,150,' + (0.55 + 0.25 * Math.sin(t * 2 + i)) + ')'; g.fillRect(gx2 + 37, base + 27, 9, 5); }
+      g.globalAlpha = 1;
+    }
     g.fillStyle = '#7f6a4d'; if (zb < 1) for (i = 0; i < 9; i++) { var bx = i * 70 - ((cam.x * 0.4) % 70); g.fillRect(bx, base + 44, 2, 14); }
     g.save(); g.translate(-Math.round(cam.x), -Math.round(cam.y));
     var wy = LV.waterY, wg = g.createLinearGradient(0, wy, 0, LV.bottom + 40); wg.addColorStop(0, TH.water[0]); wg.addColorStop(1, TH.water[1]); g.fillStyle = wg; g.fillRect(cam.x, wy, WF, LV.bottom - wy + 40);
@@ -879,7 +886,7 @@ var GymGame = (function () {
         var tx = x + (e.warn ? Math.round(Math.sin(t * 60) * 1.5) : 0);
         if (e.warn || e.falling) {
           g.save(); g.translate(tx, y); g.rotate(e.falling ? t * 9 : 0);
-          shp([[-8, -5, 16, 10, '#c0643f'], [-8, -5, 16, 3, '#d98a52'], [-6, 1, 12, 2, '#7a3524']], 0, 0, false); g.restore();
+          if (e.s.x > ZONE3X) shp([[-8, -6, 16, 12, '#3f6f9c'], [-8, -6, 16, 3, '#6aa0d0'], [-8, -1, 16, 1, '#1f3f66'], [-8, 3, 16, 1, '#1f3f66']], 0, 0, false); else shp([[-8, -5, 16, 10, '#c0643f'], [-8, -5, 16, 3, '#d98a52'], [-6, 1, 12, 2, '#7a3524']], 0, 0, false); g.restore();
           if (e.warn) { g.fillStyle = 'rgba(255,90,90,.9)'; g.fillRect(x - 1, y + 10, 2, 4); g.fillRect(x - 1, y + 16, 2, 2); }
           if (e.falling) { g.fillStyle = 'rgba(255,230,200,.5)'; g.fillRect(x - 1, y - 20, 2, 14); }
         }
@@ -984,7 +991,7 @@ var GymGame = (function () {
     if (W.done && W.gbonus && W.doneT <= 3.2) txt(W.doneT < 1.2 ? '抓到大吊環！+' + W.gbonus : '曬太陽中……', WF / 2, 86, 14, '#ffe38a');
     if (W.done && W.doneT > (W.failed ? 0.3 : 3.2)) {
       g.fillStyle = 'rgba(0,0,0,.6)'; var PY = H - 162; if (W.gbonus) PY = Math.min(PY, Math.max(60, Math.round(GP.y - cam.y + 14)));   // 勝利：結算字放在紅磚牆上（平台頂面下方）
-      g.fillRect(0, PY, WF, 158); txt(W.failed ? '午仔魚曬不成魚乾了…（' + DF().name + '）' : '午仔魚變成深色一夜干！（' + DF().name + '）', WF / 2, PY + 14, 14, W.failed ? '#ff9a8a' : '#f4dd7a');
+      g.fillRect(0, PY, WF, 158); txt(W.failed ? '午仔魚曬不成魚乾了…（' + DF().name + '）' : '午仔魚曬成一夜干了！（' + DF().name + '）', WF / 2, PY + 14, 14, W.failed ? '#ff9a8a' : '#f4dd7a');
       txt('特技分 ' + W.score + '　完美放手 ' + W.perfects + '　空翻 ' + W.flips, WF / 2, PY + 35, 9, '#fff'); txt('擊退 ' + W.kills + '　落水 ' + W.falls + '　昏倒 ' + W.faints, WF / 2, PY + 52, 9, '#fff');
       txt(NOTE || ((typeof o !== 'undefined' && o && o.onEnd) ? '' : '點空白處再玩（或按 R）' + (W.titles.length ? '　稱號：' + W.titles.join('、') : '')), WF / 2, PY + 69, 9, NOTE || W.titles.length ? '#ffd24a' : '#cdbfa8');
       var bw = Math.min(WF - 24, 300), bx = (WF - bw) / 2, by = PY + 88, bh = 62, pu = Math.floor(W.doneT * 2.5) % 2; SHOPBAND = { x: bx, y: by, w: bw, h: bh };       // 黃色橫幅＝去賣場買周邊（成功／失敗都有）
