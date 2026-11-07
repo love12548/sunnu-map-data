@@ -1,5 +1,5 @@
 /* 自動產生（源碼/build_play.py），不要手改。離線遊戲版的 Service Worker。 */
-const VER = '591923a6', CORE = 'sunnu-play-' + VER, MUSIC = 'sunnu-music';
+const VER = '0fc1a029', CORE = 'sunnu-play-' + VER, MUSIC = 'sunnu-music';
 const LOCAL = ["app.js", "chicken/audio/xianshuiji.mp3", "chicken/chicken.html", "chicken/img/chicken.webp", "chicken/img/duck.webp", "chicken/three.min.js", "dino/dino.html", "ffl/ffl.html", "games/dofu.js", "games/gym.js", "games/jeep.js", "games/shop.js", "games/train.js", "music/catalog.json", "shooter/audio/bgm1.mp3", "shooter/audio/bgm2.mp3", "shooter/audio/bgm3.mp3", "shooter/audio/bgmBoss.mp3", "shooter/audio/boom.mp3", "shooter/audio/boomBig.mp3", "shooter/audio/clear.mp3", "shooter/audio/hit.mp3", "shooter/audio/hurt.mp3", "shooter/audio/missile.mp3", "shooter/audio/pick.mp3", "shooter/audio/power.mp3", "shooter/audio/roar.mp3", "shooter/audio/shoot.mp3", "shooter/audio/warn.mp3", "shooter/audio/zap.mp3", "shooter/shooter.html"], CROSS = ["https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@main/fonts/web/Cubic_11.woff2"], CSS = ["https://fonts.googleapis.com/css2?family=DotGothic16&display=swap"];
 const ROOT = new URL('./', self.location.href).href;
 const say = async m => { for (const c of await self.clients.matchAll({ includeUncontrolled: true })) c.postMessage(m); };
