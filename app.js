@@ -1044,11 +1044,38 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
     if (changed) { try { gameState = loadGameState(); } catch (e) {} }
     return changed;
   }
-  function memPost() {
-    if (!mem.id) return;
-    try { fetch(SOURCE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ act: 'save', id: mem.id, nick: mem.nick, xp: xpNow(), dex: [...dex].slice(0, 400) }, memLoaded ? { favs: favs.slice(0, 400), save: saveBlob(), parts: saveParts() } : {})) }).catch(() => {}); } catch (e) {}
+  /* 雲端同步（2026-11 減負）：停手 15 秒才送、最久 60 秒一定送；平常只送「有變動的分區」，每 5 分鐘（與第一次）才送完整存檔；
+     關頁時用 sendBeacon 把還沒送的補送。後台有鎖、一次存檔要掃整張表，送得越少越撐得住人數。 */
+  let memSent = {}, memLastFull = 0, memSig = '', memFirst = 0, memT = 0;
+  function memBody(final) {
+    const now = Date.now(), full = !memLastFull || now - memLastFull > 300000, o = { act: 'save', id: mem.id, nick: mem.nick, xp: xpNow(), dex: [...dex].slice(0, 400) };
+    const sent = {};
+    if (memLoaded) {
+      o.favs = favs.slice(0, 400);
+      const all = saveParts(), parts = {}; let n = 0;
+      Object.keys(all).forEach(k => { if (full || memSent[k] !== all[k]) { parts[k] = all[k]; n++; } sent[k] = all[k]; });
+      if (n) o.parts = parts;
+      if (full) o.save = saveBlob();
+      const sig = JSON.stringify([o.nick, o.xp, o.dex.length, o.favs]);
+      if (!full && !n && sig === memSig) return null;   /* 沒有任何變動就不送 */
+      o._commit = () => { memSent = Object.assign({}, memSent, sent); memSig = sig; if (full) memLastFull = now; };
+    }
+    return o;
   }
-  let memT = 0; const memSave = () => { if (!mem.id) return; clearTimeout(memT); memT = setTimeout(memPost, 2500); };
+  function memPost(final) {
+    memFirst = 0; memT = 0;
+    if (!mem.id) return;
+    try {
+      const o = memBody(final); if (!o) return;
+      const commit = o._commit; delete o._commit; const body = JSON.stringify(o);
+      if (final && navigator.sendBeacon) { if (navigator.sendBeacon(SOURCE, body) && commit) commit(); return; }
+      fetch(SOURCE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body, keepalive: body.length < 60000 }).catch(() => {});
+      if (commit) commit();
+    } catch (e) {}
+  }
+  const memSave = () => { if (!mem.id) return; const now = Date.now(); if (!memFirst) memFirst = now; clearTimeout(memT); memT = setTimeout(memPost, Math.max(1500, Math.min(15000, memFirst + 60000 - now))); };
+  window.addEventListener('pagehide', () => { if (memT) { clearTimeout(memT); memPost(true); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && memT) { clearTimeout(memT); memPost(true); } });
   /* 紀錄合併（iframe 遊戲與主頁共用）：數字取大、布林取 true、陣列聯集、物件逐鍵；賽車紀錄的時間 t／名次 rk 取小，分段 sp 跟著較快的那筆 */
 function recMerge(a, b, p) {
   if (a === undefined || a === null) return b; if (b === undefined || b === null) return a;
