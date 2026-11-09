@@ -68,7 +68,7 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
     sprCache.clear();
     howCfg = data.howto && typeof data.howto === 'object' ? data.howto : {};
     const sa = v => Array.isArray(v) ? v.map(String).filter(Boolean) : [];
-    bosses = (Array.isArray(data.bosses) ? data.bosses : []).filter(b => b && b.code && b.n).map(b => ({ code: String(b.code).replace(/[^\w-]/g, '').slice(0, 30), n: String(b.n), s: String(b.s || ''), at: Math.max(1, Math.floor(+b.at) || 1), firstAt: Math.max(1, Math.floor(+b.firstAt) || 7), repeatAt: Math.max(1, Math.floor(+b.repeatAt) || 10), series: String(b.series || '大魔王系列'), tn: String(b.tn || '擊敗' + b.n), td: String(b.td || ''), i: sa(b.i), win: sa(b.win), lose: sa(b.lose), xp: Math.max(0, +b.xp || 0), st: (Array.isArray(b.st) ? b.st : []).slice(0, 3).filter(x => x && x.g).map(x => ({ g: (String(b.code) === 'ceo' && String(x.g) === '屁屁互擠') ? '屁屁互撞' : String(x.g), /* 夾褲第 2 關改用新版「屁屁互撞」（舊版 屁屁互擠 的程式還留著、不再被叫到） */ d: Math.max(1, Math.min(100, Math.round(+x.d) || 50)), say: String(x.say || '') })) })).filter(b => b.code && b.st.length);
+    bosses = (Array.isArray(data.bosses) ? data.bosses : []).filter(b => b && b.code && b.n).map(b => ({ code: String(b.code).replace(/[^\w-]/g, '').slice(0, 30), n: String(b.n), s: String(b.s || ''), at: Math.max(1, Math.floor(+b.at) || 1), firstAt: Math.max(1, Math.floor(+b.firstAt) || (String(b.code) === 'ceo' ? Math.floor(+b.at) : 0) || 7), rep: (r => ({ min: r.min > 0 ? Math.floor(r.min) : 8, pct: r.pct > 0 ? Math.min(100, +r.pct) : 15, max: r.max > 0 ? Math.floor(r.max) : 14 }))(b.rep && typeof b.rep === 'object' ? b.rep : {}), repeatAt: Math.max(1, Math.floor(+b.repeatAt) || 10), series: String(b.series || '大魔王系列'), tn: String(b.tn || '擊敗' + b.n), td: String(b.td || ''), i: sa(b.i), win: sa(b.win), lose: sa(b.lose), xp: Math.max(0, +b.xp || 0), st: (Array.isArray(b.st) ? b.st : []).slice(0, 3).filter(x => x && x.g).map(x => ({ g: (String(b.code) === 'ceo' && String(x.g) === '屁屁互擠') ? '屁屁互撞' : String(x.g), /* 夾褲第 2 關改用新版「屁屁互撞」（舊版 屁屁互擠 的程式還留著、不再被叫到） */ d: Math.max(1, Math.min(100, Math.round(+x.d) || 50)), say: String(x.say || '') })) })).filter(b => b.code && b.st.length);
     applyFont(new URLSearchParams(location.search).get('font') || (data.game && data.game.font));
     hasData = true;
     return true;
@@ -1668,9 +1668,9 @@ var VehFx = (function () {
     saveGameState();
   }
   const bossAtV2 = b => b.code === 'ceo' ? (gameState.boss.jiaku.defeats ? b.repeatAt : b.firstAt) : b.at;
-  /* 大魔王再出現：打敗過夾褲之後，遇怪滿 8 隻開始每次有 15% 機率出現，滿 14 隻一定出現；第一次固定在第 7 次遇怪 */
-  const bossMin = b => b.code === 'ceo' && gameState.boss.jiaku.defeats ? 8 : bossAtV2(b);
-  const bossDue = (b, bc) => b.code === 'ceo' && gameState.boss.jiaku.defeats ? (bc >= 14 || (bc >= 8 && Math.random() < .15)) : bc >= bossAtV2(b);
+  /* 大魔王再出現：打敗過夾褲之後，遇怪滿 rep.min（預設 8）隻開始每次有 rep.pct（預設 15）% 機率出現，滿 rep.max（預設 14）隻一定出現；第一次＝後台「出現門檻N」（預設 7）。三個數字都在試算表「大魔王設定」 */
+  const bossMin = b => b.code === 'ceo' && gameState.boss.jiaku.defeats ? b.rep.min : bossAtV2(b);
+  const bossDue = (b, bc) => b.code === 'ceo' && gameState.boss.jiaku.defeats ? (bc >= Math.max(b.rep.min, b.rep.max) || (bc >= b.rep.min && Math.random() < b.rep.pct / 100)) : bc >= bossAtV2(b);
   /* ===== 夾褲（柯基・自封 CEO）的故事 ===== */
   const CEO_LORE = {
     first: ['夾褲（CEO）：「我是這家公司的執行長。」', '夾褲：「今天的會議議程只有三項：抱抱、吃飯、肉肉。」', '夾褲：「有陌生人我就，我就汪汪叫。」', '旁白：他其實是怕寂寞，只是不會說。'],
