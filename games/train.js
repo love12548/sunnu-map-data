@@ -669,7 +669,7 @@ var TrainGame = (function () {
     host.style.background = '#8fd0ee'; host.appendChild(cv); var g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
     var FONT = 'Cubic11, "PingFang TC", sans-serif', INK = '#1b1712', au = TrainAudio.create({ enabled: o.sound, bark: o.bark, diesel: KIND !== 'emu', tod: TOD });
     au.setKind(KIND);
-    var HUDH = 42, BTN_H = 44, BTN_Y = H - BTN_H - 6, INFO_Y = BTN_Y - 58, LVW = 74, LH = H - 6 - (BTN_Y - 58), LVX = 0, LVY = BTN_Y - 58, RAIL = INFO_Y - 40, FX = UX + Math.round(W * (KIND === 'alishan' ? 0.66 : 0.62)), TOP = HUDH + 18, RESBTN = 134;
+    var HUDH = 46, BTN_H = 44, BTN_Y = H - BTN_H - 6, INFO_Y = BTN_Y - 58, LVW = 74, LH = H - 6 - (BTN_Y - 58), LVX = 0, LVY = BTN_Y - 58, RAIL = INFO_Y - 40, FX = UX + Math.round(W * (KIND === 'alishan' ? 0.66 : 0.62)), TOP = HUDH + 18, RESBTN = 134;
     function loadImg(u) { if (!u) return null; var im = new Image(); im.src = u; return im; }
     var STN = { name: (o.station && NAMEFIX[o.station.full]) || (o.station && o.station.name) || '', full: (o.station && o.station.full) || '頂埔火車站', scene: (o.station && o.station.scene) || 'field', img: loadImg(o.station && o.station.img) }, CH = { a: loadImg(o.chars && o.chars.a), b: loadImg(o.chars && o.chars.b), ba: loadImg(o.chars && o.chars.ba), bb: loadImg(o.chars && o.chars.bb), ceo: loadImg(o.chars && o.chars.ceo), bike: loadImg(o.chars && o.chars.bike) };
     (function () { var A = TrainAssets, d = A.stations && A.stations[STN.full]; if (d) { STN.art = mk(d.d, d.w, d.h, A.stpal); STN.art.sign = d.sign; STN.art.plates = d.plates || []; } })();   /* 這站有重畫的大站房就用它，沒有就退回地圖上的小像素圖 */
@@ -1160,12 +1160,12 @@ var TrainGame = (function () {
       R(g, 'rgba(27,23,18,.82)', 0, 0, CW, HUDH); R(g, '#fff6dc', 0, HUDH - 1, CW, 1); g.save(); g.translate(UX, 0);
       /* 左：下一站（小標籤＋大站名）；右：分數或倒數（小標籤＋大數字）；最右：暫停。時速在下方儀表，不在這裡重複 */
       var nm = sim.done ? '終點到了' : String(RT ? RT.infos[sim.sidx].name : (NAMEFIX[STN.full] || STN.full)).replace(/(火)?車站$/, '');
-      var dly = RT && !sim.done && o.isDaily && o.isDaily(RT.infos[sim.sidx].full); txt(sim.done ? '' : (RT ? (dly ? '下一站　★今日任務站' : '下一站') : '停靠'), 6, 11, 11, dly ? '#ffd95a' : '#c9bda5', 'left'); txt(nm, 6, 29, 22, '#fff6dc', 'left');
+      var dly = RT && !sim.done && o.isDaily && o.isDaily(RT.infos[sim.sidx].full); txt(sim.done ? '' : (RT ? (dly ? '下一站　★今日任務站' : '下一站') : '停靠'), 6, 7, 11, dly ? '#ffd95a' : '#c9bda5', 'left'); txt(nm, 6, 25, 22, '#fff6dc', 'left');
       var tl = RT ? P.tMax : sim.phase === 'play' || st.mode === 'paused' || sim.phase === 'result' ? Math.max(0, P.tMax - sim.t) : P.tMax;
-      txt(RT ? '分數' : '剩餘', W - 32, 11, 11, '#c9bda5', 'right'); txt(RT ? String(RT.total) : Math.ceil(tl) + 's', W - 32, 29, 22, RT ? '#ffd95a' : tl < 10 ? '#ec6a5c' : '#fff6dc', 'right');
-      var px = W - 24; R(g, INK, px - 1, 11, 20, 20); R(g, '#fff6dc', px, 12, 18, 18); R(g, '#5b4a2e', px + 5, 15, 3, 12); R(g, '#5b4a2e', px + 10, 15, 3, 12);
-      /* 進度條：列車在整段路上的位置 */
-      var bx = 8, bw = W - 16, by = HUDH + 6; R(g, INK, bx - 1, by - 1, bw + 2, 8); R(g, '#3a3224', bx, by, bw, 6); var tot = RT ? RT.totalLen : sim.startDist, pr = tot > 0 ? Math.max(0, Math.min(1, sim.x / tot)) : 0; R(g, '#86cf62', bx, by, bw * pr, 6); if (RT) { if (bw / RT.lines.length >= 8) RT.lines.forEach(function (l, i) { R(g, i < sim.sidx ? '#86cf62' : '#ffd95a', bx + Math.round(bw * l / tot) - 1, by - 2, 3, 10); }); } else R(g, '#ffd95a', bx + bw - 3, by - 2, 3, 10); R(g, '#fff6dc', bx + bw * pr - 2, by - 2, 4, 10); g.restore();
+      txt(RT ? '分數' : '剩餘', W - 32, 7, 11, '#c9bda5', 'right'); txt(RT ? String(RT.total) : Math.ceil(tl) + 's', W - 32, 25, 22, RT ? '#ffd95a' : tl < 10 ? '#ec6a5c' : '#fff6dc', 'right');
+      var px = W - 24; R(g, INK, px - 1, 6, 20, 20); R(g, '#fff6dc', px, 7, 18, 18); R(g, '#5b4a2e', px + 5, 10, 3, 12); R(g, '#5b4a2e', px + 10, 10, 3, 12);
+      /* 進度條：列車在整段路上的位置（放在資訊列下緣，不蓋住場景和站名牌） */
+      var bx = 8, bw = W - 16, by = HUDH - 8; R(g, INK, bx - 1, by - 1, bw + 2, 7); R(g, '#3a3224', bx, by, bw, 5); var tot = RT ? RT.totalLen : sim.startDist, pr = tot > 0 ? Math.max(0, Math.min(1, sim.x / tot)) : 0; R(g, '#86cf62', bx, by, bw * pr, 5); if (RT) { if (bw / RT.lines.length >= 8) RT.lines.forEach(function (l, i) { R(g, i < sim.sidx ? '#86cf62' : '#ffd95a', bx + Math.round(bw * l / tot) - 1, by - 1, 3, 7); }); } else R(g, '#ffd95a', bx + bw - 3, by - 1, 3, 7); R(g, '#fff6dc', bx + bw * pr - 2, by - 1, 4, 7); g.restore();
     }
     function drawInfo() {
       var IW = W - 16 - LVW - 6;
