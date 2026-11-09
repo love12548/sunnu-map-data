@@ -3616,7 +3616,7 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
   const GAME_VER = {"jeep": "3edea8e7", "train": "cce4c7d6", "dofu": "71f05050", "gym": "09a6168b", "shop": "1a94c594"};
   /* ===== 遊戲按需載入：各遊戲是獨立檔（games/<id>.js），玩到（或預載）才下載，主程式不再背著所有遊戲 ===== */
   let JeepGame, TrainGame, TrainAssets, DofuGame, GymGame, ShopGame;
-  const GAME_BASE = (() => { try { let u = window.__sunnuBase || ''; if (!u) { const el = document.querySelector('script[src*="app.js"]'); u = el ? el.src : ''; } if (!window.__sunnuBase) u = u.replace(/^https?:\/\/love12548\.github\.io\/sunnu-map-data\//, 'https://play.sunnu.co/'); return u.replace(/[^\/]*$/, ''); } catch (e) { return ''; } })();
+  const GAME_BASE = (() => { try { let u = window.__sunnuBase || ''; if (!u) { const el = document.querySelector('script[src*="app.js"]'); u = el ? el.src : ''; } u = u.replace(/^https?:\/\/love12548\.github\.io\/sunnu-map-data\//, 'https://play.sunnu.co/'); return u.replace(/[^\/]*$/, ''); } catch (e) { return ''; } })();
   const SG = (window.__SG = window.__SG || {}), gLoad = {};
   const GAME_BIND = { jeep: m => { JeepGame = m.JeepGame; }, train: m => { TrainGame = m.TrainGame; TrainAssets = m.TrainAssets; }, dofu: m => { DofuGame = m.DofuGame; }, gym: m => { GymGame = m.GymGame; }, shop: m => { ShopGame = m.ShopGame; } };
   const GAME_DEPS = { ring: ['dofu'] };
