@@ -1,44 +1,6 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>孫女遊戲間</title>
-<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
-<meta name="theme-color" content="#ffd45c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="孫女遊戲間">
-<style>
-html,body{margin:0;background:#fbf6ec}
-#pl-bar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:2147483000;max-width:520px;margin:0 auto;background:#fff4da;border:3px solid #3b2a1e;border-radius:12px;box-shadow:0 3px 0 #3b2a1e;padding:8px 10px;font:14px/1.5 system-ui,-apple-system,sans-serif;color:#3b2a1e}
-#pl-bar b{display:block}#pl-bar i{display:block;height:8px;border:2px solid #3b2a1e;border-radius:6px;background:#fff;margin:5px 0;overflow:hidden}#pl-bar i em{display:block;height:100%;width:0;background:#4c8a20}
-#pl-bar button{font:inherit;font-size:13px;padding:5px 9px;border:2px solid #3b2a1e;border-radius:8px;background:#ffd45c;color:#3b2a1e;margin:3px 6px 0 0}
-#pl-bar.min{padding:4px 8px;width:auto;right:auto;left:8px;margin:0}#pl-bar.min>*:not(.pl-h){display:none}
-.pl-h{display:flex;justify-content:space-between;gap:8px;align-items:center}.pl-h button{margin:0}
-</style></head><body>
-<div id="sunnu-app-host"></div>
-<div id="pl-bar"><div class="pl-h"><b id="pl-t">準備離線遊玩…</b><button id="pl-x" type="button" aria-label="收合">－</button></div><i><em id="pl-p"></em></i><div id="pl-s"></div><div><button id="pl-m" type="button" hidden>下載音樂</button></div></div>
-<script>
-window.__sunnuPlay = 1; window.__sunnuBase = new URL('../', location.href).href;
-var $ = function (i) { return document.getElementById(i); }, bar = $('pl-bar'), T = $('pl-t'), S = $('pl-s'), Pg = $('pl-p'), M = $('pl-m');
-/* 玩遊戲時把下載列藏起來，不擋畫面 */
-setInterval(function () { var ar = document.getElementById('smv3-arena'); bar.style.display = ar && !ar.hidden ? 'none' : ''; }, 400);
-$('pl-x').onclick = function () { bar.classList.toggle('min'); $('pl-x').textContent = bar.classList.contains('min') ? '＋' : '－'; };
-function ready(v) { T.textContent = '✅ 已可離線遊玩'; Pg.style.width = '100%'; S.textContent = '飛航模式也能玩。要聽音樂請按下方下載；記得上機前再打開一次確認。'; M.hidden = false; try { localStorage.setItem('sunnuPlayReady', v || '1'); } catch (e) {} setTimeout(function () { if (!bar.classList.contains('min')) $('pl-x').click(); }, 6000); }
-function prog(d, t) { T.textContent = '下載離線遊戲 ' + d + '／' + t; Pg.style.width = Math.round(d / t * 100) + '%'; }
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', function (e) { var m = e.data || {}; if (m.sunnuPlay === 'progress') prog(m.done, m.total); if (m.sunnuPlay === 'ready') ready(m.ver); });
-  navigator.serviceWorker.register('../sw.js', { scope: '../' }).then(function (r) {
-    if (r.active && !r.installing && !r.waiting) { ready(); }
-    r.update && r.update().catch(function () {});
-  }).catch(function (e) { T.textContent = '這個瀏覽器不支援離線'; S.textContent = String(e && e.message || e); });
-} else { T.textContent = '這個瀏覽器不支援離線'; }
-if (!navigator.onLine && !localStorage.getItem('sunnuPlayReady')) { T.textContent = '還沒下載過'; S.textContent = '請先連上網路打開一次，等顯示「已可離線遊玩」。'; }
-/* 音樂：玩家自己決定要不要下載（一首約 3 MB） */
-M.onclick = async function () {
-  M.disabled = true;
-  try {
-    var base = window.__sunnuBase + 'music/', cat = await (await fetch(base + 'catalog.json', { cache: 'no-cache' })).json(), c = await caches.open('sunnu-music'), n = 0, tot = cat.tracks.length, mb = Math.round(cat.tracks.reduce(function (a, t) { return a + (t.size || 0); }, 0) / 1048576);
-    S.textContent = '下載音樂中，約 ' + mb + ' MB…';
-    for (var t of cat.tracks) { var u = base + t.file; if (!(await c.match(u))) { var r = await fetch(u); if (r.ok) await c.put(u, r); } n++; T.textContent = '下載音樂 ' + n + '／' + tot; Pg.style.width = Math.round(n / tot * 100) + '%'; }
-    T.textContent = '✅ 音樂已存好（' + tot + ' 首）'; S.textContent = '離線時也能用音樂盒播放。';
-  } catch (e) { T.textContent = '音樂下載失敗'; S.textContent = '請連上網路再試：' + (e && e.message || e); }
-  M.disabled = false;
-};
-document.write('<script src="../app.js?v=' + (localStorage.getItem('sunnuPlayReady') || Date.now()) + '"><\/script>');
-</script></body></html>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>孫女遊戲間・暫時關閉</title>
+<style>html,body{margin:0;height:100%;background:#fbf6ec;color:#3b2a1e;font:16px/1.7 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}body{display:grid;place-items:center;padding:24px;box-sizing:border-box}
+main{max-width:360px;text-align:center;border:3px solid #3b2a1e;border-radius:14px;background:#fff4da;padding:24px 20px;box-shadow:0 5px 0 #3b2a1e}h1{margin:0 0 8px;font-size:20px}p{margin:0 0 16px}
+a{display:inline-block;padding:10px 18px;border:3px solid #3b2a1e;border-radius:10px;background:#ffd45c;color:#3b2a1e;font-weight:700;text-decoration:none}</style></head><body>
+<main><h1>離線版暫時關閉</h1><p>孫女遊戲間的離線版先暫停開放。遊戲都可以直接在地圖頁玩，你的進度不會受影響。</p><a href="https://www.sunnu.co/pages/map">回到孫女冷門地圖</a></main>
+<script>try{navigator.serviceWorker&&navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.unregister()})})}catch(e){}</script></body></html>
