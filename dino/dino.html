@@ -11,7 +11,7 @@ function recMerge(a, b, p) {
   }
   return a;
 }
-var REC_KEYS = ['sunnuRaceRec', 'sunnuDinoHI', 'sunnuDinoStats', 'sunnuShooterBest', 'sunnuShooterLevel'];
+var REC_KEYS = ['sunnuRaceRec', 'sunnuDinoHI', 'sunnuDinoStats', 'sunnuShooterBest', 'sunnuShooterLevel', 'sunnuStairsBest', 'sunnuStairsMute'];
 /* 紀錄橋（iframe 遊戲內）：把最佳成績等紀錄同步給主頁（主頁存在 sunnu.co、跟著會員存檔走），開啟時再收回主頁存的較好紀錄。
    主頁用網址 #rec=… 把紀錄帶進來，要在遊戲讀取紀錄之前就合併好，所以這段放在最前面。 */
 (function () {
