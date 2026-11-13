@@ -3803,15 +3803,17 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
   const LB_GAMES = { stairs: { name: '孫女下樓梯', unit: '層', order: 'desc', periods: ['d', 'w'], max: 3000 } };
   function lbSubmit(game, score) {
     if (!LB_ON || !mem.id || !LB_GAMES[game] || !(score > 0)) return;
+    try { delete LBC[game]; } catch (e) {}
     try { fetch(SOURCE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ act: 'lb', id: mem.id, g: game, s: score | 0, nick: mem.nick || '旅人' }), keepalive: true }).catch(() => {}); } catch (e) {}
   }
 
   /* 讀榜（JSONP，後台 act=lb）：成功回 {list:[{n,s}],me:{rank,s}|null,total}，失敗回 null */
-  function lbFetch(game, per, cb) {
+  function lbFetch(game, per, cb) { lbFetch1(game, per, d => { if (d) cb(d); else lbFetch1(game, per, cb); }); } /* 失敗自動再試一次 */
+  function lbFetch1(game, per, cb) {
     let done = false; const fin = d => { if (done) return; done = true; cb(d); };
     const fn = '__lbcb' + Date.now().toString(36) + Math.floor(Math.random() * 1e4); const sc = document.createElement('script');
     window[fn] = d => { try { delete window[fn]; } catch (e) { window[fn] = undefined; } sc.remove(); fin(d && d.ok ? d : null); };
-    sc.onerror = () => { sc.remove(); fin(null); }; setTimeout(() => fin(null), 8000);
+    sc.onerror = () => { sc.remove(); fin(null); }; setTimeout(() => fin(null), 12000);
     sc.src = SOURCE + (SOURCE.indexOf('?') < 0 ? '?' : '&') + 'act=lb&g=' + game + '&p=' + per + (mem.id ? '&id=' + mem.id : '') + '&callback=' + fn + '&x=' + Date.now(); document.head.appendChild(sc);
   }
   /* 排行榜面板（通用）：LB_ON=false 時顯示示範資料＋自己在這台裝置的成績；之後接後台只要換 lbFetch */
@@ -3821,9 +3823,11 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
   const lbMineGet = (game, p) => { const o = ((ST().lb || {})[game] || {})[p]; return o && o.k === lbKey(p) ? o.f : 0; };
   const LB_MOCK = ['豆花伯', '小雞快跑', '阿里山小火車', '午仔魚', '夾褲CEO', '鹹水雞', '迷路的旅人', '九份阿婆', '風大飛走', '吉普車手', '洞窟探險家', '港口貓', '車站長', '慢慢走'];
   function lbMock(p) { const seed = Math.floor((Date.now() + 8 * 36e5) / (p === 'd' ? 864e5 : 6048e5)); let x = seed % 977 + 3; const mx = p === 'd' ? 150 : 330, mn = p === 'd' ? 18 : 40; return LB_MOCK.map((n, i) => { x = (x * 9301 + 49297) % 233280; return { n, f: mn + Math.floor(x / 233280 * (mx - mn)) }; }).sort((a, b) => b.f - a.f); }
+  const LBC = {}; /* 排行榜快取：開遊戲時先預讀，打開面板就有資料 */
+  function lbPrefetch(game) { if (!LB_ON) return; const c = LBC[game] || (LBC[game] = {}); ['w', 'd'].forEach(p => { if (!c[p]) lbFetch(game, p, d => { if (d) c[p] = d; }); }); }
   function lbOpen(game, per, opt) {
     const G = LB_GAMES[game]; if (!G) return; per = per || 'd'; let el = document.getElementById('smv3-lb'); if (!el) { el = document.createElement('div'); el.id = 'smv3-lb'; root.appendChild(el); }
-    const cache = {}; const draw = () => { const D = LB_ON ? cache[per] : null; let mine, arr, rank = 0, rows = '';
+    const cache = LBC[game] || (LBC[game] = {}); const draw = () => { const D = LB_ON ? cache[per] : null; let mine, arr, rank = 0, rows = '';
       if (LB_ON) { mine = D && D.me ? D.me.s : 0; rank = D && D.me ? D.me.rank : 0; let LL = ((D && D.list) || []).map(x => ({ n: x.n, f: x.s, me: 0 }));
         const loc = mem.id && D ? lbMineGet(game, per) : 0; /* 剛打完的成績後台還在快取，先用本機成績補上，馬上看得到 */
         if (loc > mine) { mine = loc; LL = LL.filter((x, i) => !(D.me && D.me.rank === i + 1)); rank = LL.filter(x => x.f >= loc).length + 1; LL.splice(rank - 1, 0, { n: mem.nick || '你', f: loc, me: 1 }); }
@@ -3834,13 +3838,14 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
       const wait = LB_ON && !(per in cache);
       arr.slice(0, 11).forEach((x, i) => { rows += !x ? '<div class="lbr sep">…</div>' : '<div class="lbr' + (x.me ? ' me' : '') + '"><span class="rk">' + (x.r || i + 1) + '</span><span class="nm">' + esc(x.n) + '</span><span class="sc">' + x.f + ' ' + G.unit + '</span></div>'; });
       const n = lbTW(), left = per === 'd' ? (864e5 - (n % 864e5)) : (6048e5 - ((n - 3456e5) % 6048e5)); const hh = Math.floor(left / 36e5), dd = Math.floor(hh / 24);
-      el.innerHTML = '<div class="lbbox"><h3>' + esc(G.name) + '・排行榜</h3>' + (opt && opt.fl ? '<p style="margin:0 0 8px;color:#ffd45c">這次走到 ' + opt.fl + ' ' + G.unit + '</p>' : '') + '<div class="lbtabs"><button type="button" data-p="d"' + (per === 'd' ? ' class="on"' : '') + '>今日</button><button type="button" data-p="w"' + (per === 'w' ? ' class="on"' : '') + '>本週</button></div><div class="lbl">' + (wait ? '<div class="lbr sep">讀取中…</div>' : LB_ON && !cache[per] ? '<div class="lbr sep">排行榜暫時讀不到，晚點再試</div>' : rows + (mine ? '' : '<div class="lbr sep">' + (LB_ON && !mem.id ? '登入會員才能上榜' : '你還沒有成績，玩一局上榜吧') + '</div>')) + '</div><p>' + (per === 'd' ? '每天 00:00 重置，還剩 ' + hh + ' 小時' : '每週一 00:00 重置，還剩 ' + dd + ' 天 ' + (hh % 24) + ' 小時') + '</p><p class="lbmk">' + (LB_ON ? (mem.id ? '' : '登入會員成績才會上榜') : '示範資料（還沒連到真正的玩家）') + '</p>' + (opt && opt.again ? '<button type="button" class="lbx y" data-again>再來一次</button> ' : '') + '<button type="button" class="lbx" data-x>關閉</button></div>'; };
-    el.onclick = e => { const b = e.target.closest('button'); if (!b) { if (e.target === el) el.hidden = true; return; } if (b.dataset.x !== undefined) el.hidden = true; else if (b.dataset.again !== undefined) { el.hidden = true; opt.again(); } else if (b.dataset.p) { per = b.dataset.p; draw(); load(); } };
-    const load = () => { if (!LB_ON) return; const p0 = per; if (cache[p0]) return; lbFetch(game, p0, d => { cache[p0] = d; if (!el.hidden && per === p0) draw(); }); };
+      el.innerHTML = '<div class="lbbox"><h3>' + esc(G.name) + '・排行榜</h3>' + (opt && opt.fl ? '<p style="margin:0 0 8px;color:#ffd45c">這次走到 ' + opt.fl + ' ' + G.unit + '</p>' : '') + '<div class="lbtabs"><button type="button" data-p="d"' + (per === 'd' ? ' class="on"' : '') + '>今日</button><button type="button" data-p="w"' + (per === 'w' ? ' class="on"' : '') + '>本週</button></div><div class="lbl">' + (wait ? '<div class="lbr sep">讀取中…</div>' : LB_ON && !cache[per] ? '<div class="lbr sep">排行榜暫時讀不到<br><button type="button" class="lbx" data-retry>重試</button></div>' : rows + (mine ? '' : '<div class="lbr sep">' + (LB_ON && !mem.id ? '登入會員才能上榜' : '你還沒有成績，玩一局上榜吧') + '</div>')) + '</div><p>' + (per === 'd' ? '每天 00:00 重置，還剩 ' + hh + ' 小時' : '每週一 00:00 重置，還剩 ' + dd + ' 天 ' + (hh % 24) + ' 小時') + '</p><p class="lbmk">' + (LB_ON ? (mem.id ? '' : '登入會員成績才會上榜') : '示範資料（還沒連到真正的玩家）') + '</p>' + (opt && opt.again ? '<button type="button" class="lbx y" data-again>再來一次</button> ' : '') + '<button type="button" class="lbx" data-x>關閉</button></div>'; };
+    el.onclick = e => { const b = e.target.closest('button'); if (!b) { if (e.target === el) el.hidden = true; return; } if (b.dataset.x !== undefined) el.hidden = true; else if (b.dataset.again !== undefined) { el.hidden = true; opt.again(); } else if (b.dataset.p) { per = b.dataset.p; draw(); load(); } else if (b.dataset.retry !== undefined) { delete cache[per]; draw(); load(); } };
+    const load = () => { if (!LB_ON) return; const p0 = per; if (cache[p0]) return; delete cache[p0]; draw(); lbFetch(game, p0, d => { cache[p0] = d; if (!el.hidden && per === p0) draw(); }); };
     draw(); el.hidden = false; load();
   }
   V2_GAMES['孫女下樓梯'] = { tip: '左右移動踩樓梯一路往下，別被天花板頂到；越往下越難，走得越深越好。', run(c) {
     setupV2(c); sound = true; soundLabel(); GS.tap(); c.st.classList.add('shoot'); c.st.innerHTML = ''; c.hud.style.setProperty('display', 'none', 'important'); c.say.style.setProperty('display', 'none', 'important');
+    lbPrefetch('stairs');
     const f = document.createElement('iframe'); f.src = stairsBase() + 'stairs.html?embed=1&v=' + STAIRS_VER + (stairsAuto ? '&auto=1' : '') + recHash(); stairsAuto = false; f.allow = 'autoplay'; f.title = '孫女下樓梯'; f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#14100c';
     f.addEventListener('load', () => { try { MP.sync(); } catch (e) {} try { f.focus(); } catch (e) {} });
     c.st.appendChild(f);
