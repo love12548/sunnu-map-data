@@ -3771,7 +3771,7 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
   const STAIRS_PLACE = /基隆嶼/;
   const STAIRS_ENC = { solo: true, oneDiff: true, t: 'mon', n: '孫女下樓梯', s: 'stairsrun', ic: 'my_1', g: '孫女下樓梯', d: 3, w: 0, at: [], i: ['基隆嶼燈塔：往下走吧，一路到海蝕洞和夜霧！', '左右移動踩樓梯，別被天花板頂到，越往下越難。'], win: ['走到好深的地方了！', '燈塔：海風都被你甩在後面。'], lose: ['還沒走到底……', '燈塔：再下一次吧。'], xp: 0 };
   const stairsBase = () => (window.__sunnuPlay || window.__sunnuNative) ? GAME_BASE + 'stairs/' : /^(localhost|127\.|\[::1\]|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)|\.trycloudflare\.com$|\.ngrok(-free)?\.(app|io|dev)$|\.loca\.lt$/.test(location.hostname) ? location.origin + '/上線/stairs/' : 'https://play.sunnu.co/stairs/';
-  const STAIRS_VER = 8; let stairsAuto = false;   /* 死掉後按「再來一次」：直接開局，不再停在標題畫面 */
+  const STAIRS_VER = 9; let stairsAuto = false;   /* 死掉後按「再來一次」：直接開局，不再停在標題畫面 */
   /* 排行榜（通用）：各遊戲在這裡登記榜單，成績由主頁送（iframe 遊戲只要把分數 postMessage 回來）。規劃見 文件/排行榜系統規劃.md。
      LB_ON=false：後台還沒部署排行榜，先不送出。 */
   const LB_ON = true;
@@ -3799,7 +3799,11 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
   function lbOpen(game, per, opt) {
     const G = LB_GAMES[game]; if (!G) return; per = per || 'd'; let el = document.getElementById('smv3-lb'); if (!el) { el = document.createElement('div'); el.id = 'smv3-lb'; root.appendChild(el); }
     const cache = {}; const draw = () => { const D = LB_ON ? cache[per] : null; let mine, arr, rank = 0, rows = '';
-      if (LB_ON) { mine = D && D.me ? D.me.s : 0; rank = D && D.me ? D.me.rank : 0; arr = ((D && D.list) || []).slice(0, 10).map((x, i) => ({ n: x.n, f: x.s, me: rank === i + 1 ? 1 : 0 })); if (mine && rank > 10) arr.push(null, { n: mem.nick || '你', f: mine, me: 1, r: rank }); }
+      if (LB_ON) { mine = D && D.me ? D.me.s : 0; rank = D && D.me ? D.me.rank : 0; let LL = ((D && D.list) || []).map(x => ({ n: x.n, f: x.s, me: 0 }));
+        const loc = mem.id && D ? lbMineGet(game, per) : 0; /* 剛打完的成績後台還在快取，先用本機成績補上，馬上看得到 */
+        if (loc > mine) { mine = loc; LL = LL.filter((x, i) => !(D.me && D.me.rank === i + 1)); rank = LL.filter(x => x.f >= loc).length + 1; LL.splice(rank - 1, 0, { n: mem.nick || '你', f: loc, me: 1 }); }
+        else if (rank) LL.forEach((x, i) => { if (i + 1 === rank) x.me = 1; });
+        arr = LL.slice(0, 10); if (mine && rank > 10) arr.push(null, { n: mem.nick || '你', f: mine, me: 1, r: rank }); }
       else { mine = lbMineGet(game, per); const L = lbMock(per).slice(0, 10); arr = L.map(x => ({ n: x.n, f: x.f })); rank = mine ? L.filter(x => x.f > mine).length + 1 : 0;
         if (mine) { if (rank <= 10) arr.splice(rank - 1, 0, { n: mem.nick || '你', f: mine, me: 1 }); else arr.push(null, { n: mem.nick || '你', f: mine, me: 1, r: rank }); } }
       const wait = LB_ON && !(per in cache);
