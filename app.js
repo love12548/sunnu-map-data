@@ -358,11 +358,28 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
     else if (k === 'exit') setGame(false);
   };
   $('smv3-fx').onclick = closeSheets; $('smv3-dx').onclick = closeSheets;
+  /* 返回鍵：每打開一層畫面（全螢幕地圖／遊戲模式／手機景點抽屜）就在瀏覽器歷史多記一筆；按返回（或 iPhone 左滑）先收最上面一層，都沒開了才離開網頁 */
+  const NAV = { st: [], quiet: 0, ph: 0, popping: false, ready: false, close: {} };
+  setTimeout(() => { NAV.ready = true; }, 2500);   /* 開頁時自動還原的狀態（全螢幕、遊戲模式）不記歷史 */
+  function navOpen(k) { if (!NAV.ready || NAV.popping || NAV.st.includes(k)) return; try { history.pushState({ smv3: k }, ''); NAV.st.push(k); } catch (e) {} }
+  function navDone(k) {
+    const i = NAV.st.lastIndexOf(k); if (i < 0) return; NAV.st.splice(i, 1);
+    if (NAV.popping) { NAV.ph++; return; }
+    if (i === NAV.st.length) { NAV.quiet++; try { history.back(); } catch (e) { NAV.quiet--; } } else NAV.ph++;   /* 自己關掉的是最上面一層：把多記的那筆歷史收回；不是最上層就先留著，之後返回時自動跳過 */
+  }
+  addEventListener('popstate', () => {
+    if (NAV.quiet > 0) { NAV.quiet--; return; }
+    const k = NAV.st.pop();
+    if (!k) { if (NAV.ph > 0) { NAV.ph--; NAV.quiet++; try { history.back(); } catch (e) { NAV.quiet--; } } return; }
+    NAV.popping = true; try { if (NAV.close[k]) NAV.close[k](); } catch (e) {} NAV.popping = false;
+  });
+  NAV.close.full = () => mapFullToggle(false); NAV.close.game = () => setGame(false); NAV.close.drawer = () => drawerSet('peek');
   let mapFull = false;
   const touchy = () => phone() && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
   function mapMode() { if (!map) return; try { map.dragging.enable(); if (map.touchZoom) map.touchZoom.enable(); } catch (e) {} }
   function mapFullToggle(on) {
     if (!on && game && phone() && !PLAY) return; /* 手機遊戲模式一定全螢幕：要離開全螢幕只能關遊戲模式 */
+    if (on) { if (NAV.ready && !(game && phone() && !PLAY)) navOpen('full'); } else navDone('full');
     mapFull = on; store('sunnuFull', on ? '1' : '0'); root.querySelector('.smv3-map-area').classList.toggle('smv3-mapfull', on); drSync(); document.documentElement.style.overflow = on ? 'hidden' : '';
     $('smv3-full').textContent = on ? '✕ 回到頁面' : '⛶ 全螢幕地圖'; stageSet(on && game); mapMode();
     setTimeout(() => { if (map) { map.invalidateSize(); if (glLayer) try { glLayer._update(); } catch (e) {} if (selectedId) { const p = places.find(x => x.id === selectedId); if (p && on) map.panTo([p.lat, p.lng], { animate: false }); } } }, 80);
@@ -500,7 +517,7 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
   const drH = () => innerHeight * .88;
   const drOff = s => s === 'peek' ? drH() - 96 : s === 'half' ? drH() - innerHeight * .42 : 0;
   function drSync() { const sd = drSide(); if (!sd) return; const fs = mapFull && !game && phone(); sd.classList.toggle('dr-hide', fs && drState === 'peek'); sd.classList.toggle('dr-top', fs && drState !== 'peek'); }
-  function drawerSet(s) { const sd = drSide(); drState = s; { const dh0 = $('smv3-dh'), hb = dh0 && dh0.querySelector('b'), up = s === 'peek' || s === 'card'; if (hb) hb.textContent = up ? '▲ 拖曳或點我展開清單' : '▼ 點我收起清單'; if (dh0) dh0.setAttribute('aria-label', up ? '拖曳或點我展開清單' : '點我收起清單'); } sd.style.transition = ''; if (s === 'card') { sd.classList.add('dr-card'); sd.style.transform = ''; } else { sd.classList.remove('dr-card'); drCur = drOff(s); sd.style.transform = 'translateY(' + drCur + 'px)'; } drSync(); }
+  function drawerSet(s) { const sd = drSide(); drState = s; if (s === 'half' || s === 'full') navOpen('drawer'); else navDone('drawer'); { const dh0 = $('smv3-dh'), hb = dh0 && dh0.querySelector('b'), up = s === 'peek' || s === 'card'; if (hb) hb.textContent = up ? '▲ 拖曳或點我展開清單' : '▼ 點我收起清單'; if (dh0) dh0.setAttribute('aria-label', up ? '拖曳或點我展開清單' : '點我收起清單'); } sd.style.transition = ''; if (s === 'card') { sd.classList.add('dr-card'); sd.style.transform = ''; } else { sd.classList.remove('dr-card'); drCur = drOff(s); sd.style.transform = 'translateY(' + drCur + 'px)'; } drSync(); }
   function toggleFav(id) { favs = isFav(id) ? favs.filter(x => x !== id) : favs.concat(id); store('sunnuFav', JSON.stringify(favs)); memSave(); render(); const h = $('smv3-list').querySelector('[data-heart="' + id + '"]'); if (h) h.classList.add('bump'); if (isFav(id)) toast('已加入收藏　在「♥ 收藏」分頁可以看到', 2400); }
   function dtabsUi() { drSide().classList.toggle('dtab-f', dtab === 'f'); drSide().classList.toggle('dr-list', isDrawer() && dtab !== 'p' && !detailOpen); drSide().querySelectorAll('[data-dt]').forEach(b => { b.classList.toggle('on', b.dataset.dt === dtab); if (b.dataset.dt === 'f') b.textContent = '♥ 收藏' + (favs.length ? ' ' + favs.length : ''); }); }
   function drawerFlat() { if (!isDrawer()) { if (!game && dtab === 'f') { dtabsUi(); return true; } dtabsUi(); return false; } dtabsUi(); return dtab !== 'v'; }
@@ -4949,6 +4966,7 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
     if (on && near) nearOff();
     if (on) loadMonsterSwitches();
     game = on; store('sunnuGame', on ? '1' : '0'); root.querySelector('.smv3-side').removeAttribute('style'); if (!on && mapFull) mapFullToggle(false);
+    if (on && !quiet) navOpen('game'); else if (!on) navDone('game');
     root.classList.toggle('smv3-game', on);
     if (!on && mapFull && !phone()) mapFullToggle(false);
     setTimeout(() => { try { if (map) { map.invalidateSize(); if (glLayer) glLayer._update(); } } catch (e) {} }, 150);
