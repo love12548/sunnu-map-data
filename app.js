@@ -3,6 +3,14 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
   const root = document.getElementById('sunnu-map-app-v3');
   const $ = id => root.querySelector('#' + id);
   const reduced = () => matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* 載入保險：開頁 30 秒內程式出錯，就在頁面上顯示一小塊錯誤訊息和「重新整理」，不再整片空白（方便回報；之後出錯的不顯示） */
+  (function () {
+    const show = m => { try { if (performance.now() > 30000 || root.querySelector('#smv3-errbox')) return; const b = document.createElement('div'); b.id = 'smv3-errbox'; b.style.cssText = 'margin:12px;padding:12px;border:2px solid #1b1712;border-radius:8px;background:#fff6e0;color:#1b1712;font:14px/1.5 sans-serif;word-break:break-all';
+      b.innerHTML = '<b>地圖載入遇到問題</b><br>請按「重新整理」；還是一樣的話，把下面這行截圖給孫女：<br><code></code><br><button type="button" style="margin-top:8px;padding:8px 14px;border:2px solid #1b1712;border-radius:6px;background:#ffd45c;font:inherit">重新整理</button>';
+      b.querySelector('code').textContent = String(m).slice(0, 220); b.querySelector('button').onclick = () => location.reload(); root.insertBefore(b, root.firstChild); } catch (e) {} };
+    addEventListener('error', e => { if (!e.filename || /app\.js/.test(e.filename)) show((e.message || 'error') + ' @' + (e.lineno || '?') + ':' + (e.colno || '?')); });
+    addEventListener('unhandledrejection', e => show('promise: ' + (e.reason && e.reason.message || e.reason)));
+  })();
   (function(){ if (typeof AudioNode === 'undefined' || AudioNode.prototype.__sfxPatched) return; AudioNode.prototype.__sfxPatched = true;   /* 音樂盒的「遊戲音效」大小聲：所有連到喇叭的聲音多繞過一個總音量節點 */
     const orig = AudioNode.prototype.connect, gains = [], vol = () => (window.__sunnuSfxVol == null ? 1 : window.__sunnuSfxVol);
     window.__sunnuSfxApply = () => { gains.forEach(g => { try { g.gain.value = vol(); if (g.context.state !== 'running') g.context.resume(); } catch (e) {} }); };
