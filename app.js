@@ -359,21 +359,45 @@ window.__sunnuBase=window.__sunnuBase||(document.currentScript&&document.current
   };
   $('smv3-fx').onclick = closeSheets; $('smv3-dx').onclick = closeSheets;
   /* 返回鍵：每打開一層畫面（全螢幕地圖／遊戲模式／手機景點抽屜）就在瀏覽器歷史多記一筆；按返回（或 iPhone 左滑）先收最上面一層，都沒開了才離開網頁 */
-  const NAV = { st: [], quiet: 0, ph: 0, popping: false, ready: false, close: {} };
-  setTimeout(() => { NAV.ready = true; }, 2500);   /* 開頁時自動還原的狀態（全螢幕、遊戲模式）不記歷史 */
-  function navOpen(k) { if (!NAV.ready || NAV.popping || NAV.st.includes(k)) return; try { history.pushState({ smv3: k }, ''); NAV.st.push(k); } catch (e) {} }
+  const NAV = { st: [], en: [], pend: new Set(), pred: {}, quiet: 0, popping: false, ready: false, close: {} };   /* st＝目前開著的層；en＝瀏覽器歷史每一筆對應哪一層（null＝已關掉但歷史還留著的空筆） */
+  const NAV_BOOT = (() => { try { return history.state && history.state.smv3 || ''; } catch (e) { return ''; } })();   /* 重新整理時瀏覽器會保留這一筆的標記 */
+  setTimeout(() => { NAV.ready = true; try { if (NAV_BOOT && NAV.pred[NAV_BOOT] && NAV.pred[NAV_BOOT]() && !NAV.st.includes(NAV_BOOT)) { NAV.st.push(NAV_BOOT); NAV.en.push(NAV_BOOT); } } catch (e) {} }, 2500);   /* 重新整理後還原的那一層，對上原本的歷史筆，返回才不會白按一次 */   /* 開頁時自動還原的狀態（全螢幕、遊戲模式）不記歷史 */
+  function navOpen(k) { if (!NAV.ready || NAV.popping || NAV.st.includes(k)) return; if (NAV.quiet > 0) { NAV.pend.add(k); return; }   /* 還有「收回歷史」的退步沒跑完：先排隊，跑完再開，否則新的一筆會被誤退掉 */
+    try { history.pushState({ smv3: k }, ''); NAV.st.push(k); NAV.en.push(k); } catch (e) {} }
+  function navTrim() { let n = 0; while (NAV.en.length && NAV.en[NAV.en.length - 1] === null) { NAV.en.pop(); n++; } return n; }   /* 最上面連續的空筆一起清掉，回傳筆數 */
+  function navFlush() { const q = [...NAV.pend]; NAV.pend.clear(); q.forEach(k => { try { if (NAV.pred[k] && NAV.pred[k]()) navOpen(k); } catch (e) {} }); navSync(); }
+  function navGo(n) { if (n < 1) return; NAV.quiet++; try { history.go(-n); } catch (e) { NAV.quiet--; } }
   function navDone(k) {
     const i = NAV.st.lastIndexOf(k); if (i < 0) return; NAV.st.splice(i, 1);
-    if (NAV.popping) { NAV.ph++; return; }
-    if (i === NAV.st.length) { NAV.quiet++; try { history.back(); } catch (e) { NAV.quiet--; } } else NAV.ph++;   /* 自己關掉的是最上面一層：把多記的那筆歷史收回；不是最上層就先留著，之後返回時自動跳過 */
+    const j = NAV.en.lastIndexOf(k); if (j < 0) return;
+    if (!NAV.popping && j === NAV.en.length - 1) { NAV.en.pop(); navGo(1 + navTrim()); }   /* 自己關掉的是最上面一層：把多記的那筆歷史（連同下面的空筆）一起收回 */
+    else NAV.en[j] = null;   /* 不是最上層：那筆歷史先留著當空筆，等上面的層都收掉時一起跳過，不會白按一次 */
   }
+  if (/[?&]debug/.test(location.search)) window.__nav = NAV;
   addEventListener('popstate', () => {
-    if (NAV.quiet > 0) { NAV.quiet--; return; }
-    const k = NAV.st.pop();
-    if (!k) { if (NAV.ph > 0) { NAV.ph--; NAV.quiet++; try { history.back(); } catch (e) { NAV.quiet--; } } return; }
+    if (NAV.quiet > 0) { NAV.quiet--; if (!NAV.quiet) navFlush(); return; }
+    if (!NAV.en.length) return;
+    const k = NAV.en.pop(); if (k === null) return;
+    const i = NAV.st.lastIndexOf(k); if (i >= 0) NAV.st.splice(i, 1);
     NAV.popping = true; try { if (NAV.close[k]) NAV.close[k](); } catch (e) {} NAV.popping = false;
+    navGo(navTrim());   /* 收掉這層後，下面若是空筆就一起退過去，畫面才不會「按了沒反應」 */
   });
-  NAV.close.full = () => mapFullToggle(false); NAV.close.game = () => setGame(false); NAV.close.drawer = () => drawerSet('peek');
+  NAV.close.full = () => mapFullToggle(false); NAV.close.game = () => setGame(false); NAV.close.drawer = () => drawerSet('peek'); 
+  /* 其他會蓋住畫面的面板（圖鑑／商店、排行榜、手機底部面板、歡迎卡）：偵測到打開就記一層歷史，返回先收它，不會一口氣退出遊戲模式 */
+  const NAV_OV = [
+    { k: 'arena', on: () => { const e = $('smv3-arena'); return !!e && !e.hidden; }, off: () => arenaClose() },   /* 遊戲／對戰視窗：返回先關它，回到遊戲模式地圖 */
+    { k: 'dex', on: () => { const e = $('smv3-dexpanel'); return !!e && !e.hidden; }, off: () => { $('smv3-dexpanel').hidden = true; } },
+    { k: 'lb', on: () => { const e = $('smv3-lb'); return !!e && !e.hidden; }, off: () => { $('smv3-lb').hidden = true; } },
+    { k: 'sheet', on: () => { const a = areaEl(); return !!a && (a.classList.contains('smv3-sh-f') || a.classList.contains('smv3-sh-d')); }, off: () => closeSheets() },
+    { k: 'music', on: () => { const e = document.querySelector('.smv3-mp-panel'); return !!e && !e.hidden; }, off: () => { const b = document.querySelector('.smv3-mp-panel [data-a="close"]'); if (b) b.click(); else { const e = document.querySelector('.smv3-mp-panel'); if (e) e.hidden = true; } } },   /* 音樂盒面板（掛在 body，不在 root 裡，由 toggleUi 直接通知） */
+    { k: 'peek', on: () => { const e = $('smv3-peek'); return !!e && !e.hidden && game; }, off: () => { $('smv3-peek').hidden = true; } },
+    { k: 'welcome', on: () => !!root.querySelector('.smv3-welcome'), off: () => { const b = root.querySelector('.smv3-welcome button'); if (b) b.click(); } }
+  ];
+  NAV_OV.forEach(o => { NAV.close[o.k] = o.off; NAV.pred[o.k] = o.on; });
+  NAV.pred.game = () => game; NAV.pred.full = () => mapFull; NAV.pred.drawer = () => drState === 'half' || drState === 'full'; 
+  let navSyncQ = false;
+  function navSync() { navSyncQ = false; try { NAV_OV.forEach(o => { const on = o.on(), has = NAV.st.includes(o.k); if (on && !has) navOpen(o.k); else if (!on && has) navDone(o.k); }); } catch (e) {} }
+  try { new MutationObserver(() => { if (navSyncQ) return; navSyncQ = true; setTimeout(navSync, 0); }).observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'class'] }); } catch (e) {}
   let mapFull = false;
   const touchy = () => phone() && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
   function mapMode() { if (!map) return; try { map.dragging.enable(); if (map.touchZoom) map.touchZoom.enable(); } catch (e) {} }
@@ -5109,7 +5133,7 @@ if (typeof window !== 'undefined') window.PixFx = PixFx;
       document.addEventListener('keydown', e => { if (open && e.key === 'Escape') toggleUi(false); });
     };
     const favToggle = id => { if (!id) return; const i = prefs.favs.indexOf(id); if (i < 0) prefs.favs.push(id); else prefs.favs.splice(i, 1); save(); paint(); };
-    const toggleUi = v => { open = v === undefined ? !open : v; if (open && !prefs.seen) { prefs.seen = true; save(); } panel.hidden = !open; chip.classList.toggle('on', open); place(); paint(); if (open) { const cur = panel.querySelector('.mp-row.on'); if (cur && cur.scrollIntoView) { try { cur.scrollIntoView({ block: 'nearest' }); } catch (e) {} } } };
+    const toggleUi = v => { open = v === undefined ? !open : v; if (open && !prefs.seen) { prefs.seen = true; save(); } panel.hidden = !open; chip.classList.toggle('on', open); try { navSync(); } catch (e) {} place(); paint(); if (open) { const cur = panel.querySelector('.mp-row.on'); if (cur && cur.scrollIntoView) { try { cur.scrollIntoView({ block: 'nearest' }); } catch (e) {} } } };
     const place = () => {
       if (!chip || chip.hidden && !open) return;
       const vw = innerWidth, vh = innerHeight, mob = vw <= 600, cw = chip.offsetWidth || 44, ch = chip.offsetHeight || 44, cl = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
