@@ -71,7 +71,7 @@ var cv=document.getElementById('c'),g=cv.getContext('2d'),VIG=null;
 /* 手機（直立）：寬度鋪滿、高度依螢幕比例延伸到滿版；電腦：整數倍放大 */
 function fit(){var iw=innerWidth,ih=innerHeight,sc;
   if(iw<=720&&ih>iw){sc=iw/W;H=Math.max(320,Math.min(620,Math.round(ih/sc)))}
-  else{H=360;sc=Math.max(1,Math.floor(Math.min(iw/W,ih/H)))}
+  else{sc=Math.max(1,Math.floor(Math.min(iw/W,ih/320)*4)/4);H=Math.max(320,Math.min(620,Math.floor(ih/sc)))}
   SC=sc;cv.width=W;cv.height=H;cv.style.width=Math.round(W*sc)+'px';cv.style.height=Math.round(H*sc)+'px';VIG=null}
 addEventListener('resize',fit);fit();
 /* 單一難度：越往下越難（上升速度、事件頻率、海風都隨層數增加；愛心也越來越稀有） */
